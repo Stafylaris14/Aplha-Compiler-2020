@@ -18,6 +18,7 @@ struct alpha_token_t
     char* value;
     char* type;
     char* category;
+    char* sub_category;
     struct alpha_token_t *next;
 }typedef token;
 
@@ -27,7 +28,7 @@ struct alpha_token_t
 
 void insert( token* newNode);
 
-token* createNewNode(int lineNo , int token_counter , char* value , char* type , char* category);
+token* createNewNode(int lineNo , int token_counter , char* value , char* type ,char* sub_category, char* category);
 
 void printList();
 
