@@ -32,15 +32,16 @@ token* head = NULL , *last = NULL;
 
 
 
-token* createNewNode(int lineNo , int token_counter , char* value , char* type , char* category)
+token* createNewNode(int lineNo , int token_counter , char* value , char* type ,char* sub_category, char* category)
 {
     token* newNode ;
     newNode = malloc(sizeof(token));
     newNode->lineNo = lineNo;
     newNode->token_counter = token_counter;
     newNode->value = strdup(value);
-    newNode->type = type;
-    newNode->category = category;
+    newNode->type = strdup(type);
+    newNode->category = strdup(category);
+    newNode->sub_category = strdup(sub_category);
     newNode->next = NULL;
     return newNode;
 }
@@ -62,25 +63,19 @@ void insert(token* node)
 }
 
 
-
-
-
 void printList()
 {
     struct alpha_token_t *tmp = head;
     yel();
     fprintf(stderr,"------------- Lexical Analysis -------------\n");
     cyn();
-    while(tmp->next != NULL){
-        fprintf(stderr ," %d:  #%d (\"%s\") %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->category);   
+    while(tmp != NULL){
+        if(!strcmp(tmp->type,"ID") || !strcmp(tmp->type,"STRING")){
+            fprintf(stderr ," %d:  #%d (\"%s\") %s \"%s\" <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);
+        }else  fprintf(stderr ," %d:  #%d (\"%s\") %s %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);   
         tmp = tmp->next;
     }
-    fprintf(stderr,"%s", KWHT);
-    
-        fprintf(stderr ," %d:  #%d (\"%s\") %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->category);   
-        tmp = tmp->next;
-    }
-    fprintf(stderr,"%s", KWHT);
+    fprintf(stderr,"%s" , KWHT);
     
 }
 

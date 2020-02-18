@@ -1,15 +1,13 @@
 lex:
 	flex -o scanner.c scanner.l
 	
-
-
-
-scanner:scanner.c linkedList.c
+scanner:scanner.l linkedList.c
+	flex -o scanner.c scanner.l
 	gcc -c linkedList.c
 	gcc -c scanner.c
 	gcc -o scanner scanner.o linkedList.o
 
-test:
+test:scanner
 	./scanner Testfile.txt
 
 
