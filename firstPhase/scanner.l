@@ -25,6 +25,8 @@
 
 
 
+
+
 /*regex*/
 
 id                          [a-zA-Z][a-zA-Z_0-9]*
@@ -34,9 +36,7 @@ space                       [ \r\n\t\v]
 comment1                    "//".*
 comment2                    "#".*
 
-
-
-
+ 
 
 /*keywords*/
 
@@ -96,17 +96,30 @@ other                 .
     
 %%
 
-{id} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"enumerated"); 
-        insert(tmp);
-    }
-{comment1} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "COMMENT", "COMMENT1","enumerated"); 
+
+{comment1} {token* tmp = createNewNode(yylineno , token_counter++ , "" , "COMMENT", "LINE_COMMENT","enumerated"); 
         insert(tmp);
     }
 {comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext ,"COMMENT", "COMMENT2","enumerated"); 
         insert(tmp);
     }  
+{if} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);}
+{else} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "ELSE" , "keyword");insert(tmp);}
+{while} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "WHILE" , "keyword");insert(tmp);}
+{for} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FOR" , "keyword");insert(tmp);}
+{function} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FUNCTION" , "keyword");insert(tmp);}
+{return} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "RETURN" , "keyword");insert(tmp);}
+{break} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "BREAK" , "keyword");insert(tmp);}
+{continue} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "CONTINUE" , "keyword");insert(tmp);}
+{and} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "AND" , "keyword");insert(tmp);}
+{not} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NOT" , "keyword");insert(tmp);}
+{or} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "OR" , "keyword");insert(tmp);}
+{local} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "LOCAL" , "keyword");insert(tmp);}
+{true} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "TRUE" , "keyword");insert(tmp);}
+{false} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FALSE" , "keyword");insert(tmp);}
+{nil} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NIL" , "keyword");insert(tmp);}
 {integer} {
-        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "INTCONST" , yytext ,"enumerated");
+        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "CONST_INT" , yytext ,"integer");
         
         insert(tmp);
     }
@@ -157,11 +170,6 @@ other                 .
 {l_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS_EQUAL","enumerated"); 
         insert(tmp);
     }
-
-
-
-
-
 {left_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_CURLY_BRACE","enumerated"); 
         insert(tmp);
     }
@@ -198,6 +206,11 @@ other                 .
 {double_dots} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_DOTS","enumerated"); 
         insert(tmp);
     }
+
+{id} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"char*"); 
+        insert(tmp);
+    }
+
 {other} {
         red();
        

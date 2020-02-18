@@ -72,7 +72,7 @@ void printList()
     while(tmp != NULL){
         if(!strcmp(tmp->type,"ID") || !strcmp(tmp->type,"STRING")){
             fprintf(stderr ," %d:  #%d (\"%s\") %s \"%s\" <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);
-        }else fprintf(stderr ," %d:  #%d (\"%s\") %s %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);   
+        }else  fprintf(stderr ," %d:  #%d (\"%s\") %s %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);   
         tmp = tmp->next;
     }
     fprintf(stderr,"%s" , KWHT);
