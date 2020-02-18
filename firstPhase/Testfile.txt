@@ -1,0 +1,3 @@
+23   5.5
+myvariable
+32s
