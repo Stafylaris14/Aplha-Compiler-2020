@@ -30,8 +30,7 @@
 id                          [a-zA-Z][a-zA-Z_0-9]*
 integer                     (0[xX][0-9A-Fa-f]+)|([0-9]+)
 real                        [0-9]*\.[0-9](e|E)?[0-9]*
-space                       [\r\n\t\v]
-newline                     "\\n"
+space                       [ \r\n\t\v]
 
 comment1                    "//".*
 comment2                    "#".*
@@ -108,17 +107,15 @@ other                 .
 {comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "COMMENT2","enumerated"); 
         insert(tmp);
     }  
-{integer} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "INTCONST","enumerated"); 
+{integer} {
+        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "INTCONST","enumerated");
+        
         insert(tmp);
     }
 {real} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "REALCONST","enumerated"); 
         insert(tmp);
     }
-{space} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "SPACE","enumerated"); 
-        insert(tmp);
-    }
-{newline} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "NEWLINE","enumerated"); 
-        insert(tmp);
+{space} {
     }
 {multyLineComment} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "COMMENT_BLOCK_COMMENT","enumerated"); 
         insert(tmp);

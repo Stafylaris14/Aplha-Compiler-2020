@@ -400,7 +400,7 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         2,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    4,    1,    5,    1,    6,    1,    1,    7,
+        1,    2,    4,    1,    5,    1,    6,    1,    1,    7,
         8,    9,   10,   11,   12,   13,   14,   15,   16,   16,
        16,   16,   16,   16,   16,   16,   16,   17,   18,   19,
        20,   21,    1,    1,   22,   22,   22,   22,   23,   22,
@@ -835,13 +835,15 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 111 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "INTCONST","enumerated"); 
+{
+        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "INTCONST","enumerated");
+        
         insert(tmp);
     }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 114 "scanner.l"
+#line 116 "scanner.l"
 {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "REALCONST","enumerated"); 
         insert(tmp);
     }
@@ -849,16 +851,14 @@ YY_RULE_SETUP
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 117 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "SPACE","enumerated"); 
-        insert(tmp);
+#line 119 "scanner.l"
+{
     }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 120 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "NEWLINE","enumerated"); 
-        insert(tmp);
+#line 121 "scanner.l"
+{
     }
 	YY_BREAK
 case 8:
