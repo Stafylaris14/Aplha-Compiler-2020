@@ -6,11 +6,14 @@
     #define YY_NO_UNISTD_H
     static int isatty{int i} {return 0;}
     #endif
+    int token_counter = 0;
 
+    
+    #include "linkedList.h"
+        
+    #define  YY_DECL int alpha_yylex ()
+   
 
-    #include <stdlib.h>
-    #include <string.h>
-    #include <stdio.h>
     /*
     Includes 
     */
@@ -18,6 +21,7 @@
 
 %option noyywrap
 %option yylineno
+
 
 
 
@@ -89,53 +93,133 @@ colon                 ":"
 double_colons         "::"
 dot                   "."
 double_dots           ".."
-
+other                 .
 
 
     
 %%
 
-{id} {fprintf(stderr , "Found a Id in line %d with value %s\n" , yylineno , yytext);}
-{comment1} {fprintf(stderr , "Found a singlecomment1 in line %s \n" , yytext);}
-{integer} {fprintf(stderr , "found an integer in line %d , with value %s\n" , yylineno , yytext);}
-{real} {fprintf(stderr , "found an real in line %d , with value %s\n" , yylineno , yytext);}
-{space} {fprintf(stderr , "found an space in line %d , with value %s\n" , yylineno , yytext);}
-{newline} {fprintf(stderr , "found an newline in line %d , with value %s\n" , yylineno , yytext);}
-{multyLineComment} {fprintf(stderr , "found an multyLineComment in line %d \n" , yylineno);}
+{id} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID","enumerated"); 
+        insert(tmp);
+    }
+{comment1} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "COMMENT1","enumerated"); 
+        insert(tmp);
+    }
+{comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "COMMENT2","enumerated"); 
+        insert(tmp);
+    }  
+{integer} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "INTCONST","enumerated"); 
+        insert(tmp);
+    }
+{real} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "REALCONST","enumerated"); 
+        insert(tmp);
+    }
+{space} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "SPACE","enumerated"); 
+        insert(tmp);
+    }
+{newline} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "NEWLINE","enumerated"); 
+        insert(tmp);
+    }
+{multyLineComment} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "COMMENT_BLOCK_COMMENT","enumerated"); 
+        insert(tmp);
+    }
 
 
-{assign} {fprintf(stderr , "found an assignment in line %d , with value %s\n" , yylineno , yytext);}
-{plus} {fprintf(stderr , "found a plus in line %d , with value %s\n" , yylineno , yytext);}
-{minus} {fprintf(stderr , "found an minus in line %d , with value %s\n" , yylineno , yytext);}
-{multiply} {fprintf(stderr , "found a multiply in line %d , with value %s\n" , yylineno , yytext);}
-{division} {fprintf(stderr , "found a division in line %d , with value %s\n" , yylineno , yytext);}
-{mod} {fprintf(stderr , "found a mod in line %d , with value %s\n" , yylineno , yytext);}
-{equal} {fprintf(stderr , "found an equal in line %d , with value %s\n" , yylineno , yytext);}
-{n_equal} {fprintf(stderr , "found a not equal in line %d , with value %s\n" , yylineno , yytext);}
-{plus_plus} {fprintf(stderr , "found a plus plus in line %d , with value %s\n" , yylineno , yytext);}
-{minus_minus} {fprintf(stderr , "found a minus minus in line %d , with value %s\n" , yylineno , yytext);}
-{greater} {fprintf(stderr , "found a greater in line %d , with value %s\n" , yylineno , yytext);}
-{less} {fprintf(stderr , "found a less in line %d , with value %s\n" , yylineno , yytext);}
-{g_equal} {fprintf(stderr , "found a greater equal in line %d , with value %s\n" , yylineno , yytext);}
-{l_equal} {fprintf(stderr , "found a less equal in line %d , with value %s\n" , yylineno , yytext);}
+
+
+{assign} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_ASSIGN","enumerated"); 
+        insert(tmp);
+    }
+{plus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_PLUS","enumerated"); 
+        insert(tmp);
+    }
+{minus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_MINUS","enumerated"); 
+        insert(tmp);
+    }
+{multiply} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_MULTIPLY","enumerated"); 
+        insert(tmp);
+    }
+{division} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_DIVISION","enumerated"); 
+        insert(tmp);
+    }
+{mod} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_MOD","enumerated"); 
+        insert(tmp);
+    }
+{equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_EQUAL","enumerated"); 
+        insert(tmp);
+    }
+{n_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_NOT_EQUAL","enumerated"); 
+        insert(tmp);
+    }
+{plus_plus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_PLUS_PLUS","enumerated"); 
+        insert(tmp);
+    }
+{minus_minus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_MINUS_MINUS","enumerated"); 
+        insert(tmp);
+    }
+{greater} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_GREATER","enumerated"); 
+        insert(tmp);
+    }
+{less} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_LESS","enumerated"); 
+        insert(tmp);
+    }
+{g_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_GREATER_EQUAL","enumerated"); 
+        insert(tmp);
+    }
+{l_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR_LESS_EQUAL","enumerated"); 
+        insert(tmp);
+    }
 
 
 
 
 
-{left_curle_bracket} {fprintf(stderr , "found a left curle bracket in line %d \n" ,yylineno);}
-{right_curle_bracket} {fprintf(stderr , "found a right curle bracket in line %d \n" ,yylineno);}
-{left_bracket} {fprintf(stderr , "found a left curle bracket in line %d \n" , yylineno);}
-{right_bracket} {fprintf(stderr , "found a right curle bracket in line %d \n" , yylineno);}
-{left_parenthesis} {fprintf(stderr , "found an left_parenthesis in line %d , with value %s\n" , yylineno , yytext);}
-{right_parenthesis} {fprintf(stderr , "found an right_parenthesis in line %d , with value %s\n" , yylineno , yytext);}
-{semicolon} {fprintf(stderr , "found an semicolon in line %d , with value %s\n" , yylineno , yytext);}
-{comma} {fprintf(stderr , "found an comma in line %d , with value %s\n" , yylineno , yytext);}
-{colon} {fprintf(stderr , "found an colon in line %d , with value %s\n" , yylineno , yytext);}
-{double_colons} {fprintf(stderr , "found an double_colons in line %d , with value %s\n" , yylineno , yytext);}
-{dot} {fprintf(stderr , "found an dot in line %d , with value %s\n" , yylineno , yytext);}
-{double_dots} {fprintf(stderr , "found an double_dots in line %d , with value %s\n" , yylineno , yytext);}
-
+{left_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_LEFT_CURLY_BRACE","enumerated"); 
+        insert(tmp);
+    }
+{right_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_RIGHT_CURLY_BRACE","enumerated"); 
+        insert(tmp);
+    }
+{left_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_LEFT_BRACE","enumerated"); 
+        insert(tmp);
+    }
+{right_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_RIGHT_BRACE","enumerated"); 
+        insert(tmp);
+    }
+{left_parenthesis} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_LEFT_PARENTHESIS","enumerated"); 
+        insert(tmp);
+    }
+{right_parenthesis} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_RIGHT_PARENTHESIS","enumerated"); 
+        insert(tmp);
+    }
+{semicolon} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_SEMI_COLON","enumerated"); 
+        insert(tmp);
+    }
+{comma} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_COMMA","enumerated"); 
+        insert(tmp);
+    }
+{colon} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_COLON","enumerated"); 
+        insert(tmp);
+    }
+{double_colons} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_DOUBLE_COLONS","enumerated"); 
+        insert(tmp);
+    }
+{dot} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_DOT","enumerated"); 
+        insert(tmp);
+    }
+{double_dots} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION_DOUBLE_DOTS","enumerated"); 
+        insert(tmp);
+    }
+{other} {
+        red();
+       
+        fprintf(stderr , "UNDEFINED CHARACTER");
+        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "UNDEFINED_TOKEN","enumerated"); 
+        insert(tmp);
+    
+        
+        wht();
+    }
 
 %%
 
@@ -148,11 +232,13 @@ int main(int argc , char** argv)
     if(argc>1)
     {
         if(!(yyin = fopen(argv[1] , "r"))){
+            
             fprintf(stderr , "Cannot open file\n");    
         }
     }else
         yyin = stdin;
     
-    yylex();
+    alpha_yylex();
+    printList();
     return 0;
 }
