@@ -38,7 +38,7 @@ token* createNewNode(int lineNo , int token_counter , char* value , char* type ,
     newNode = malloc(sizeof(token));
     newNode->lineNo = lineNo;
     newNode->token_counter = token_counter;
-    newNode->value = value;
+    newNode->value = strdup(value);
     newNode->type = type;
     newNode->category = category;
     newNode->next = NULL;
@@ -56,7 +56,7 @@ void insert(token* node)
         last = node;
     }
     grn();
-    fprintf(stderr,"added new Node with value: %s ..." , node->value);
+    fprintf(stderr,"added new Node with value: (%s) ..." , node->value);
     wht();
         
 }
@@ -72,10 +72,16 @@ void printList()
     fprintf(stderr,"------------- Lexical Analysis -------------\n");
     cyn();
     while(tmp->next != NULL){
-        fprintf(stderr ,"%d: #%d \"%s\" %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->category);   
+        fprintf(stderr ," %d:  #%d (\"%s\") %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->category);   
         tmp = tmp->next;
     }
-    wht();
+    fprintf(stderr,"%s", KWHT);
+    
+        fprintf(stderr ," %d:  #%d (\"%s\") %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->category);   
+        tmp = tmp->next;
+    }
+    fprintf(stderr,"%s", KWHT);
+    
 }
 
 
