@@ -3,9 +3,13 @@
 #include <string.h>
 #include <stdio.h>
 
+
+
+
+
 void printStack()
 {
-    printf("prepei na kanw pring\n" );
+    // printf("prepei na kanw pring\n" );
     stack* tmp = top;
     while(tmp != NULL){
         fprintf(stderr , "tmp->line  %d\n" , tmp->lineNo);
@@ -31,7 +35,7 @@ void push(int lineNo)
         top =  tmp;
     }
 
-    fprintf(stderr , "pushed synartisi to %d\n",lineNo);
+    // fprintf(stderr , "pushed synartisi to %d\n",lineNo);
 
 }
 
@@ -39,7 +43,7 @@ void push(int lineNo)
 int isEmpty()
 {
     if(top == NULL){return 1;
-      fprintf(stderr , "ADEIA LISTA\n" );
+    //   fprintf(stderr , "ADEIA LISTA\n" );
     }
     else return 0;
 }
@@ -54,7 +58,7 @@ int pop()
     int line = toPop->lineNo;
     free(toPop);
 
-    fprintf(stderr , "Poped synartis %d\n",line);
+    // fprintf(stderr , "Poped synartis %d\n",line);
     return line;
 
 }
