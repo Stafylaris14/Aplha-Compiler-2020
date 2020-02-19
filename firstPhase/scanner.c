@@ -853,7 +853,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 100 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "COMMENT", "COMMENT1","enumerated"); 
+{token* tmp = createNewNode(yylineno , token_counter++ , "" , "COMMENT", "LINE_COMMENT","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
@@ -943,7 +943,7 @@ case 18:
 YY_RULE_SETUP
 #line 121 "scanner.l"
 {
-        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "INTCONST" , yytext ,"enumerated");
+        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "CONST_INT" , yytext ,"integer");
         
         insert(tmp);
     }
@@ -1147,7 +1147,7 @@ YY_RULE_SETUP
 case 47:
 YY_RULE_SETUP
 #line 210 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"enumerated"); 
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"char*"); 
         insert(tmp);
     }
 	YY_BREAK
