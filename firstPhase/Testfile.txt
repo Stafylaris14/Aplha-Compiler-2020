@@ -1,4 +1,2 @@
 
-"this is a string"
-
-""
+String id  = "this is a string ";

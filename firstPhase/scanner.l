@@ -154,16 +154,18 @@ other                 .
         
         cyn();
         fprintf(stderr , "FOUND ENDING OF STRING %s IN LINE %d" ,myString, yylineno);
+        token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"enumerated");
+        insert(tmp);
         free(myString);
         myString = NULL;
         BEGIN(INITIAL);
-        wht();
+        wht(); 
     }
 
     "\\n" {
          sizeCounter++;
         if(sizeCounter > size){
-            size = sizeCounter;
+            size = sizeCounter; 
             myString = realloc(myString , sizeCounter);
             strcat(myString , "\n");
         }else{
