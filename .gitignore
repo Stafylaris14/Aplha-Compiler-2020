@@ -1,7 +1,6 @@
 
 firstPhase/.vscode/
 
-firstPhase/Testfile.txt
 
 firstPhase/commentStack.o
 
@@ -14,3 +13,5 @@ firstPhase/scanner.c
 firstPhase/scanner.o
 
 *.o
+
+*.swp

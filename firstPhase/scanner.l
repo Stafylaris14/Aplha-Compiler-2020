@@ -34,6 +34,7 @@ id                          [a-zA-Z][a-zA-Z_0-9]*
 integer                     (0[xX][0-9A-Fa-f]+)|([0-9]+)
 real                        [0-9]*\.[0-9](e|E)?[0-9]*
 space                       [ \r\n\t\v]
+string                      "\""
 comment1                    "//".*
 comment2                    "#".*
 multy_comment               "/*"
@@ -94,6 +95,7 @@ double_dots           ".."
 other                 .
 
 %x COMMENT
+%x STRING
 
 %%
 
@@ -115,13 +117,11 @@ other                 .
     "\n"   lineCounter++;
     "*/" {
 
-            fprintf(stderr,"kleinw %d\n",yylineno);
+            // fprintf(stderr,"kleinw %d\n",yylineno);
 
             printStack();
             int startLine = pop();
-            cyn();
-            fprintf(stderr,"kanw pop %d\n",startLine);
-            wht();
+            
             char buffer[100];
             sprintf(buffer,"%d - %d",startLine,yylineno);
             token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
@@ -141,6 +141,85 @@ other                 .
             wht();
             exit(0);
         }
+    }
+}
+
+
+
+{string} BEGIN(STRING);int size = 5;size_t sizeCounter = 0;char* myString = (char*)malloc(sizeof(char)*20);
+    
+
+<STRING>{
+    "\"" {
+        
+        cyn();
+        fprintf(stderr , "FOUND ENDING OF STRING %s IN LINE %d" ,myString, yylineno);
+        token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"enumerated");
+        insert(tmp);
+        free(myString);
+        myString = NULL;
+        BEGIN(INITIAL);
+        wht(); 
+    }
+
+    "\\n" {
+         sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter; 
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\n");
+        }else{
+            strcat(myString , "\n");
+        }
+    }
+    "\\t" {
+        sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\t");
+        }else{
+            strcat(myString , "\t");
+        }
+    }
+    "\\r" {
+        sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\r");
+        }else{
+            strcat(myString , "\r");
+        }
+    }
+    "\\v" {
+        sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\v");
+        }else{
+            strcat(myString , "\v");
+        }
+    }
+    . {
+        cyn();
+        sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , yytext);
+        }else{
+            strcat(myString , yytext);
+        }
+        
+
+    }
+    <<EOF>> {
+        red();
+        fprintf(stderr , "EXPECTED  CLOSING STRING WITH \" IN LINE %d" , yylineno);
+        wht();
+        exit(0);
     }
 }
 
