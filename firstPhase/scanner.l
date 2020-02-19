@@ -162,10 +162,45 @@ other                 .
         wht();
     }
 
-    "\n" {
-        yel();
-        fprintf(stderr , "found a new line in String in line %d" , yylineno);
-        wht();
+    "\\n" {
+         sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\n");
+        }else{
+            strcat(myString , "\n");
+        }
+    }
+    "\\t" {
+        sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\t");
+        }else{
+            strcat(myString , "\t");
+        }
+    }
+    "\\r" {
+        sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\r");
+        }else{
+            strcat(myString , "\r");
+        }
+    }
+    "\\v" {
+        sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\v");
+        }else{
+            strcat(myString , "\v");
+        }
     }
     . {
         cyn();

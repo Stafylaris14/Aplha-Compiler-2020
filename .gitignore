@@ -14,3 +14,5 @@ firstPhase/scanner.c
 firstPhase/scanner.o
 
 *.o
+
+*.swp
