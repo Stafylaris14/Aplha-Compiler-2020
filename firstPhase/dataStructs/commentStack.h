@@ -1,14 +1,16 @@
 struct Stack{
     int lineNo;
     struct Stack* next;
-}typedef stack; 
+}typedef stack;
 
+ stack* top;
 
+void printStack() ;
 
 stack * newCommentNode(int lineNo);
 
-void push(int lineNo , stack* head);
+void push(int lineNo);
 
-int pop(stack* head);
+int pop();
 
-int isEmpty(stack *head);
+int isEmpty();

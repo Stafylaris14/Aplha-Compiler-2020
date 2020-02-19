@@ -8,15 +8,15 @@
     #endif
     int token_counter = 1;
 
-    
+
     #include "dataStructs/linkedList.h"
     #include "dataStructs/commentStack.h"
-        
+
     #define  YY_DECL int alpha_yylex ()
-   
+
 
     /*
-    Includes 
+    Includes
     */
 %}
 
@@ -37,7 +37,7 @@ space                       [ \r\n\t\v]
 comment1                    "//".*
 comment2                    "#".*
 multy_comment               "/*"
- 
+
 
 /*keywords*/
 
@@ -94,44 +94,42 @@ double_dots           ".."
 other                 .
 
 %x COMMENT
-    
+
 %%
 
 
-{comment1} {token* tmp = createNewNode(yylineno , token_counter++ , "" , "COMMENT", "LINE_COMMENT","enumerated"); 
+{comment1} {token* tmp = createNewNode(yylineno , token_counter++ , "" , "COMMENT", "LINE_COMMENT","enumerated");
         insert(tmp);
     }
-{comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext ,"COMMENT", "COMMENT2","enumerated"); 
+{comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext ,"COMMENT", "COMMENT2","enumerated");
         insert(tmp);
-    }  
-{multy_comment} BEGIN(COMMENT);fprintf(stderr,"3ekinaw\n"); int lineCounter = 0;stack* top= newCommentNode(yylineno);
+    }
+{multy_comment} BEGIN(COMMENT);fprintf(stderr,"push arxi %d\n",yylineno); int lineCounter = 0; push(yylineno);
 
 <COMMENT>{
 "/*" {
-    grn();
-        fprintf(stderr , "line = %d" , yylineno);
-        wht();
-    push(yylineno , top);
-    printStack(top);
+    fprintf(stderr , "push %d\n" , yylineno);
+     wht();
+    push(yylineno);
 }
 "\n"   lineCounter++;
 "*/" {
-        red();
-        fprintf(stderr , "line = %d" , yylineno);
-        wht();
-        int startLine = pop(top);
+        fprintf(stderr,"kleinw %d\n",yylineno);
+
+        printStack();
+        int startLine = pop();
         cyn();
-        fprintf(stderr,"brika asteraki %d\n",startLine); 
+        fprintf(stderr,"kanw pop %d\n",startLine);
         wht();
         char buffer[100];
         sprintf(buffer,"%d - %d",startLine,yylineno);
-        token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated"); 
+        token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
         insert(tmp);
-        if(isEmpty(top))BEGIN(INITIAL);
+        if(isEmpty())BEGIN(INITIAL);
         else BEGIN(COMMENT);
-       
-    } 
-.  
+
+    }
+.
 }
 
 {if} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);}
@@ -151,105 +149,105 @@ other                 .
 {nil} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NIL" , "keyword");insert(tmp);}
 {integer} {
         token* tmp = createNewNode(yylineno , token_counter++ , yytext , "CONST_INT" , yytext ,"integer");
-        
+
         insert(tmp);
     }
-{real} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "REALCONST", yytext ,"enumerated"); 
+{real} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "REALCONST", yytext ,"enumerated");
         insert(tmp);
     }
 {space} {
     }
-{assign} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "ASSIGN","enumerated"); 
+{assign} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "ASSIGN","enumerated");
         insert(tmp);
     }
-{plus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS","enumerated"); 
+{plus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS","enumerated");
         insert(tmp);
     }
-{minus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS","enumerated"); 
+{minus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS","enumerated");
         insert(tmp);
     }
-{multiply} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MULTIPLY","enumerated"); 
+{multiply} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MULTIPLY","enumerated");
         insert(tmp);
     }
-{division} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "DIVISION","enumerated"); 
+{division} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "DIVISION","enumerated");
         insert(tmp);
     }
-{mod} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MOD","enumerated"); 
+{mod} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MOD","enumerated");
         insert(tmp);
     }
-{equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "EQUAL","enumerated"); 
+{equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "EQUAL","enumerated");
         insert(tmp);
     }
-{n_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "NOT_EQUAL","enumerated"); 
+{n_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "NOT_EQUAL","enumerated");
         insert(tmp);
     }
-{plus_plus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS_PLUS","enumerated"); 
+{plus_plus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS_PLUS","enumerated");
         insert(tmp);
     }
-{minus_minus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS_MINUS","enumerated"); 
+{minus_minus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS_MINUS","enumerated");
         insert(tmp);
     }
-{greater} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER","enumerated"); 
+{greater} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER","enumerated");
         insert(tmp);
     }
-{less} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS","enumerated"); 
+{less} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS","enumerated");
         insert(tmp);
     }
-{g_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER_EQUAL","enumerated"); 
+{g_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER_EQUAL","enumerated");
         insert(tmp);
     }
-{l_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS_EQUAL","enumerated"); 
+{l_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS_EQUAL","enumerated");
         insert(tmp);
     }
-{left_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_CURLY_BRACE","enumerated"); 
+{left_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_CURLY_BRACE","enumerated");
         insert(tmp);
     }
-{right_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_CURLY_BRACE","enumerated"); 
+{right_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_CURLY_BRACE","enumerated");
         insert(tmp);
     }
-{left_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_BRACE","enumerated"); 
+{left_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_BRACE","enumerated");
         insert(tmp);
     }
-{right_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_BRACE","enumerated"); 
+{right_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_BRACE","enumerated");
         insert(tmp);
     }
-{left_parenthesis} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_PARENTHESIS","enumerated"); 
+{left_parenthesis} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_PARENTHESIS","enumerated");
         insert(tmp);
     }
-{right_parenthesis} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_PARENTHESIS","enumerated"); 
+{right_parenthesis} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_PARENTHESIS","enumerated");
         insert(tmp);
     }
-{semicolon} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "SEMI_COLON","enumerated"); 
+{semicolon} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "SEMI_COLON","enumerated");
         insert(tmp);
     }
-{comma} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COMMA","enumerated"); 
+{comma} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COMMA","enumerated");
         insert(tmp);
     }
-{colon} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COLON","enumerated"); 
+{colon} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COLON","enumerated");
         insert(tmp);
     }
-{double_colons} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_COLONS","enumerated"); 
+{double_colons} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_COLONS","enumerated");
         insert(tmp);
     }
-{dot} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOT","enumerated"); 
+{dot} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOT","enumerated");
         insert(tmp);
     }
-{double_dots} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_DOTS","enumerated"); 
+{double_dots} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_DOTS","enumerated");
         insert(tmp);
     }
 
-{id} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"char*"); 
+{id} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"char*");
         insert(tmp);
     }
 
 {other} {
         red();
-       
+
         fprintf(stderr , "UNDEFINED CHARACTER");
-        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "UNDEFINED_TOKEN","","enumerated"); 
+        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "UNDEFINED_TOKEN","","enumerated");
         insert(tmp);
-    
-        
+
+
         wht();
     }
 
@@ -264,12 +262,12 @@ int main(int argc , char** argv)
     if(argc>1)
     {
         if(!(yyin = fopen(argv[1] , "r"))){
-            
-            fprintf(stderr , "Cannot open file\n");    
+
+            fprintf(stderr , "Cannot open file\n");
         }
     }else
         yyin = stdin;
-    
+
     alpha_yylex();
     printList();
     return 0;
