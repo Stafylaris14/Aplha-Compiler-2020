@@ -107,29 +107,41 @@ other                 .
 {multy_comment} BEGIN(COMMENT);fprintf(stderr,"push arxi %d\n",yylineno); int lineCounter = 0; push(yylineno);
 
 <COMMENT>{
-"/*" {
-    fprintf(stderr , "push %d\n" , yylineno);
-     wht();
-    push(yylineno);
-}
-"\n"   lineCounter++;
-"*/" {
-        fprintf(stderr,"kleinw %d\n",yylineno);
-
-        printStack();
-        int startLine = pop();
-        cyn();
-        fprintf(stderr,"kanw pop %d\n",startLine);
+    "/*" {
+        fprintf(stderr , "push %d\n" , yylineno);
         wht();
-        char buffer[100];
-        sprintf(buffer,"%d - %d",startLine,yylineno);
-        token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
-        insert(tmp);
-        if(isEmpty())BEGIN(INITIAL);
-        else BEGIN(COMMENT);
-
+        push(yylineno);
     }
-.
+    "\n"   lineCounter++;
+    "*/" {
+
+            fprintf(stderr,"kleinw %d\n",yylineno);
+
+            printStack();
+            int startLine = pop();
+            cyn();
+            fprintf(stderr,"kanw pop %d\n",startLine);
+            wht();
+            char buffer[100];
+            sprintf(buffer,"%d - %d",startLine,yylineno);
+            token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
+            insert(tmp);
+            if(isEmpty())BEGIN(INITIAL);
+            else BEGIN(COMMENT);
+
+            
+
+        }
+    .
+
+    <<EOF>> {
+        if(!isEmpty()){
+            red();
+            fprintf(stderr , "EXPECTING *\\ in line %d " , yylineno);
+            wht();
+            exit(0);
+        }
+    }
 }
 
 {if} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);}
