@@ -146,84 +146,41 @@ other                 .
 
 
 
-{string} BEGIN(STRING);int size = 5;size_t sizeCounter = 0;char* myString = (char*)malloc(sizeof(char)*20);
+{string} BEGIN(STRING);char* myString = malloc(strlen(yytext)* sizeof(char));
     
 
 <STRING>{
     "\"" {
         
-        cyn();
+        // cyn();
         // fprintf(stderr , "FOUND ENDING OF STRING %s IN LINE %d" ,myString, yylineno);
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
-        free(myString);
+        // free(myString);
         myString = NULL;
         BEGIN(INITIAL);
         wht(); 
     }
 
     "\\n" {
-         sizeCounter++;
-        if(sizeCounter > size){
-            size = sizeCounter; 
-            myString = realloc(myString , sizeCounter);
             strcat(myString , "\n");
-        }else{
-            strcat(myString , "\n");
-        }
     }
     "\\t" {
-        sizeCounter++;
-        if(sizeCounter > size){
-            size = sizeCounter;
-            myString = realloc(myString , sizeCounter);
-            strcat(myString , "\t");
-        }else{
-            strcat(myString , "\t");
-        }
+            strcat(myString , "\t");    
     }
     "\\r" {
-        sizeCounter++;
-        if(sizeCounter > size){
-            size = sizeCounter;
-            myString = realloc(myString , sizeCounter);
-            strcat(myString , "\r");
-        }else{
-            strcat(myString , "\r");
-        }
+            strcat(myString , "\r");   
     }
     "\\v" {
-        sizeCounter++;
-        if(sizeCounter > size){
-            size = sizeCounter;
-            myString = realloc(myString , sizeCounter);
-            strcat(myString , "\v");
-        }else{
-            strcat(myString , "\v");
-        }
+            strcat(myString , "\v");    
     }
     "\\\"" {
-        sizeCounter++;
-        if(sizeCounter > size){
-            size = sizeCounter;
-            myString = realloc(myString , sizeCounter);
             strcat(myString , "\"");
-        }else{
-            strcat(myString , "\"");
-        }
     }
     . {
         cyn();
-        sizeCounter++;
-        if(sizeCounter > size){
-            size = sizeCounter;
-            myString = realloc(myString , sizeCounter);
-            strcat(myString , yytext);
-        }else{
-            strcat(myString , yytext);
-        }
-        
 
+            strcat(myString , yytext);
     }
     <<EOF>> {
         red();
