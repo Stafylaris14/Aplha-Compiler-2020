@@ -2,3 +2,15 @@
 firstPhase/.vscode/
 
 firstPhase/Testfile.txt
+
+firstPhase/commentStack.o
+
+firstPhase/linkedList.o
+
+firstPhase/scanner
+
+firstPhase/scanner.c
+
+firstPhase/scanner.o
+
+*.o
