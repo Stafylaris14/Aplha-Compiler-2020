@@ -157,30 +157,30 @@ other                 .
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
         // free(myString);
-        myString = NULL;
+        //myString = NULL;
         BEGIN(INITIAL);
         wht(); 
     }
 
     "\\n" {
-            strcat(myString , "\n");
+            sprintf(myString,"%s%s",myString,"\n");
     }
     "\\t" {
-            strcat(myString , "\t");    
+            sprintf(myString,"%s%s",myString,"\t");   
     }
     "\\r" {
-            strcat(myString , "\r");   
+            sprintf(myString,"%s%s",myString,"\r"); 
     }
     "\\v" {
-            strcat(myString , "\v");    
+            sprintf(myString,"%s%s",myString,"\v");      
     }
     "\\\"" {
-            strcat(myString , "\"");
+            sprintf(myString,"%s%s",myString,"\\\"");   
     }
     . {
         cyn();
 
-            strcat(myString , yytext);
+            sprintf(myString,"%s%s",myString,yytext);   
     }
     <<EOF>> {
         red();
