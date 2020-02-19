@@ -151,6 +151,7 @@ other                 .
 
 <STRING>{
     "\"" {
+        
         cyn();
         fprintf(stderr , "FOUND ENDING OF STRING %s IN LINE %d" ,myString, yylineno);
         free(myString);
