@@ -377,8 +377,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 55
-#define YY_END_OF_BUFFER 56
+#define YY_NUM_RULES 54
+#define YY_END_OF_BUFFER 55
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -388,19 +388,19 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[122] =
     {   0,
-        0,    0,    0,    0,   56,   54,   26,   26,   54,    2,
-       32,   45,   46,   30,   28,   48,   29,   51,   31,   24,
-       24,   49,   47,   38,   27,   37,   53,   43,   44,   53,
-       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
-       53,   41,   42,    6,    4,    6,    6,   34,    2,   35,
-       36,   52,   25,    3,    1,    0,   24,    0,   50,   40,
-       33,   39,   53,   53,   53,   53,   53,   53,   53,   53,
-        9,   53,   53,   53,   19,   53,   53,   53,    5,    7,
-       25,   25,    1,   24,   17,   53,   53,   53,   53,   12,
-       53,   53,   23,   18,   53,   53,   53,   53,   53,   10,
+        0,    0,    0,    0,   55,   53,   25,   25,   53,    2,
+       31,   44,   45,   29,   27,   47,   28,   50,   30,   23,
+       23,   48,   46,   37,   26,   36,   52,   42,   43,   52,
+       52,   52,   52,   52,   52,   52,   52,   52,   52,   52,
+       52,   40,   41,    7,    5,    7,    7,   33,    2,   34,
+       35,   51,   24,    3,    1,    0,   23,    0,   49,   39,
+       32,   38,   52,   52,   52,   52,   52,   52,   52,   52,
+        8,   52,   52,   52,   18,   52,   52,   52,    6,    4,
+       24,   24,    1,   23,   16,   52,   52,   52,   52,   11,
+       52,   52,   22,   17,   52,   52,   52,   52,   52,    9,
 
-       53,   53,   53,   53,   21,   53,   15,   53,   22,   53,
-       20,   53,   11,   53,   53,   14,   53,   53,   16,   13,
+       52,   52,   52,   52,   20,   52,   14,   52,   21,   52,
+       19,   52,   10,   52,   52,   13,   52,   52,   15,   12,
         0
     } ;
 
@@ -534,11 +534,11 @@ static yyconst flex_int16_t yy_chk[201] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static yyconst flex_int32_t yy_rule_can_match_eol[56] =
+static yyconst flex_int32_t yy_rule_can_match_eol[55] =
     {   0,
-0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
+0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -566,7 +566,8 @@ char *yytext;
     int token_counter = 1;
 
     
-    #include "linkedList.h"
+    #include "dataStructs/linkedList.h"
+    #include "dataStructs/commentStack.h"
         
     #define  YY_DECL int alpha_yylex ()
    
@@ -579,7 +580,7 @@ char *yytext;
 /*operators*/
 /*braces*/
 
-#line 583 "scanner.c"
+#line 584 "scanner.c"
 
 #define INITIAL 0
 #define COMMENT 1
@@ -762,11 +763,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 97 "scanner.l"
+#line 98 "scanner.l"
 
 
 
-#line 770 "scanner.c"
+#line 771 "scanner.c"
 
 	if ( !(yy_init) )
 		{
@@ -861,348 +862,357 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 100 "scanner.l"
+#line 101 "scanner.l"
 {token* tmp = createNewNode(yylineno , token_counter++ , "" , "COMMENT", "LINE_COMMENT","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 103 "scanner.l"
+#line 104 "scanner.l"
 {token* tmp = createNewNode(yylineno , token_counter++ , yytext ,"COMMENT", "COMMENT2","enumerated"); 
         insert(tmp);
     }  
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 106 "scanner.l"
-BEGIN(COMMENT);fprintf(stderr,"3ekinaw\n"); int lineCounter = 0;
+#line 107 "scanner.l"
+BEGIN(COMMENT);fprintf(stderr,"3ekinaw\n"); int lineCounter = 0;stack* top= newCommentNode(yylineno);
 	YY_BREAK
 
 case 4:
-/* rule 4 can match eol */
 YY_RULE_SETUP
 #line 110 "scanner.l"
-lineCounter++;
+{
+    grn();
+        fprintf(stderr , "line = %d" , yylineno);
+        wht();
+    push(yylineno , top);
+    printStack(top);
+}
 	YY_BREAK
 case 5:
+/* rule 5 can match eol */
 YY_RULE_SETUP
-#line 111 "scanner.l"
-{
-        fprintf(stderr,"brika asteraki \n" ); 
-        char buffer[100];
-        sprintf(buffer,"%d - %d",yylineno-lineCounter,yylineno);
-        token* tmp = createNewNode(yylineno-lineCounter , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated"); 
-        insert(tmp);
-        BEGIN(INITIAL);
-    } 
+#line 117 "scanner.l"
+lineCounter++;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 119 "scanner.l"
-
+#line 118 "scanner.l"
+{
+        red();
+        fprintf(stderr , "line = %d" , yylineno);
+        wht();
+        int startLine = pop(top);
+        cyn();
+        fprintf(stderr,"brika asteraki %d\n",startLine); 
+        wht();
+        char buffer[100];
+        sprintf(buffer,"%d - %d",startLine,yylineno);
+        token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated"); 
+        insert(tmp);
+        if(isEmpty(top))BEGIN(INITIAL);
+        else BEGIN(COMMENT);
+       
+    } 
 	YY_BREAK
-
 case 7:
 YY_RULE_SETUP
-#line 121 "scanner.l"
-red();fprintf(stderr,"eimai se inner comment\n");wht();
+#line 134 "scanner.l"
+
 	YY_BREAK
+
 case 8:
 YY_RULE_SETUP
-#line 122 "scanner.l"
-red();fprintf(stderr,"vghka apo to comment\n");wht();
+#line 137 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 125 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);}
+#line 138 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "ELSE" , "keyword");insert(tmp);}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 126 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "ELSE" , "keyword");insert(tmp);}
+#line 139 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "WHILE" , "keyword");insert(tmp);}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 127 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "WHILE" , "keyword");insert(tmp);}
+#line 140 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FOR" , "keyword");insert(tmp);}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 128 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FOR" , "keyword");insert(tmp);}
+#line 141 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FUNCTION" , "keyword");insert(tmp);}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 129 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FUNCTION" , "keyword");insert(tmp);}
+#line 142 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "RETURN" , "keyword");insert(tmp);}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 130 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "RETURN" , "keyword");insert(tmp);}
+#line 143 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "BREAK" , "keyword");insert(tmp);}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 131 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "BREAK" , "keyword");insert(tmp);}
+#line 144 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "CONTINUE" , "keyword");insert(tmp);}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 132 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "CONTINUE" , "keyword");insert(tmp);}
+#line 145 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "AND" , "keyword");insert(tmp);}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 133 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "AND" , "keyword");insert(tmp);}
+#line 146 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NOT" , "keyword");insert(tmp);}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 134 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NOT" , "keyword");insert(tmp);}
+#line 147 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "OR" , "keyword");insert(tmp);}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 135 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "OR" , "keyword");insert(tmp);}
+#line 148 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "LOCAL" , "keyword");insert(tmp);}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 136 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "LOCAL" , "keyword");insert(tmp);}
+#line 149 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "TRUE" , "keyword");insert(tmp);}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 137 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "TRUE" , "keyword");insert(tmp);}
+#line 150 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FALSE" , "keyword");insert(tmp);}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 138 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FALSE" , "keyword");insert(tmp);}
+#line 151 "scanner.l"
+{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NIL" , "keyword");insert(tmp);}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 139 "scanner.l"
-{ token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NIL" , "keyword");insert(tmp);}
-	YY_BREAK
-case 24:
-YY_RULE_SETUP
-#line 140 "scanner.l"
+#line 152 "scanner.l"
 {
         token* tmp = createNewNode(yylineno , token_counter++ , yytext , "CONST_INT" , yytext ,"integer");
         
         insert(tmp);
     }
 	YY_BREAK
-case 25:
+case 24:
 YY_RULE_SETUP
-#line 145 "scanner.l"
+#line 157 "scanner.l"
 {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "REALCONST", yytext ,"enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
-case 26:
-/* rule 26 can match eol */
+case 25:
+/* rule 25 can match eol */
 YY_RULE_SETUP
-#line 148 "scanner.l"
+#line 160 "scanner.l"
 {
+    }
+	YY_BREAK
+case 26:
+YY_RULE_SETUP
+#line 162 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "ASSIGN","enumerated"); 
+        insert(tmp);
     }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 150 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "ASSIGN","enumerated"); 
+#line 165 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 153 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS","enumerated"); 
+#line 168 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 156 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS","enumerated"); 
+#line 171 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MULTIPLY","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 159 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MULTIPLY","enumerated"); 
+#line 174 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "DIVISION","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 162 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "DIVISION","enumerated"); 
+#line 177 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MOD","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 165 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MOD","enumerated"); 
+#line 180 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "EQUAL","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 168 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "EQUAL","enumerated"); 
+#line 183 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "NOT_EQUAL","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 171 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "NOT_EQUAL","enumerated"); 
+#line 186 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS_PLUS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 174 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS_PLUS","enumerated"); 
+#line 189 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS_MINUS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 177 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS_MINUS","enumerated"); 
+#line 192 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 180 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER","enumerated"); 
+#line 195 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 183 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS","enumerated"); 
+#line 198 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER_EQUAL","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 186 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER_EQUAL","enumerated"); 
+#line 201 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS_EQUAL","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 189 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS_EQUAL","enumerated"); 
+#line 204 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_CURLY_BRACE","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 192 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_CURLY_BRACE","enumerated"); 
+#line 207 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_CURLY_BRACE","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 195 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_CURLY_BRACE","enumerated"); 
+#line 210 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_BRACE","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 198 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_BRACE","enumerated"); 
+#line 213 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_BRACE","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 201 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_BRACE","enumerated"); 
+#line 216 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_PARENTHESIS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 204 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_PARENTHESIS","enumerated"); 
+#line 219 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_PARENTHESIS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 207 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_PARENTHESIS","enumerated"); 
+#line 222 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "SEMI_COLON","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 210 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "SEMI_COLON","enumerated"); 
+#line 225 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COMMA","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 213 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COMMA","enumerated"); 
+#line 228 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COLON","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 216 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COLON","enumerated"); 
+#line 231 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_COLONS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 219 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_COLONS","enumerated"); 
+#line 234 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOT","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 222 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOT","enumerated"); 
+#line 237 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_DOTS","enumerated"); 
         insert(tmp);
     }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 225 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_DOTS","enumerated"); 
+#line 241 "scanner.l"
+{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"char*"); 
         insert(tmp);
     }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 229 "scanner.l"
-{token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"char*"); 
-        insert(tmp);
-    }
-	YY_BREAK
-case 54:
-YY_RULE_SETUP
-#line 233 "scanner.l"
+#line 245 "scanner.l"
 {
         red();
        
@@ -1214,12 +1224,12 @@ YY_RULE_SETUP
         wht();
     }
 	YY_BREAK
-case 55:
+case 54:
 YY_RULE_SETUP
-#line 244 "scanner.l"
+#line 256 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1223 "scanner.c"
+#line 1233 "scanner.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 	yyterminate();
@@ -2229,7 +2239,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 244 "scanner.l"
+#line 256 "scanner.l"
 
 
 
