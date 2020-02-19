@@ -1,2 +1,3 @@
+str = "String with nesting comments /*this is not a comment. Is part of the string*/";
 
-String id  = "this is a string ";
+"3 strings in a row""comment1""comment2""comment3"

@@ -153,8 +153,8 @@ other                 .
     "\"" {
         
         cyn();
-        fprintf(stderr , "FOUND ENDING OF STRING %s IN LINE %d" ,myString, yylineno);
-        token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"enumerated");
+        // fprintf(stderr , "FOUND ENDING OF STRING %s IN LINE %d" ,myString, yylineno);
+        token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
         free(myString);
         myString = NULL;
@@ -200,6 +200,16 @@ other                 .
             strcat(myString , "\v");
         }else{
             strcat(myString , "\v");
+        }
+    }
+    "\\\"" {
+        sizeCounter++;
+        if(sizeCounter > size){
+            size = sizeCounter;
+            myString = realloc(myString , sizeCounter);
+            strcat(myString , "\"");
+        }else{
+            strcat(myString , "\"");
         }
     }
     . {
