@@ -146,11 +146,8 @@ other                 .
 
 
 
-{string} BEGIN(STRING);int size = 20;size_t sizeCounter = 0;char* myString = (char*)malloc(sizeof(char)*20);
+{string} BEGIN(STRING);int size = 5;size_t sizeCounter = 0;char* myString = (char*)malloc(sizeof(char)*20);
     
-
-
-
 
 <STRING>{
     "\"" {
