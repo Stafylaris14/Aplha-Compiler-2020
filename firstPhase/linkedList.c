@@ -36,7 +36,7 @@ token* createNewNode(int lineNo , int token_counter , char* value , char* type ,
 {
     token* newNode ;
     newNode = malloc(sizeof(token));
-    newNode->lineNo = lineNo;
+    newNode->lineNo = lineNo++;
     newNode->token_counter = token_counter;
     newNode->value = strdup(value);
     newNode->type = strdup(type);
