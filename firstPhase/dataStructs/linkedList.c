@@ -36,7 +36,7 @@ token* createNewNode(int lineNo , int token_counter , char* value , char* type ,
 {
     token* newNode ;
     newNode = malloc(sizeof(token));
-    newNode->lineNo = lineNo;
+    newNode->lineNo = lineNo++;
     newNode->token_counter = token_counter;
     newNode->value = strdup(value);
     newNode->type = strdup(type);
@@ -55,11 +55,7 @@ void insert(token* node)
     }else{
         last->next = node;
         last = node;
-    }
-    grn();
-    fprintf(stderr,"added new Node with value: (%s) ..." , node->value);
-    wht();
-        
+    }    
 }
 
 
@@ -71,8 +67,8 @@ void printList()
     cyn();
     while(tmp != NULL){
         if(!strcmp(tmp->type,"ID") || !strcmp(tmp->type,"STRING")){
-            fprintf(stderr ," %d:  #%d (\"%s\") %s \"%s\" <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);
-        }else  fprintf(stderr ," %d:  #%d (\"%s\") %s %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);   
+            fprintf(stderr ," %d:  #%d \"%s\" %s \"%s\" <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);
+        }else  fprintf(stderr ," %d:  #%d \"%s\" %s %s <-%s\n",tmp->lineNo,tmp->token_counter,tmp->value,tmp->type,tmp->sub_category,tmp->category);   
         tmp = tmp->next;
     }
     fprintf(stderr,"%s" , KWHT);

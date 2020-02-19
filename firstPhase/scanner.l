@@ -9,7 +9,8 @@
     int token_counter = 1;
 
     
-    #include "linkedList.h"
+    #include "dataStructs/linkedList.h"
+    #include "dataStructs/commentStack.h"
         
     #define  YY_DECL int alpha_yylex ()
    
@@ -35,7 +36,7 @@ real                        [0-9]*\.[0-9](e|E)?[0-9]*
 space                       [ \r\n\t\v]
 comment1                    "//".*
 comment2                    "#".*
-
+multy_comment               "/*"
  
 
 /*keywords*/
@@ -92,7 +93,7 @@ dot                   "."
 double_dots           ".."
 other                 .
 
-
+%x COMMENT
     
 %%
 
@@ -103,6 +104,36 @@ other                 .
 {comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext ,"COMMENT", "COMMENT2","enumerated"); 
         insert(tmp);
     }  
+{multy_comment} BEGIN(COMMENT);fprintf(stderr,"3ekinaw\n"); int lineCounter = 0;stack* top= newCommentNode(yylineno);
+
+<COMMENT>{
+"/*" {
+    grn();
+        fprintf(stderr , "line = %d" , yylineno);
+        wht();
+    push(yylineno , top);
+    printStack(top);
+}
+"\n"   lineCounter++;
+"*/" {
+        red();
+        fprintf(stderr , "line = %d" , yylineno);
+        wht();
+        int startLine = pop(top);
+        cyn();
+        fprintf(stderr,"brika asteraki %d\n",startLine); 
+        wht();
+        char buffer[100];
+        sprintf(buffer,"%d - %d",startLine,yylineno);
+        token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated"); 
+        insert(tmp);
+        if(isEmpty(top))BEGIN(INITIAL);
+        else BEGIN(COMMENT);
+       
+    } 
+.  
+}
+
 {if} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);}
 {else} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "ELSE" , "keyword");insert(tmp);}
 {while} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "WHILE" , "keyword");insert(tmp);}
