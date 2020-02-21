@@ -115,7 +115,8 @@ other                 .
     }
     "\n"   lineCounter++;
     "*/" {
-
+            /*ean theloyme na emfanizei to ending line prepei na alla3oyme opou startLine -> yylineno*/
+            
             // fprintf(stderr,"kleinw %d\n",yylineno);
 
             printStack();
@@ -124,10 +125,10 @@ other                 .
             char buffer[100];
             sprintf(buffer,"%d - %d",startLine,yylineno);
             if(isEmpty()){
-            token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
+            token* tmp = createNewNode(startLine , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
             insert(tmp);
             }else{
-              token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"NESTED COMMENT", "BLOCK_COMMENT","enumerated");
+              token* tmp = createNewNode(startLine , token_counter++ , buffer ,"NESTED COMMENT", "BLOCK_COMMENT","enumerated");
               insert(tmp);
             }
             if(isEmpty())BEGIN(INITIAL);
@@ -158,7 +159,7 @@ other                 .
         // cyn();
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
-        // free(myString);
+        
         myString = NULL;
         BEGIN(INITIAL);
         wht();
