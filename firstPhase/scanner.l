@@ -106,11 +106,10 @@ other                 .
 {comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext ,"COMMENT", "COMMENT2","enumerated");
         insert(tmp);
     }
-{multy_comment} BEGIN(COMMENT);fprintf(stderr,"push arxi %d\n",yylineno); int lineCounter = 0; push(yylineno);
+{multy_comment} BEGIN(COMMENT); int lineCounter = 0; push(yylineno);
 
 <COMMENT>{
     "/*" {
-        fprintf(stderr , "push %d\n" , yylineno);
         wht();
         push(yylineno);
     }
@@ -124,8 +123,13 @@ other                 .
 
             char buffer[100];
             sprintf(buffer,"%d - %d",startLine,yylineno);
+            if(isEmpty()){
             token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
             insert(tmp);
+            }else{
+              token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"NESTED COMMENT", "BLOCK_COMMENT","enumerated");
+              insert(tmp);
+            }
             if(isEmpty())BEGIN(INITIAL);
             else BEGIN(COMMENT);
 
