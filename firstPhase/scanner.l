@@ -106,30 +106,35 @@ other                 .
 {comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext ,"COMMENT", "COMMENT2","enumerated");
         insert(tmp);
     }
-{multy_comment} BEGIN(COMMENT);fprintf(stderr,"push arxi %d\n",yylineno); int lineCounter = 0; push(yylineno);
+{multy_comment} BEGIN(COMMENT); int lineCounter = 0; push(yylineno);
 
 <COMMENT>{
     "/*" {
-        fprintf(stderr , "push %d\n" , yylineno);
         wht();
         push(yylineno);
     }
     "\n"   lineCounter++;
     "*/" {
-
+            /*ean theloyme na emfanizei to ending line prepei na alla3oyme opou startLine -> yylineno*/
+            
             // fprintf(stderr,"kleinw %d\n",yylineno);
 
             printStack();
             int startLine = pop();
-            
+
             char buffer[100];
             sprintf(buffer,"%d - %d",startLine,yylineno);
-            token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
+            if(isEmpty()){
+            token* tmp = createNewNode(startLine , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
             insert(tmp);
+            }else{
+              token* tmp = createNewNode(startLine , token_counter++ , buffer ,"NESTED COMMENT", "BLOCK_COMMENT","enumerated");
+              insert(tmp);
+            }
             if(isEmpty())BEGIN(INITIAL);
             else BEGIN(COMMENT);
 
-            
+
 
         }
     .
@@ -146,40 +151,67 @@ other                 .
 
 
 
-{string} BEGIN(STRING);char* myString = malloc(strlen(yytext)* sizeof(char));
-    
+{string} BEGIN(STRING);int size = 100; char* myString = malloc(size);int count = 1;int real =1;
+
 
 <STRING>{
     "\"" {
-        
         // cyn();
-        // fprintf(stderr , "FOUND ENDING OF STRING %s IN LINE %d" ,myString, yylineno);
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
-        // free(myString);
+        
         myString = NULL;
         BEGIN(INITIAL);
-        wht(); 
+        wht();
     }
 
     "\\n" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
             strcat(myString , "\n");
     }
     "\\t" {
-            strcat(myString , "\t");    
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\t");
     }
     "\\r" {
-            strcat(myString , "\r");   
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\r");
     }
     "\\v" {
-            strcat(myString , "\v");    
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\v");
     }
     "\\\"" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
             strcat(myString , "\"");
     }
     . {
         cyn();
-
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
             strcat(myString , yytext);
     }
     <<EOF>> {

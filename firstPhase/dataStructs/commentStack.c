@@ -12,7 +12,7 @@ void printStack()
     // printf("prepei na kanw pring\n" );
     stack* tmp = top;
     while(tmp != NULL){
-        fprintf(stderr , "tmp->line  %d\n" , tmp->lineNo);
+      //  fprintf(stderr , "tmp->line  %d\n" , tmp->lineNo);
         tmp = tmp->next;
     }
 }
