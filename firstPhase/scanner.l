@@ -121,7 +121,7 @@ other                 .
 
             printStack();
             int startLine = pop();
-            
+
             char buffer[100];
             sprintf(buffer,"%d - %d",startLine,yylineno);
             token* tmp = createNewNode(yylineno , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
@@ -129,7 +129,7 @@ other                 .
             if(isEmpty())BEGIN(INITIAL);
             else BEGIN(COMMENT);
 
-            
+
 
         }
     .
@@ -146,40 +146,67 @@ other                 .
 
 
 
-{string} BEGIN(STRING);char* myString = malloc(strlen(yytext)* sizeof(char));
-    
+{string} BEGIN(STRING);int size = 100; char* myString = malloc(size);int count = 1;int real =1;
+
 
 <STRING>{
     "\"" {
-        
         // cyn();
-        // fprintf(stderr , "FOUND ENDING OF STRING %s IN LINE %d" ,myString, yylineno);
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
         // free(myString);
         myString = NULL;
         BEGIN(INITIAL);
-        wht(); 
+        wht();
     }
 
     "\\n" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
             strcat(myString , "\n");
     }
     "\\t" {
-            strcat(myString , "\t");    
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\t");
     }
     "\\r" {
-            strcat(myString , "\r");   
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\r");
     }
     "\\v" {
-            strcat(myString , "\v");    
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\v");
     }
     "\\\"" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
             strcat(myString , "\"");
     }
     . {
         cyn();
-
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
             strcat(myString , yytext);
     }
     <<EOF>> {
