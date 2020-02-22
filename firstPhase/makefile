@@ -1,11 +1,11 @@
-CFLAGS= -Wall -pedantic
+
 
 scanner:scanner.l dataStructs/linkedList.c dataStructs/commentStack.c
 	flex -o scanner.c scanner.l
-	gcc $(CFLAGS) -c dataStructs/commentStack.c
-	gcc $(CFLAGS) -c dataStructs/linkedList.c
+	gcc  -c dataStructs/commentStack.c
+	gcc  -c dataStructs/linkedList.c
 	gcc  -c scanner.c
-	gcc $(CFLAGS) -o scanner scanner.o linkedList.o commentStack.o
+	gcc  -o scanner scanner.o linkedList.o commentStack.o
 lex:
 	flex -o scanner.c scanner.l
 	
