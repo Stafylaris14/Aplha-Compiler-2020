@@ -241,9 +241,9 @@ other                 .
     }
     \\. {
         yel();
-        fprintf(stderr , "iligal escape char in line %d" , yylineno);
+        fprintf(stderr , "WARNING \n iligal escape char in line %d" , yylineno);
         wht();
-        exit(0);
+        // exit(0);
     }
     . {
         cyn();
