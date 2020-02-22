@@ -110,7 +110,6 @@ other                 .
 
 <COMMENT>{
     "/*" {
-        wht();
         push(yylineno);
     }
     "\n"   lineCounter++;
@@ -142,7 +141,7 @@ other                 .
     <<EOF>> {
         if(!isEmpty()){
             red();
-            fprintf(stderr , "EXPECTING *\\ in line %d " , yylineno);
+            fprintf(stderr , "EXPECTING *\\ in line %d \n" , yylineno);
             wht();
             exit(0);
         }
@@ -163,7 +162,7 @@ other                 .
         
         myString = NULL;
         BEGIN(INITIAL);
-        wht();
+        
     }
     "\\\'" {
             count++;
@@ -242,7 +241,7 @@ other                 .
     \\. {
         count++;
         yel();
-        fprintf(stderr , "WARNING \n iligal escape char in line %d" , yylineno);
+        fprintf(stderr , "WARNING \n iligal escape char in line %d \n" , yylineno);
         wht();
         // exit(0);
     }
@@ -258,7 +257,7 @@ other                 .
     <<EOF>> {
 
         red();
-        fprintf(stderr , "ERROR \n EXPECTED  CLOSING STRING WITH \" IN LINE %d" , yylineno);
+        fprintf(stderr , "ERROR \n EXPECTED  CLOSING STRING WITH \" IN LINE %d \n" , yylineno);
         wht();
         exit(0);
     }
@@ -375,7 +374,7 @@ other                 .
 {other} {
         red();
 
-        fprintf(stderr , "ERROR \n UNDEFINED CHARACTER IN LINE %d" , yylineno);
+        fprintf(stderr , "ERROR \n UNDEFINED CHARACTER IN LINE %d\n" , yylineno);
         token* tmp = createNewNode(yylineno , token_counter++ , yytext , "UNDEFINED_TOKEN","","enumerated");
         insert(tmp);
 
