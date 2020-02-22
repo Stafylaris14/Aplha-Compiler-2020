@@ -240,10 +240,10 @@ other                 .
             strcat(myString , "\\"); 
     }
     \\. {
-        red();
-        fprintf(stderr , "ILIGAL escape char in line %d" , yylineno);
-        exit(0);
+        yel();
+        fprintf(stderr , "iligal escape char in line %d" , yylineno);
         wht();
+        exit(0);
     }
     . {
         cyn();
