@@ -257,7 +257,7 @@ other                 .
     <<EOF>> {
 
         red();
-        fprintf(stderr , "ERROR \n EXPECTED  CLOSING STRING WITH \" IN LINE %d \n" , yylineno);
+        fprintf(stderr , "ERROR : EXPECTED  CLOSING STRING WITH \" IN LINE %d  exit \n" , yylineno);
         wht();
         exit(0);
     }
@@ -374,7 +374,7 @@ other                 .
 {other} {
         red();
 
-        fprintf(stderr , "ERROR \n UNDEFINED CHARACTER IN LINE %d\n" , yylineno);
+        fprintf(stderr , "ERROR : UNDEFINED CHARACTER IN LINE %d\n" , yylineno);
         token* tmp = createNewNode(yylineno , token_counter++ , yytext , "UNDEFINED_TOKEN","","enumerated");
         insert(tmp);
 
