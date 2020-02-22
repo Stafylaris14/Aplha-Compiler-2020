@@ -1,5 +1,1 @@
-/*  this is a comment
-
-/*this is a nested comment*/
-
-*/
+"string with all legal esc chars (with out comma between them), \\\"\t\"\n\"";

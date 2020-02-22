@@ -165,14 +165,7 @@ other                 .
         BEGIN(INITIAL);
         wht();
     }
-    "\\" {
-        count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
-            }
-            strcat(myString , "\\"); 
-    }
+    
     "\\n" {
             count++;
             if(count > size*real){
@@ -213,7 +206,14 @@ other                 .
             }
             strcat(myString , "\"");
     }
-    
+    "\\\\" {
+        count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\\"); 
+    }
     . {
         cyn();
             count++;
