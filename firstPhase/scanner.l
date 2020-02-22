@@ -12,7 +12,7 @@
     #include "dataStructs/linkedList.h"
     #include "dataStructs/commentStack.h"
 
-    #define  YY_DECL int alpha_yylex ()
+    #define  YY_DECL int alpha_yylex (token *lvalp)
 
 
     /*
@@ -33,7 +33,7 @@
 id                          [a-zA-Z][a-zA-Z_0-9]*
 integer                     (0[xX][0-9A-Fa-f]+)|([0-9]+)
 real                        [0-9]*\.[0-9](e|E)?[0-9]*
-space                       [ \r\n\t\v]
+space                       [\r\n \t\v]
 string                      "\""
 comment1                    "//".*
 comment2                    "#".*
@@ -165,7 +165,14 @@ other                 .
         BEGIN(INITIAL);
         wht();
     }
-    
+    "\\\'" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\'");
+    }
     "\\n" {
             count++;
             if(count > size*real){
@@ -198,6 +205,15 @@ other                 .
             }
             strcat(myString , "\v");
     }
+    "\\f" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\f");
+    }
+    
     "\\\"" {
             count++;
             if(count > size*real){
@@ -205,6 +221,14 @@ other                 .
               myString = realloc(myString,size*real);
             }
             strcat(myString , "\"");
+    }
+    "\\b" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\b");
     }
     "\\\\" {
         count++;
@@ -367,7 +391,7 @@ int main(int argc , char** argv)
     }else
         yyin = stdin;
 
-    alpha_yylex();
+    alpha_yylex(NULL);
     printList();
     return 0;
 }

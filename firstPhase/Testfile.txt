@@ -1,1 +1,1 @@
-"string with all legal esc chars (with out comma between them), \\\"\t\"\n\"";
+"string \' kat "
