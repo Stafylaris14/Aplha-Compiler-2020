@@ -6,7 +6,8 @@ void red()
 }
 void wht()
 {
-	fprintf(stderr,"%s\n", KWHT);
+	fprintf(stderr,"%s", KWHT);
+    
 }
 void grn()
 {

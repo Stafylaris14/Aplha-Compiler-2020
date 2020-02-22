@@ -12,7 +12,7 @@
     #include "dataStructs/linkedList.h"
     #include "dataStructs/commentStack.h"
 
-    #define  YY_DECL int alpha_yylex ()
+    #define  YY_DECL int alpha_yylex (token *lvalp)
 
 
     /*
@@ -33,7 +33,7 @@
 id                          [a-zA-Z][a-zA-Z_0-9]*
 integer                     (0[xX][0-9A-Fa-f]+)|([0-9]+)
 real                        [0-9]*\.[0-9](e|E)?[0-9]*
-space                       [ \r\n\t\v]
+space                       [\r\n \t\v]
 string                      "\""
 comment1                    "//".*
 comment2                    "#".*
@@ -110,7 +110,6 @@ other                 .
 
 <COMMENT>{
     "/*" {
-        wht();
         push(yylineno);
     }
     "\n"   lineCounter++;
@@ -142,7 +141,7 @@ other                 .
     <<EOF>> {
         if(!isEmpty()){
             red();
-            fprintf(stderr , "EXPECTING *\\ in line %d " , yylineno);
+            fprintf(stderr , "EXPECTING *\\ in line %d \n" , yylineno);
             wht();
             exit(0);
         }
@@ -157,22 +156,23 @@ other                 .
 <STRING>{
     
     "\"" {
-        // cyn();
+    
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
         
         myString = NULL;
         BEGIN(INITIAL);
-        wht();
+        
     }
-    "\\" {
-        count++;
+    "\\\'" {
+            count++;
             if(count > size*real){
               real++;
               myString = realloc(myString,size*real);
             }
-            strcat(myString , "\\"); 
+            strcat(myString , "\'");
     }
+    
     "\\n" {
             count++;
             if(count > size*real){
@@ -205,6 +205,15 @@ other                 .
             }
             strcat(myString , "\v");
     }
+    "\\f" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\f");
+    }
+    
     "\\\"" {
             count++;
             if(count > size*real){
@@ -213,7 +222,29 @@ other                 .
             }
             strcat(myString , "\"");
     }
-    
+    "\\b" {
+            count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\b");
+    }
+    "\\\\" {
+        count++;
+            if(count > size*real){
+              real++;
+              myString = realloc(myString,size*real);
+            }
+            strcat(myString , "\\"); 
+    }
+    \\. {
+        count++;
+        yel();
+        fprintf(stderr , "WARNING \n iligal escape char in line %d \n" , yylineno);
+        wht();
+        // exit(0);
+    }
     . {
         cyn();
             count++;
@@ -224,8 +255,9 @@ other                 .
             strcat(myString , yytext);
     }
     <<EOF>> {
+
         red();
-        fprintf(stderr , "EXPECTED  CLOSING STRING WITH \" IN LINE %d" , yylineno);
+        fprintf(stderr , "ERROR : EXPECTED  CLOSING STRING WITH \" IN LINE %d  exit \n" , yylineno);
         wht();
         exit(0);
     }
@@ -342,7 +374,7 @@ other                 .
 {other} {
         red();
 
-        fprintf(stderr , "UNDEFINED CHARACTER");
+        fprintf(stderr , "ERROR : UNDEFINED CHARACTER IN LINE %d\n" , yylineno);
         token* tmp = createNewNode(yylineno , token_counter++ , yytext , "UNDEFINED_TOKEN","","enumerated");
         insert(tmp);
 
@@ -367,7 +399,7 @@ int main(int argc , char** argv)
     }else
         yyin = stdin;
 
-    alpha_yylex();
+    alpha_yylex(NULL);
     printList();
     return 0;
 }
