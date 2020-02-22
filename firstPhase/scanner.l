@@ -157,7 +157,7 @@ other                 .
 <STRING>{
     
     "\"" {
-        // cyn();
+
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
         
@@ -173,6 +173,7 @@ other                 .
             }
             strcat(myString , "\'");
     }
+    
     "\\n" {
             count++;
             if(count > size*real){
@@ -237,6 +238,12 @@ other                 .
               myString = realloc(myString,size*real);
             }
             strcat(myString , "\\"); 
+    }
+    \\. {
+        red();
+        fprintf(stderr , "ILIGAL escape char in line %d" , yylineno);
+        exit(0);
+        wht();
     }
     . {
         cyn();
