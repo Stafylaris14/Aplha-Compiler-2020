@@ -103,7 +103,7 @@ other                 .
 {comment1} {token* tmp = createNewNode(yylineno , token_counter++ , "" , "COMMENT", "LINE_COMMENT","enumerated");
         insert(tmp);
     }
-{comment2} {token* tmp = createNewNode(yylineno , token_counter++ , yytext ,"COMMENT", "COMMENT2","enumerated");
+{comment2} {token* tmp = createNewNode(yylineno , token_counter++ , "" ,"COMMENT", "COMMENT2","enumerated");
         insert(tmp);
     }
 {multy_comment} BEGIN(COMMENT); int lineCounter = 0; push(yylineno);
@@ -115,7 +115,7 @@ other                 .
     "\n"   lineCounter++;
     "*/" {
             /*ean theloyme na emfanizei to ending line prepei na alla3oyme opou startLine -> yylineno*/
-            
+
             // fprintf(stderr,"kleinw %d\n",yylineno);
 
             printStack();
@@ -154,15 +154,15 @@ other                 .
 
 
 <STRING>{
-    
+
     "\"" {
-    
+
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
-        
+
         myString = NULL;
         BEGIN(INITIAL);
-        
+
     }
     "\\\'" {
             count++;
@@ -172,7 +172,7 @@ other                 .
             }
             strcat(myString , "\'");
     }
-    
+
     "\\n" {
             count++;
             if(count > size*real){
@@ -213,7 +213,7 @@ other                 .
             }
             strcat(myString , "\f");
     }
-    
+
     "\\\"" {
             count++;
             if(count > size*real){
@@ -236,7 +236,7 @@ other                 .
               real++;
               myString = realloc(myString,size*real);
             }
-            strcat(myString , "\\"); 
+            strcat(myString , "\\");
     }
     \\. {
         count++;
@@ -374,11 +374,7 @@ other                 .
 {other} {
         red();
 
-        fprintf(stderr , "ERROR : UNDEFINED CHARACTER IN LINE %d\n" , yylineno);
-        token* tmp = createNewNode(yylineno , token_counter++ , yytext , "UNDEFINED_TOKEN","","enumerated");
-        insert(tmp);
-
-
+        fprintf(stderr , "ERROR : UNDEFINED \"%s\" IN LINE %d\n" ,yytext, yylineno);
         wht();
     }
 
