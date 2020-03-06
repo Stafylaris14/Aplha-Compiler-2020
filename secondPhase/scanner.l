@@ -102,9 +102,11 @@ other                 .
 
 {comment1} {token* tmp = createNewNode(yylineno , token_counter++ , "" , "COMMENT", "LINE_COMMENT","enumerated");
         insert(tmp);
+        return comment1;
     }
 {comment2} {token* tmp = createNewNode(yylineno , token_counter++ , "" ,"COMMENT", "COMMENT2","enumerated");
         insert(tmp);
+        return comment2;
     }
 {multy_comment} BEGIN(COMMENT); int lineCounter = 0; push(yylineno);
 
@@ -126,6 +128,7 @@ other                 .
             if(isEmpty()){
             token* tmp = createNewNode(startLine , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
             insert(tmp);
+            return comment;
             }else{
               token* tmp = createNewNode(startLine , token_counter++ , buffer ,"NESTED COMMENT", "BLOCK_COMMENT","enumerated");
               insert(tmp);
@@ -159,6 +162,7 @@ other                 .
 
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
+        return string;
 
         myString = NULL;
         BEGIN(INITIAL);
@@ -263,112 +267,143 @@ other                 .
     }
 }
 
-{if} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);}
-{else} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "ELSE" , "keyword");insert(tmp);}
-{while} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "WHILE" , "keyword");insert(tmp);}
-{for} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FOR" , "keyword");insert(tmp);}
-{function} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FUNCTION" , "keyword");insert(tmp);}
-{return} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "RETURN" , "keyword");insert(tmp);}
-{break} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "BREAK" , "keyword");insert(tmp);}
-{continue} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "CONTINUE" , "keyword");insert(tmp);}
-{and} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "AND" , "keyword");insert(tmp);}
-{not} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NOT" , "keyword");insert(tmp);}
-{or} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "OR" , "keyword");insert(tmp);}
-{local} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "LOCAL" , "keyword");insert(tmp);}
-{true} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "TRUE" , "keyword");insert(tmp);}
-{false} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FALSE" , "keyword");insert(tmp);}
-{nil} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NIL" , "keyword");insert(tmp);}
+{if} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);return if;}
+{else} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "ELSE" , "keyword");insert(tmp);return else;}
+{while} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "WHILE" , "keyword");insert(tmp);return while;}
+{for} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FOR" , "keyword");insert(tmp);return for;}
+{function} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FUNCTION" , "keyword");insert(tmp);return function;}
+{return} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "RETURN" , "keyword");insert(tmp);return return;}
+{break} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "BREAK" , "keyword");insert(tmp);return break;}
+{continue} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "CONTINUE" , "keyword");insert(tmp);return continue;}
+{and} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "AND" , "keyword");insert(tmp);return and;}
+{not} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NOT" , "keyword");insert(tmp);return not;}
+{or} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "OR" , "keyword");insert(tmp);return or;}
+{local} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "LOCAL" , "keyword");insert(tmp);return local;}
+{true} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "TRUE" , "keyword");insert(tmp);return true;}
+{false} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FALSE" , "keyword");insert(tmp);return false;}
+{nil} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NIL" , "keyword");insert(tmp);return nil;}
 {integer} {
         token* tmp = createNewNode(yylineno , token_counter++ , yytext , "CONST_INT" , yytext ,"integer");
-
         insert(tmp);
+        yyval.intVal = atoi(yytext);
+        return integer;
     }
 {real} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "REALCONST", yytext ,"enumerated");
         insert(tmp);
+        yyval.doubleVal = atoi(yytext);
+        return real;
     }
 {space} {
     }
 {assign} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "ASSIGN","enumerated");
         insert(tmp);
+        return assign;
     }
 {plus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS","enumerated");
         insert(tmp);
+        return plus;
     }
 {minus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS","enumerated");
         insert(tmp);
+        return minus;
     }
 {multiply} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MULTIPLY","enumerated");
         insert(tmp);
+        return multiply;
     }
 {division} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "DIVISION","enumerated");
         insert(tmp);
+        return division;
     }
 {mod} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MOD","enumerated");
         insert(tmp);
+        return mod;
     }
 {equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "EQUAL","enumerated");
         insert(tmp);
+        return equal;
     }
 {n_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "NOT_EQUAL","enumerated");
         insert(tmp);
+        return n_equal;
     }
 {plus_plus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "PLUS_PLUS","enumerated");
         insert(tmp);
+        return plus_plus;
     }
 {minus_minus} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "MINUS_MINUS","enumerated");
         insert(tmp);
+        return minus_minus;
     }
 {greater} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER","enumerated");
         insert(tmp);
+        return greater;
     }
 {less} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS","enumerated");
         insert(tmp);
+        return less;
     }
 {g_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "GREATER_EQUAL","enumerated");
         insert(tmp);
+        return g_equal;
     }
 {l_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS_EQUAL","enumerated");
         insert(tmp);
+        return less_equal;
     }
 {left_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_CURLY_BRACE","enumerated");
         insert(tmp);
+        return left_curle_bracket;
     }
 {right_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_CURLY_BRACE","enumerated");
         insert(tmp);
+        return right_curle_bracket;
     }
 {left_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_BRACE","enumerated");
         insert(tmp);
+        return left_bracket;
     }
 {right_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_BRACE","enumerated");
         insert(tmp);
+        return right_bracket;
     }
 {left_parenthesis} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_PARENTHESIS","enumerated");
         insert(tmp);
+        return left_parenthesis;
     }
 {right_parenthesis} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "RIGHT_PARENTHESIS","enumerated");
         insert(tmp);
+        return right_parenthesis;
     }
 {semicolon} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "SEMI_COLON","enumerated");
         insert(tmp);
+        return semicolon;
     }
 {comma} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COMMA","enumerated");
         insert(tmp);
+        return comma;
     }
 {colon} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "COLON","enumerated");
         insert(tmp);
+        return colon;
     }
 {double_colons} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_COLONS","enumerated");
         insert(tmp);
+        return double_colons;
     }
 {dot} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOT","enumerated");
         insert(tmp);
+        return dot;
     }
 {double_dots} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "DOUBLE_DOTS","enumerated");
         insert(tmp);
+        return double_dots;
     }
 
 {id} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"char*");
         insert(tmp);
+        yyval.StrVal = strdup(yytext);
+        return id;
     }
 
 {other} {
