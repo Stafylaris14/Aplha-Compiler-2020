@@ -3,6 +3,18 @@
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 #include "dataStructs/symb.h"
+
+
+  int yyerror(char *yaccProvideMessage);
+  int yylex(void);
+  
+  
+  extern int yylineno;
+  extern char* yytext;
+  extern FILE* yyin;
+
+
+
 %}
 
 
@@ -108,13 +120,15 @@ Stmt: Expression semicolon
     | Funcdef
     | semicolon    
     ;
+
+
 Expression: Assignexpression
             | Expression plus Expression
             | Expression minus Expression
+            | Expression multiply Expression
+            | Expression division Expression 
             | Expression and Expression
             | Expression or Expression
-            | Expression multiply Expression
-            | Expression division Expression    
             | Expression mod Expression
             | Expression equal Expression
             | Expression n_equal Expression
@@ -127,7 +141,7 @@ Expression: Assignexpression
 
     
 Term:   left_parenthesis Expression right_parenthesis
-        | minus Expression
+        | minus Expression %prec Uminus             /*na ftia3oume protereothta */
         | not Expression
         | plus_plus Lvalue
         | Lvalue plus_plus
@@ -169,7 +183,6 @@ Member: Lvalue dot id
 Call: Call left_parenthesis Elist right_parenthesis
         | Lvalue Callsuffix
         | left_parenthesis Funcdef right_parenthesis left_parenthesis Elist right_parenthesis 
-
         ;
 
 
@@ -178,7 +191,7 @@ Callsuffix: Normalcall
             | Methodcall
             ;
 
-Normalcall: left_bracket Elist right_parenthesis
+Normalcall: left_parenthesis Elist right_parenthesis
             ;
 
 
@@ -216,8 +229,7 @@ Block: left_curle_bracket States right_curle_bracket
 
 
 
-Funcdef: function
-        | function id
+Funcdef: function id
         | function left_parenthesis idlist right_parenthesis
         ;
 
@@ -254,3 +266,30 @@ Returnstmt: return semicolon
 
 
 %%
+
+
+//tin ftiaxoyme
+
+int yyerror (const char * YaccProvidedMessage){
+
+  exit(1);
+}
+
+
+int main(int argc, char** argv)
+{
+  if(argc > 1){
+    if (!(yyin = fopen(argv[1], "r"))){
+        fprintf(stderr,"Cannot read file: %s\n", argv[1]);
+	return 1;
+    }
+  }
+  else{
+    yyin = stdin;
+  }
+
+  yyparser();
+  return 0;
+}
+
+

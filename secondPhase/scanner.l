@@ -12,6 +12,8 @@
     #include "dataStructs/linkedList.h"
     #include "dataStructs/commentStack.h"
 
+    #include "parser.h"
+
     #define  YY_DECL int alpha_yylex (token *lvalp)
 
 
@@ -419,18 +421,3 @@ other                 .
 
 
 
-int main(int argc , char** argv)
-{
-    if(argc>1)
-    {
-        if(!(yyin = fopen(argv[1] , "r"))){
-
-            fprintf(stderr , "Cannot open file\n");
-        }
-    }else
-        yyin = stdin;
-
-    alpha_yylex(NULL);
-    printList();
-    return 0;
-}
