@@ -1,13 +1,12 @@
+parser: parser.y
+	bison --yacc --defines --output=parser.c parser.y
 
-scanner:scanner.l dataStructs/linkedList.c dataStructs/commentStack.c
+scanner:scanner.l dataStructs/linkedList.c dataStructs/commentStack.c parser
 	flex -o scanner.c scanner.l
 	gcc  -c dataStructs/commentStack.c
 	gcc  -c dataStructs/linkedList.c
 	gcc  -c scanner.c
 	gcc  -o scanner scanner.o linkedList.o commentStack.o
-
-parser: scanner
-	bison --yacc --defines --output=parser.c parser.y
 
 lex:
 	flex -o scanner.c scanner.l
