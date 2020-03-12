@@ -6,7 +6,7 @@
 
 
 int yyerror(char *yaccProvideMessage);
-int alpha_yylex(void);
+int yylex(void);
   
   
   extern int yylineno;
@@ -302,4 +302,5 @@ int main(int argc, char** argv)
 	return 1;
     }
   }
+    yyparse();
 }
