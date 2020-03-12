@@ -11,7 +11,6 @@
 
     #include "dataStructs/linkedList.h"
     #include "dataStructs/commentStack.h"
-
     #include "parser.h"
 
     #define  YY_DECL int alpha_yylex (token *lvalp)
