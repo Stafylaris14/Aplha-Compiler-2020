@@ -97,7 +97,9 @@
 
 /*prepei na kanoume protereothta*/
 
-
+%left assign
+%left or
+%left and
 
 
 %%
@@ -123,7 +125,7 @@ Stmt: Expression semicolon
 
 
 Expression: Assignexpression
-            | Expression plus Expression
+            | Expression plus Expression {}
             | Expression minus Expression
             | Expression multiply Expression
             | Expression division Expression 
