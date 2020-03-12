@@ -3,15 +3,12 @@ dataStructs: dataStructs/linkedList.c dataStructs/commentStack.c
 	gcc  -c dataStructs/linkedList.c
 	gcc  -c dataStructs/symb.c
 
-# edw ftiaxnw to parser.c
+
 parser: parser.y 
 	bison --yacc --defines --output=parser.c parser.y
 
 scanner:scanner.l 
 	flex -o scanner.c scanner.l	
-
-lex:
-	flex -o scanner.c scanner.l
 
 compiler: parser scanner
 	gcc -c parser.c dataStructs/symb.c
