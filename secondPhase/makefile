@@ -13,8 +13,13 @@ scanner:scanner.l parser
 lex:
 	flex -o scanner.c scanner.l
 
-compiler:scanner parser
-	gcc -o calc scanner.c parser.c linkedList.c commentStack.c symb.c
+compiler:parser scanner 
+	gcc -c scanner.c 
+	gcc -c parser.c
+	gcc -c dataStructs/linkedList.c 
+	gcc -c dataStructs/commentStack.c 
+	gcc -c dataStructs/symb.c
+	gcc -o calc scanner.o parser.o linkedList.o commentStack.o symb.o
 
 clean:
 	rm -f scanner.c
@@ -22,3 +27,7 @@ clean:
 	rm -f *.o
 	rm -f parser.c
 	rm -f parser.h
+
+
+
+

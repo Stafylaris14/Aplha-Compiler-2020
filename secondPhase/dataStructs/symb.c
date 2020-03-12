@@ -1,4 +1,4 @@
-#include <symb.h>
+#include "symb.h"
 
 void init_symTable()
 {
@@ -9,7 +9,7 @@ void init_symTable()
         symtable[index]->lineno = -1;
         symtable[index]->name = NULL;
         symtable[index]->next = NULL;
-        symtable[index]->scope = NULL;
+        symtable[index]->scope = -1;
         symtable[index]->type = NULL;
     }
 }

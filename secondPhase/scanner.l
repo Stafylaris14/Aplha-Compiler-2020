@@ -43,20 +43,20 @@ multy_comment               "/*"
 
 /*keywords*/
 
-if              "if"
-else            "else"
-while           "while"
-for             "for"
+if              "If"
+else            "Else"
+while           "While"
+for             "For"
 function        "function"
-return          "return"
-break           "break"
-continue        "continue"
+return          "Return"
+break           "Break"
+continue        "Continue"
 and             "and"
 not             "not"
 or              "or"
 local           "local"
-true            "true"
-false           "false"
+true            "True"
+false           "False"
 nil             "nil"
 
 
@@ -103,11 +103,11 @@ other                 .
 
 {comment1} {token* tmp = createNewNode(yylineno , token_counter++ , "" , "COMMENT", "LINE_COMMENT","enumerated");
         insert(tmp);
-        return comment1;
+        //return comment1;
     }
 {comment2} {token* tmp = createNewNode(yylineno , token_counter++ , "" ,"COMMENT", "COMMENT2","enumerated");
         insert(tmp);
-        return comment2;
+    //    return comment2;
     }
 {multy_comment} BEGIN(COMMENT); int lineCounter = 0; push(yylineno);
 
@@ -129,7 +129,7 @@ other                 .
             if(isEmpty()){
             token* tmp = createNewNode(startLine , token_counter++ , buffer ,"COMMENT", "BLOCK_COMMENT","enumerated");
             insert(tmp);
-            return comment;
+          //  return comment;
             }else{
               token* tmp = createNewNode(startLine , token_counter++ , buffer ,"NESTED COMMENT", "BLOCK_COMMENT","enumerated");
               insert(tmp);
@@ -154,7 +154,7 @@ other                 .
 
 
 
-{string} BEGIN(STRING);int size = 100; char* myString = malloc(size);int count = 1;int real =1;
+{string} BEGIN(STRING);int size = 100; char* myString = malloc(size);int count = 1;int Real =1;
 
 
 <STRING>{
@@ -171,75 +171,75 @@ other                 .
     }
     "\\\'" {
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\'");
     }
 
     "\\n" {
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\n");
     }
     "\\t" {
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\t");
     }
     "\\r" {
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\r");
     }
     "\\v" {
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\v");
     }
     "\\f" {
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\f");
     }
 
     "\\\"" {
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\"");
     }
     "\\b" {
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\b");
     }
     "\\\\" {
         count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , "\\");
     }
@@ -253,9 +253,9 @@ other                 .
     . {
         cyn();
             count++;
-            if(count > size*real){
-              real++;
-              myString = realloc(myString,size*real);
+            if(count > size*Real){
+              Real++;
+              myString = realloc(myString,size*Real);
             }
             strcat(myString , yytext);
     }
@@ -268,30 +268,30 @@ other                 .
     }
 }
 
-{if} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);return if;}
-{else} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "ELSE" , "keyword");insert(tmp);return else;}
-{while} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "WHILE" , "keyword");insert(tmp);return while;}
-{for} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FOR" , "keyword");insert(tmp);return for;}
-{function} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FUNCTION" , "keyword");insert(tmp);return function;}
-{return} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "RETURN" , "keyword");insert(tmp);return return;}
-{break} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "BREAK" , "keyword");insert(tmp);return break;}
-{continue} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "CONTINUE" , "keyword");insert(tmp);return continue;}
+{if} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "IF" , "keyword");insert(tmp);return If;}
+{else} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "ELSE" , "keyword");insert(tmp);return Else;}
+{while} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "WHILE" , "keyword");insert(tmp);return While;}
+{for} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FOR" , "keyword");insert(tmp);return For;}
+{function} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FUNCTION" , "keyword");insert(tmp);return Function;}
+{return} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "RETURN" , "keyword");insert(tmp);return Return;}
+{break} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "BREAK" , "keyword");insert(tmp);return Break;}
+{continue} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "CONTINUE" , "keyword");insert(tmp);return Continue;}
 {and} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "AND" , "keyword");insert(tmp);return and;}
 {not} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NOT" , "keyword");insert(tmp);return not;}
 {or} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "OR" , "keyword");insert(tmp);return or;}
 {local} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "LOCAL" , "keyword");insert(tmp);return local;}
-{true} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "TRUE" , "keyword");insert(tmp);return true;}
-{false} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FALSE" , "keyword");insert(tmp);return false;}
+{true} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "TRUE" , "keyword");insert(tmp);return True;}
+{false} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "FALSE" , "keyword");insert(tmp);return False;}
 {nil} { token* tmp = createNewNode(yylineno , token_counter++ , yytext , "KEYWORD" , "NIL" , "keyword");insert(tmp);return nil;}
 {integer} {
         token* tmp = createNewNode(yylineno , token_counter++ , yytext , "CONST_INT" , yytext ,"integer");
         insert(tmp);
-        yyval.intVal = atoi(yytext);
+        yylval.intVal = atoi(yytext);
         return integer;
     }
 {real} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "REALCONST", yytext ,"enumerated");
         insert(tmp);
-        yyval.doubleVal = atoi(yytext);
+        yylval.doubleVal = atoi(yytext);
         return real;
     }
 {space} {
@@ -350,7 +350,7 @@ other                 .
     }
 {l_equal} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "OPERATOR" , "LESS_EQUAL","enumerated");
         insert(tmp);
-        return less_equal;
+        return l_equal;
     }
 {left_curle_bracket} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "PUNCTUATION" , "LEFT_CURLY_BRACE","enumerated");
         insert(tmp);
@@ -403,7 +403,7 @@ other                 .
 
 {id} {token* tmp = createNewNode(yylineno , token_counter++ , yytext , "ID" ,yytext ,"char*");
         insert(tmp);
-        yyval.StrVal = strdup(yytext);
+        yylval.strVal = strdup(yytext);
         return id;
     }
 

@@ -1,4 +1,6 @@
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #define HASH_SIZE 1409
 
 
