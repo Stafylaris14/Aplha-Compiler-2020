@@ -6,7 +6,7 @@
 
 
 int yyerror(char *yaccProvideMessage);
-int yylex(void);
+int alpha_yylex(void);
   
   
   extern int yylineno;
