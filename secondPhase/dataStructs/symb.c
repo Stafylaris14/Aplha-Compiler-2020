@@ -124,7 +124,7 @@ void printSymTable()
             {
                 if (tmp->scope == scopeIndex)
                 {
-                    fprintf(stderr, "\"%s\" [%s] (line %f) (scope %d) \n", tmp->name, tmp->type, tmp->lineno, tmp->scope);
+                    fprintf(stderr, "\"%s\" [%s] (line %d) (scope %d) \n", tmp->name, tmp->type, tmp->lineno, tmp->scope);
                 }
                 tmp = tmp->next;
             }

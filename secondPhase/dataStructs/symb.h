@@ -11,7 +11,7 @@ typedef struct Item
     char *name;
     char *type;
     int scope;
-    double lineno;
+    int lineno;
     struct Item *next;
 } item;
 

@@ -133,7 +133,7 @@ Stmt: Expression semicolon {;}
 
 
 Expression: Assignexpression {;}
-            | Expression plus Expression {printf("eimai edw!\n");}
+            | Expression plus Expression {;}
             | Expression minus Expression {;}
             | Expression multiply Expression {;}
             | Expression division Expression {;}
@@ -176,14 +176,23 @@ Primary: Lvalue {;}
 
 
 
-Lvalue: id {fprintf(stderr,"Id %s on line %d\n",$1,yylineno);
-        if(!isLibraryFunction($1)){
-                item* new = newItem($1,"id", scopeCounter , yylineno );
-                insert_symTable(new);
+Lvalue: id {
+                if(!isLibraryFunction($1)){
+                        item* new = newItem($1,"id", scopeCounter , yylineno );
+                        insert_symTable(new);
+                }else{
+                        errorLibFunction(yylineno , $1);
+                }
+                
         }
-        
+        | local id {
+                        if(!isLibraryFunction($2)){
+                                item* new = newItem($2,"id", scopeCounter , yylineno );
+                                insert_symTable(new);
+                        }else{
+                                errorLibFunction(yylineno , $2);
+                        }   
         }
-        | local id {;}
         | double_colons id {;}
         | Member {;}
         ;
@@ -238,16 +247,18 @@ Multy_ind: Multy_ind comma Indexedelement {;}
          ;
 
 Indexedelement: left_curle_bracket{scopeCounter++;
-                if(scopeCounter > maxScope) maxScope = scopeCounter;
-                printf("Scope ++ %d\n" , scopeCounter);}
-                Expression colon Expression right_curle_bracket {scopeCounter--; printf("Scope -- %d\n" , scopeCounter);}
+                if(scopeCounter > maxScope) maxScope = scopeCounter;}
+                Expression colon Expression right_curle_bracket {
+                        
+                        scopeCounter--;
+                        printSymTable();
+                 }
                 ;
 
 
 Block: left_curle_bracket{scopeCounter++;
-        if(scopeCounter > maxScope) maxScope = scopeCounter;
-        printf("Scope ++ %d\n" , scopeCounter);} 
-        States right_curle_bracket {scopeCounter--;printf("Scope -- %d\n" , scopeCounter);}
+        if(scopeCounter > maxScope) maxScope = scopeCounter;} 
+        States right_curle_bracket {scopeCounter--;}
         ;
         
 

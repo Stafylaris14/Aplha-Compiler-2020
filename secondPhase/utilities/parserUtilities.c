@@ -1,5 +1,5 @@
 #include "parserUtilities.h"
-// #include "../dataStructs/symb.h"
+#include "../dataStructs/linkedList.h"
 
 char *libFun[12] = {
     "print",
@@ -22,11 +22,15 @@ int isLibraryFunction(char *name)
     for (i = 0; i < 12; i++)
     {
         if (strcmp(name, libFun[i]) == 0){
-            printf("synartisi biblio8ikis %s\n",name);
             return 1;
         }
     }
     return 0;
 }
 
-
+void errorLibFunction(int lineno, char *name)
+{
+    red();
+    fprintf(stderr, "Library function detected in line %d   %s\n", lineno, name);
+    wht();
+}

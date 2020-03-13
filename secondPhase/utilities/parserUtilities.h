@@ -11,4 +11,7 @@
 #define KCYN "\x1B[36m"
 
 char *libFun[12];
+
 int isLibraryFunction(char *name);
+
+void errorLibFunction(int lineno, char *name);
