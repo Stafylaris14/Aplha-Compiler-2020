@@ -3,15 +3,16 @@
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 #include "dataStructs/symb.h"
+#include "utilities/parserUtilities.h"
 
 
 int yyerror(char *yaccProvideMessage);
 int yylex(void);
   
-  
-  extern int yylineno;
-  extern char* yytext;
-  extern FILE* yyin;
+int scopeCounter = 0;
+extern int yylineno;
+extern char* yytext;
+extern FILE* yyin;
 
 
 
@@ -29,7 +30,7 @@ int yylex(void);
 %start program
 
 %token <intVal> integer
-%token <StrVal> id
+%token <strVal> id
 %token <doubleVal> real
 %token <strVal> string
 
@@ -132,7 +133,7 @@ Stmt: Expression semicolon {;}
 
 
 Expression: Assignexpression {;}
-            | Expression plus Expression {;}
+            | Expression plus Expression {printf("eimai edw!\n");}
             | Expression minus Expression {;}
             | Expression multiply Expression {;}
             | Expression division Expression {;}
@@ -175,7 +176,7 @@ Primary: Lvalue {;}
 
 
 
-Lvalue: id {;}
+Lvalue: id {fprintf(stderr,"Id %s on line %d\n",$1,yylineno); int x = isLibraryFunction($1);}
         | local id {;}
         | double_colons id {;}
         | Member {;}
@@ -230,11 +231,11 @@ Multy_ind: Multy_ind comma Indexedelement {;}
         | {;}
          ;
 
-Indexedelement: left_curle_bracket Expression colon Expression right_curle_bracket {;}
+Indexedelement: left_curle_bracket{scopeCounter++;printf("Scope ++ %d\n" , scopeCounter);} Expression colon Expression right_curle_bracket {scopeCounter--; printf("Scope -- %d\n" , scopeCounter);}
                 ;
 
 
-Block: left_curle_bracket States right_curle_bracket {;}
+Block: left_curle_bracket{scopeCounter++;printf("Scope ++ %d\n" , scopeCounter);} States right_curle_bracket {scopeCounter--;printf("Scope -- %d\n" , scopeCounter);}
         ;
         
 
@@ -246,7 +247,7 @@ Funcdef: Function id {;}
 
 
 
-Const: integer {;}
+Const: integer {fprintf(stderr,"integer %d on line %d\n",$1,yylineno);;}
         | real {;}
         | string {;}
         | nil {;}

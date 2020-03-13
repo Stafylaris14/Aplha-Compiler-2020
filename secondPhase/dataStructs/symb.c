@@ -11,6 +11,7 @@ void init_symTable()
         symtable[index]->next = NULL;
         symtable[index]->scope = -1;
         symtable[index]->type = NULL;
+        
     }
 }
 
@@ -43,8 +44,25 @@ void insert_symTable(item *i)
     insert_list(i, index);
 }
 
+/*lookup in selected scope*/
+item *lookupScope(char *name, int scope)
+{
+    int index = hash((int)name);
+    item *tmp = symtable[index];
+    while (tmp != NULL)
+    {
+        if (!strcmp(tmp->name, name))
+        {
+            if (tmp->scope == scope)
+                return tmp;
+        }
 
-/*returns NULL if name not found*/
+        tmp = tmp->next;
+    }
+    return NULL;
+}
+
+/*returns NULL if name not found with in any scope*/
 item *lookup(char *name)
 {
     int index = hash((int)name);
@@ -60,3 +78,6 @@ item *lookup(char *name)
     }
     return NULL;
 }
+
+
+

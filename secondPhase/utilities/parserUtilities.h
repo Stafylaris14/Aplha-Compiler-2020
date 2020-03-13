@@ -1,0 +1,4 @@
+
+
+
+int isLibraryFunction(char *name);
