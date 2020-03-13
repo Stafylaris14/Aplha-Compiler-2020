@@ -42,7 +42,7 @@ void insert_list(item *i, int index)
 
 void insert_symTable(item *i)
 {
-    int index = hash(i->lineno);
+    int index = hash(strlen(i->name));
     insert_list(i, index);
 }
 
