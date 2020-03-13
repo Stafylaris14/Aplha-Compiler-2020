@@ -35,8 +35,7 @@ void insert_list(item *i, int index)
         {
             tmp = tmp->next;
         }
-        tmp = i;
-        tmp->next = NULL;
+        tmp->next = i;
     }
 }
 
@@ -98,11 +97,12 @@ void hide(int scope)
     int i;
     for (i = 0; i < HASH_SIZE; i++)
     {
-        item *tmp = symtable[i]->next;
+        item *tmp = symtable[i];
         while (tmp != NULL)
         {
-            if (tmp->scope == scope)
+            if (tmp->scope == scope && tmp->isActive == 1)
             {
+                printf("inactive %s\n",tmp->name );
                 tmp->isActive = 0;
             }
             tmp = tmp->next;
@@ -113,7 +113,7 @@ void hide(int scope)
 void printSymTable()
 {
     int index, scopeIndex;
-    for (scopeIndex = 0; scopeIndex < maxScope; scopeIndex++)
+    for (scopeIndex = 0; scopeIndex <= maxScope; scopeIndex++)
     {
         cyn();
         fprintf(stderr, "-------Scope #%d------\n", scopeIndex);

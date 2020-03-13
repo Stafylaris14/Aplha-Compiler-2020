@@ -8,7 +8,7 @@
 
 int yyerror(char *yaccProvideMessage);
 int yylex(void);
-  
+
 int scopeCounter = 0;
 extern int yylineno;
 extern char* yytext;
@@ -66,31 +66,31 @@ extern FILE* yyin;
 %token division
 %token mod
 %token equal
-%token n_equal       
-%token plus_plus     
-%token minus_minus   
-%token greater      
-%token less          
-%token g_equal       
-%token l_equal       
+%token n_equal
+%token plus_plus
+%token minus_minus
+%token greater
+%token less
+%token g_equal
+%token l_equal
 
 
 
 /*braces*/
 
-%token left_curle_bracket    
-%token right_curle_bracket   
-%token left_bracket          
-%token right_bracket         
-%token left_parenthesis      
-%token right_parenthesis     
-%token semicolon             
-%token comma                 
-%token colon                 
-%token double_colons         
-%token dot                   
-%token double_dots           
-%token other       
+%token left_curle_bracket
+%token right_curle_bracket
+%token left_bracket
+%token right_bracket
+%token left_parenthesis
+%token right_parenthesis
+%token semicolon
+%token comma
+%token colon
+%token double_colons
+%token dot
+%token double_dots
+%token other
 
 
 
@@ -99,7 +99,7 @@ extern FILE* yyin;
 %left assign
 %left or
 %left and
-%nonassoc equal n_equal 
+%nonassoc equal n_equal
 %nonassoc greater g_equal less l_equal
 %left plus minus
 %left multiply division mod
@@ -116,7 +116,7 @@ program: States {;}
     ;
 
 States: States Stmt {;}
-    |   
+    |
     ;
 
 Stmt: Expression semicolon {;}
@@ -128,7 +128,7 @@ Stmt: Expression semicolon {;}
     | Continue semicolon {;}
     | Block {;}
     | Funcdef {;}
-    | semicolon   {;} 
+    | semicolon   {;}
     ;
 
 
@@ -149,9 +149,9 @@ Expression: Assignexpression {;}
             | Term {;}
              ;
 
-    
+
 Term:   left_parenthesis Expression right_parenthesis {;}
-        | minus Expression %prec Uminus {;}         
+        | minus Expression %prec Uminus {;}
         | not Expression {;}
         | plus_plus Lvalue {;}
         | Lvalue plus_plus {;}
@@ -183,7 +183,7 @@ Lvalue: id {
                 }else{
                         errorLibFunction(yylineno , $1);
                 }
-                
+
         }
         | local id {
                         if(!isLibraryFunction($2)){
@@ -191,7 +191,7 @@ Lvalue: id {
                                 insert_symTable(new);
                         }else{
                                 errorLibFunction(yylineno , $2);
-                        }   
+                        }
         }
         | double_colons id {;}
         | Member {;}
@@ -220,7 +220,7 @@ Normalcall: left_parenthesis Elist right_parenthesis {;}
             ;
 
 
-            
+
 Methodcall: double_dots id left_parenthesis Elist right_parenthesis {;}
             ;
 
@@ -249,7 +249,7 @@ Multy_ind: Multy_ind comma Indexedelement {;}
 Indexedelement: left_curle_bracket{scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
                 Expression colon Expression right_curle_bracket {
-                        
+                        hide(scopeCounter);
                         scopeCounter--;
                         printSymTable();
                  }
@@ -257,10 +257,12 @@ Indexedelement: left_curle_bracket{scopeCounter++;
 
 
 Block: left_curle_bracket{scopeCounter++;
-        if(scopeCounter > maxScope) maxScope = scopeCounter;} 
-        States right_curle_bracket {scopeCounter--;}
+        if(scopeCounter > maxScope) maxScope = scopeCounter;}
+        States right_curle_bracket {
+            hide(scopeCounter);
+            scopeCounter--;}
         ;
-        
+
 
 
 
@@ -321,8 +323,8 @@ int yyerror (char * YaccProvidedMessage){
 
 int main(int argc, char** argv)
 {
-  maxScope = 0;   
-  init_symTable();   
+  maxScope = 0;
+  init_symTable();
   if(argc > 1){
     if (!(yyin = fopen(argv[1], "r"))){
         fprintf(stderr,"Cannot read file: %s\n", argv[1]);
