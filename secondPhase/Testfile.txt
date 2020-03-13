@@ -1,14 +1,13 @@
 {
-    print = 5 + 2;
-    local print = 0;
-    input = e;
-
+    
+    input = a;
 }
 
+ela = 1;
 
-
-
+input = e;
 {
+    this = 1;
     {
         {
             x = 1;

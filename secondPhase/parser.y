@@ -249,7 +249,7 @@ Multy_ind: Multy_ind comma Indexedelement {;}
 Indexedelement: left_curle_bracket{scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
                 Expression colon Expression right_curle_bracket {
-                        
+                        hide(scopeCounter);
                         scopeCounter--;
                         printSymTable();
                  }
@@ -331,4 +331,5 @@ int main(int argc, char** argv)
   }
     yyparse();
     printSymTable();
+    printHash();
 }

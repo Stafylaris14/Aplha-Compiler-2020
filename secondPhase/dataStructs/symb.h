@@ -32,3 +32,5 @@ item *lookup(char *name);
 item *newItem(char *name, char *type, int scope, double lineno);
 
 void printSymTable();
+
+void printHash();

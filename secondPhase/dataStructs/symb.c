@@ -124,10 +124,31 @@ void printSymTable()
             {
                 if (tmp->scope == scopeIndex)
                 {
+                    if(tmp->isActive == 0){
+                        red();
+                    }else {
+                        cyn();
+                    }
                     fprintf(stderr, "\"%s\" [%s] (line %d) (scope %d) \n", tmp->name, tmp->type, tmp->lineno, tmp->scope);
+                    
                 }
                 tmp = tmp->next;
+                wht();
             }
         }
+    }
+}
+
+void printHash(){
+    int index ;
+    for(index = 0; index < HASH_SIZE; index++){
+            item* tmp = symtable[index];
+            grn();
+            if(tmp != NULL)
+                fprintf(stderr , "\n");
+            while(tmp != NULL){
+                fprintf(stderr , "   |  %s  |    " , tmp->name);
+                tmp = tmp->next;
+            }
     }
 }
