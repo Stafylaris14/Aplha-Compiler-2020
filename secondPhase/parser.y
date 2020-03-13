@@ -176,7 +176,13 @@ Primary: Lvalue {;}
 
 
 
-Lvalue: id {fprintf(stderr,"Id %s on line %d\n",$1,yylineno); int x = isLibraryFunction($1);}
+Lvalue: id {fprintf(stderr,"Id %s on line %d\n",$1,yylineno);
+        if(!isLibraryFunction($1)){
+                item* new = newItem($1,"id", scopeCounter , yylineno );
+                insert_symTable(new);
+        }
+        
+        }
         | local id {;}
         | double_colons id {;}
         | Member {;}
@@ -231,11 +237,17 @@ Multy_ind: Multy_ind comma Indexedelement {;}
         | {;}
          ;
 
-Indexedelement: left_curle_bracket{scopeCounter++;printf("Scope ++ %d\n" , scopeCounter);} Expression colon Expression right_curle_bracket {scopeCounter--; printf("Scope -- %d\n" , scopeCounter);}
+Indexedelement: left_curle_bracket{scopeCounter++;
+                if(scopeCounter > maxScope) maxScope = scopeCounter;
+                printf("Scope ++ %d\n" , scopeCounter);}
+                Expression colon Expression right_curle_bracket {scopeCounter--; printf("Scope -- %d\n" , scopeCounter);}
                 ;
 
 
-Block: left_curle_bracket{scopeCounter++;printf("Scope ++ %d\n" , scopeCounter);} States right_curle_bracket {scopeCounter--;printf("Scope -- %d\n" , scopeCounter);}
+Block: left_curle_bracket{scopeCounter++;
+        if(scopeCounter > maxScope) maxScope = scopeCounter;
+        printf("Scope ++ %d\n" , scopeCounter);} 
+        States right_curle_bracket {scopeCounter--;printf("Scope -- %d\n" , scopeCounter);}
         ;
         
 
@@ -291,12 +303,15 @@ Returnstmt: Return semicolon {;}
 //tin ftiaxoyme
 
 int yyerror (char * YaccProvidedMessage){
-  return 0;
+        fprintf(stderr,"%s\n",YaccProvidedMessage);
+        return 0;
 }
 
 
 int main(int argc, char** argv)
 {
+  maxScope = 0;   
+  init_symTable();   
   if(argc > 1){
     if (!(yyin = fopen(argv[1], "r"))){
         fprintf(stderr,"Cannot read file: %s\n", argv[1]);
@@ -304,4 +319,5 @@ int main(int argc, char** argv)
     }
   }
     yyparse();
+    printSymTable();
 }

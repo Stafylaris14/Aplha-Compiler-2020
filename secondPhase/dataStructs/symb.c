@@ -1,17 +1,17 @@
 #include "symb.h"
-
+#include "../utilities/parserUtilities.h"
+#include "../dataStructs/linkedList.h"
 void init_symTable()
 {
     int index;
     for (index = 0; index < HASH_SIZE; index++)
     {
-        symtable[index] = malloc(sizeof(item));
-        symtable[index]->lineno = -1;
-        symtable[index]->name = NULL;
-        symtable[index]->next = NULL;
-        symtable[index]->scope = -1;
-        symtable[index]->type = NULL;
-        
+        symtable[index] = NULL;
+    }
+    for (index = 0; index < 12; index++)
+    {
+        item *tmp = newItem(libFun[index], "library function", 0, 0);
+        insert_symTable(tmp);
     }
 }
 
@@ -22,11 +22,12 @@ int hash(int val)
 
 void insert_list(item *i, int index)
 {
-    item *tmp = symtable[index]->next;
-    if (tmp == NULL)
+    item *tmp = symtable[index];
+    if (symtable[index] == NULL)
     {
-        tmp = i;
-        tmp->next = NULL;
+        symtable[index] = i;
+        symtable[index]->next = NULL;
+        return;
     }
     else
     {
@@ -35,12 +36,13 @@ void insert_list(item *i, int index)
             tmp = tmp->next;
         }
         tmp = i;
+        tmp->next = NULL;
     }
 }
 
 void insert_symTable(item *i)
 {
-    int index = hash((int)i->name);
+    int index = hash(i->lineno);
     insert_list(i, index);
 }
 
@@ -79,5 +81,53 @@ item *lookup(char *name)
     return NULL;
 }
 
+item *newItem(char *name, char *type, int scope, double lineno)
+{
+    item *tmp = malloc(sizeof(item));
+    tmp->name = strdup(name);
+    tmp->type = strdup(type);
+    tmp->scope = scope;
+    tmp->lineno = lineno;
+    tmp->isActive = 1;
+    tmp->next = NULL;
+    return tmp;
+}
 
+void hide(int scope)
+{
+    int i;
+    for (i = 0; i < HASH_SIZE; i++)
+    {
+        item *tmp = symtable[i]->next;
+        while (tmp != NULL)
+        {
+            if (tmp->scope == scope)
+            {
+                tmp->isActive = 0;
+            }
+            tmp = tmp->next;
+        }
+    }
+}
 
+void printSymTable()
+{
+    int index, scopeIndex;
+    for (scopeIndex = 0; scopeIndex < maxScope; scopeIndex++)
+    {
+        cyn();
+        fprintf(stderr, "-------Scope #%d------\n", scopeIndex);
+        for (index = 0; index < HASH_SIZE; index++)
+        {
+            item *tmp = symtable[index];
+            while (tmp != NULL)
+            {
+                if (tmp->scope == scopeIndex)
+                {
+                    fprintf(stderr, "\"%s\" [%s] (line %f) (scope %d) \n", tmp->name, tmp->type, tmp->lineno, tmp->scope);
+                }
+                tmp = tmp->next;
+            }
+        }
+    }
+}

@@ -555,11 +555,11 @@ static const yytype_uint16 yyrline[] =
      127,   128,   129,   130,   131,   135,   136,   137,   138,   139,
      140,   141,   142,   143,   144,   145,   146,   147,   148,   149,
      153,   154,   155,   156,   157,   158,   159,   160,   163,   169,
-     170,   171,   172,   173,   179,   180,   181,   182,   186,   187,
-     188,   189,   193,   194,   195,   200,   201,   204,   209,   214,
-     215,   218,   219,   222,   223,   227,   230,   231,   234,   234,
-     238,   238,   244,   245,   250,   251,   252,   253,   254,   255,
-     260,   261,   264,   265,   271,   272,   275,   278,   282,   283
+     170,   171,   172,   173,   179,   186,   187,   188,   192,   193,
+     194,   195,   199,   200,   201,   206,   207,   210,   215,   220,
+     221,   224,   225,   228,   229,   233,   236,   237,   240,   240,
+     247,   247,   256,   257,   262,   263,   264,   265,   266,   267,
+     272,   273,   276,   277,   283,   284,   287,   290,   294,   295
 };
 #endif
 
@@ -1861,237 +1861,247 @@ yyreduce:
 
   case 44:
 #line 179 "parser.y"
-    {fprintf(stderr,"Id %s on line %d\n",(yyvsp[(1) - (1)].strVal),yylineno); int x = isLibraryFunction((yyvsp[(1) - (1)].strVal));}
+    {fprintf(stderr,"Id %s on line %d\n",(yyvsp[(1) - (1)].strVal),yylineno);
+        if(!isLibraryFunction((yyvsp[(1) - (1)].strVal))){
+                item* new = newItem((yyvsp[(1) - (1)].strVal),"id", scopeCounter , yylineno );
+                insert_symTable(new);
+        }
+        
+        }
     break;
 
   case 45:
-#line 180 "parser.y"
-    {;}
-    break;
-
-  case 46:
-#line 181 "parser.y"
-    {;}
-    break;
-
-  case 47:
-#line 182 "parser.y"
-    {;}
-    break;
-
-  case 48:
 #line 186 "parser.y"
     {;}
     break;
 
-  case 49:
+  case 46:
 #line 187 "parser.y"
     {;}
     break;
 
-  case 50:
+  case 47:
 #line 188 "parser.y"
     {;}
     break;
 
-  case 51:
-#line 189 "parser.y"
+  case 48:
+#line 192 "parser.y"
     {;}
     break;
 
-  case 52:
+  case 49:
 #line 193 "parser.y"
     {;}
     break;
 
-  case 53:
+  case 50:
 #line 194 "parser.y"
     {;}
     break;
 
-  case 54:
+  case 51:
 #line 195 "parser.y"
     {;}
     break;
 
-  case 55:
+  case 52:
+#line 199 "parser.y"
+    {;}
+    break;
+
+  case 53:
 #line 200 "parser.y"
     {;}
     break;
 
-  case 56:
+  case 54:
 #line 201 "parser.y"
     {;}
     break;
 
+  case 55:
+#line 206 "parser.y"
+    {;}
+    break;
+
+  case 56:
+#line 207 "parser.y"
+    {;}
+    break;
+
   case 57:
-#line 204 "parser.y"
+#line 210 "parser.y"
     {;}
     break;
 
   case 58:
-#line 209 "parser.y"
-    {;}
-    break;
-
-  case 59:
-#line 214 "parser.y"
-    {;}
-    break;
-
-  case 60:
 #line 215 "parser.y"
     {;}
     break;
 
+  case 59:
+#line 220 "parser.y"
+    {;}
+    break;
+
+  case 60:
+#line 221 "parser.y"
+    {;}
+    break;
+
   case 61:
-#line 218 "parser.y"
+#line 224 "parser.y"
     {;}
     break;
 
   case 62:
-#line 219 "parser.y"
+#line 225 "parser.y"
     {;}
     break;
 
   case 63:
-#line 222 "parser.y"
+#line 228 "parser.y"
     {;}
     break;
 
   case 64:
-#line 223 "parser.y"
+#line 229 "parser.y"
     {;}
     break;
 
   case 65:
-#line 227 "parser.y"
+#line 233 "parser.y"
     {;}
     break;
 
   case 66:
-#line 230 "parser.y"
+#line 236 "parser.y"
     {;}
     break;
 
   case 67:
-#line 231 "parser.y"
+#line 237 "parser.y"
     {;}
     break;
 
   case 68:
-#line 234 "parser.y"
-    {scopeCounter++;printf("Scope ++ %d\n" , scopeCounter);}
+#line 240 "parser.y"
+    {scopeCounter++;
+                if(scopeCounter > maxScope) maxScope = scopeCounter;
+                printf("Scope ++ %d\n" , scopeCounter);}
     break;
 
   case 69:
-#line 234 "parser.y"
+#line 243 "parser.y"
     {scopeCounter--; printf("Scope -- %d\n" , scopeCounter);}
     break;
 
   case 70:
-#line 238 "parser.y"
-    {scopeCounter++;printf("Scope ++ %d\n" , scopeCounter);}
+#line 247 "parser.y"
+    {scopeCounter++;
+        if(scopeCounter > maxScope) maxScope = scopeCounter;
+        printf("Scope ++ %d\n" , scopeCounter);}
     break;
 
   case 71:
-#line 238 "parser.y"
+#line 250 "parser.y"
     {scopeCounter--;printf("Scope -- %d\n" , scopeCounter);}
     break;
 
   case 72:
-#line 244 "parser.y"
+#line 256 "parser.y"
     {;}
     break;
 
   case 73:
-#line 245 "parser.y"
+#line 257 "parser.y"
     {;}
     break;
 
   case 74:
-#line 250 "parser.y"
+#line 262 "parser.y"
     {fprintf(stderr,"integer %d on line %d\n",(yyvsp[(1) - (1)].intVal),yylineno);;}
     break;
 
   case 75:
-#line 251 "parser.y"
+#line 263 "parser.y"
     {;}
     break;
 
   case 76:
-#line 252 "parser.y"
-    {;}
-    break;
-
-  case 77:
-#line 253 "parser.y"
-    {;}
-    break;
-
-  case 78:
-#line 254 "parser.y"
-    {;}
-    break;
-
-  case 79:
-#line 255 "parser.y"
-    {;}
-    break;
-
-  case 80:
-#line 260 "parser.y"
-    {;}
-    break;
-
-  case 81:
-#line 261 "parser.y"
-    {;}
-    break;
-
-  case 82:
 #line 264 "parser.y"
     {;}
     break;
 
-  case 83:
+  case 77:
 #line 265 "parser.y"
     {;}
     break;
 
-  case 84:
-#line 271 "parser.y"
+  case 78:
+#line 266 "parser.y"
     {;}
     break;
 
-  case 85:
+  case 79:
+#line 267 "parser.y"
+    {;}
+    break;
+
+  case 80:
 #line 272 "parser.y"
     {;}
     break;
 
+  case 81:
+#line 273 "parser.y"
+    {;}
+    break;
+
+  case 82:
+#line 276 "parser.y"
+    {;}
+    break;
+
+  case 83:
+#line 277 "parser.y"
+    {;}
+    break;
+
+  case 84:
+#line 283 "parser.y"
+    {;}
+    break;
+
+  case 85:
+#line 284 "parser.y"
+    {;}
+    break;
+
   case 86:
-#line 275 "parser.y"
+#line 287 "parser.y"
     {;}
     break;
 
   case 87:
-#line 278 "parser.y"
+#line 290 "parser.y"
     {;}
     break;
 
   case 88:
-#line 282 "parser.y"
+#line 294 "parser.y"
     {;}
     break;
 
   case 89:
-#line 283 "parser.y"
+#line 295 "parser.y"
     {;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 2095 "parser.c"
+#line 2105 "parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2305,19 +2315,22 @@ yyreturn:
 }
 
 
-#line 288 "parser.y"
+#line 300 "parser.y"
 
 
 
 //tin ftiaxoyme
 
 int yyerror (char * YaccProvidedMessage){
-  return 0;
+        fprintf(stderr,"%s\n",YaccProvidedMessage);
+        return 0;
 }
 
 
 int main(int argc, char** argv)
 {
+  maxScope = 0;   
+  init_symTable();   
   if(argc > 1){
     if (!(yyin = fopen(argv[1], "r"))){
         fprintf(stderr,"Cannot read file: %s\n", argv[1]);
@@ -2325,5 +2338,6 @@ int main(int argc, char** argv)
     }
   }
     yyparse();
+    printSymTable();
 }
 
