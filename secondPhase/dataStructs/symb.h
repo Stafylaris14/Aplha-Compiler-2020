@@ -34,4 +34,12 @@ item *newItem(char *name, char *type, int scope, double lineno);
 void printSymTable();
 
 void printHash();
+
 void hide(int scope);
+
+/*
+returns -1 if item with name is not found
+returns 0 if is not a function
+returns 1 if is function
+*/
+int isFunction(char *name);

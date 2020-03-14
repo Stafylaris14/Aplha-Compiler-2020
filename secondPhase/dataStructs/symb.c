@@ -1,6 +1,9 @@
 #include "symb.h"
 #include "../utilities/parserUtilities.h"
 #include "../dataStructs/linkedList.h"
+
+extern int yylineno;
+
 void init_symTable()
 {
     int index;
@@ -43,6 +46,7 @@ void insert_symTable(item *i)
 {
     int index = hash(strlen(i->name));
     insert_list(i, index);
+    
 }
 
 /*lookup in selected scope*/
@@ -68,6 +72,30 @@ item *lookupScope(char *name, int scope)
     return NULL;
 }
 
+
+int isFunction(char* name)
+{
+    item* tmp = lookup(name);
+    
+    if(tmp == NULL)return -1;
+    
+    if(tmp->isActive == 1){
+        red();
+        fprintf(stderr , "function detected in : %d \n" , yylineno);
+        wht();
+        return 0;
+    }
+    
+    if (strcmp(tmp->type, "User Function") == 0)return 1;
+
+    return -1;
+}
+
+
+
+
+
+
 /*returns NULL if name not found with in any scope*/
 item *lookup(char *name)
 {
@@ -75,17 +103,18 @@ item *lookup(char *name)
     item *tmp = symtable[index];
     while (tmp != NULL)
     {
-        if (!strcmp(tmp->name, name))
+        if (strcmp(tmp->name, name) == 0)
         {
-            printf("lookup brika id %s\n",name);
             return tmp;
         }
 
         tmp = tmp->next;
     }
-    printf("lookup den brika\n");
+    printf("lookupscope den brika \n");
     return NULL;
 }
+
+
 
 item *newItem(char *name, char *type, int scope, double lineno)
 {
@@ -146,7 +175,8 @@ void printSymTable()
     }
 }
 
-void printHash(){
+void printHash()
+{
     int index ;
     for(index = 0; index < HASH_SIZE; index++){
             item* tmp = symtable[index];
@@ -161,3 +191,7 @@ void printHash(){
             wht();
     }
 }
+   
+
+
+
