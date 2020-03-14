@@ -138,7 +138,6 @@ void printSymTable()
         }
     }
 }
-<<<<<<< HEAD
 
 void printHash(){
     int index ;
@@ -153,5 +152,3 @@ void printHash(){
             }
     }
 }
-=======
->>>>>>> parser.y
