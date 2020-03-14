@@ -333,4 +333,5 @@ int main(int argc, char** argv)
   }
     yyparse();
     printSymTable();
+    printHash();
 }

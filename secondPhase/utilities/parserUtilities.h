@@ -15,3 +15,4 @@ char *libFun[12];
 int isLibraryFunction(char *name);
 
 void errorLibFunction(int lineno, char *name);
+

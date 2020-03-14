@@ -124,9 +124,16 @@ void printSymTable()
             {
                 if (tmp->scope == scopeIndex)
                 {
+                    if(tmp->isActive == 0){
+                        red();
+                    }else {
+                        cyn();
+                    }
                     fprintf(stderr, "\"%s\" [%s] (line %d) (scope %d) \n", tmp->name, tmp->type, tmp->lineno, tmp->scope);
+                    
                 }
                 tmp = tmp->next;
+                wht();
             }
         }
     }
@@ -146,3 +153,5 @@ void printHash(){
             }
     }
 }
+=======
+>>>>>>> parser.y
