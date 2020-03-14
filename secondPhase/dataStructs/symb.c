@@ -131,3 +131,18 @@ void printSymTable()
         }
     }
 }
+<<<<<<< HEAD
+
+void printHash(){
+    int index ;
+    for(index = 0; index < HASH_SIZE; index++){
+            item* tmp = symtable[index];
+            grn();
+            if(tmp != NULL)
+                fprintf(stderr , "\n");
+            while(tmp != NULL){
+                fprintf(stderr , "   |  %s  |    " , tmp->name);
+                tmp = tmp->next;
+            }
+    }
+}

@@ -2,7 +2,7 @@
     print = 5 + 2;
     local print = 0;
     input = e;
-
+    a = 1;
 }
 
 
