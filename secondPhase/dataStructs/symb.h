@@ -34,3 +34,4 @@ item *newItem(char *name, char *type, int scope, double lineno);
 void printSymTable();
 
 void printHash();
+void hide(int scope);

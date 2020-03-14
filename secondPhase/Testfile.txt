@@ -1,18 +1,32 @@
-{
-    print = 5 + 2;
-    local print = 0;
-    input = e;
 
-}
 
-ela = 1;
+function f(){
+	function f(){
+		f = 1;
+	}
+	function (){
+		return 0;
+	}
+	function (){
+		return 0;
+	}
 
-input = e;
-{
-    this = 1;
-    {
-        {
-            x = 1;
-        }
-    }
+	function (){
+		return 0;
+	}
+
+	function (){
+		return 0;
+	}
+
+	function (){
+	function (){
+		return 0;
+	}
+
+		return 0;
+
+	}
+
+	f = 1;
 }

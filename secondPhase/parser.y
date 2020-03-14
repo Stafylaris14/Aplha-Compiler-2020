@@ -13,7 +13,7 @@ int scopeCounter = 0;
 extern int yylineno;
 extern char* yytext;
 extern FILE* yyin;
-
+int functionCounter = 0;
 
 
 %}
@@ -132,7 +132,7 @@ Stmt: Expression semicolon {;}
     ;
 
 
-Expression: Assignexpression {;}
+Expression: Assignexpression {printdb("assignexpression");}
             | Expression plus Expression {;}
             | Expression minus Expression {;}
             | Expression multiply Expression {;}
@@ -177,23 +177,43 @@ Primary: Lvalue {;}
 
 
 Lvalue: id {
+        printdb("id");
                 if(!isLibraryFunction($1)){
-                        item* new = newItem($1,"id", scopeCounter , yylineno );
-                        insert_symTable(new);
+                        if(lookupScope($1 , scopeCounter) != NULL){
+                                error("same id detected POUTSA" , yylineno);
+                        }else{
+                                item* new = newItem($1,"id", scopeCounter , yylineno );
+                                insert_symTable(new);
+                        }
                 }else{
                         errorLibFunction(yylineno , $1);
                 }
 
         }
         | local id {
-                        if(!isLibraryFunction($2)){
-                                item* new = newItem($2,"id", scopeCounter , yylineno );
-                                insert_symTable(new);
+                if(!isLibraryFunction($2)){
+                        if(lookupScope($2 , scopeCounter) != NULL){
+                                error("same id detected POUTSA" , yylineno);
                         }else{
-                                errorLibFunction(yylineno , $2);
+                                item* new = newItem($2,"local id", scopeCounter , yylineno );
+                                insert_symTable(new);
                         }
+                }else{
+                        errorLibFunction(yylineno , $2);
+                }
         }
-        | double_colons id {;}
+        | double_colons id {
+                if(!isLibraryFunction($2)){
+                        if(lookupScope($2 , scopeCounter) != NULL){
+                                error("same id detected POUTSA" , yylineno);
+                        }else{
+                                item* new = newItem($2,"global id", 0 , yylineno );
+                                insert_symTable(new);
+                        }
+                }else{
+                        errorLibFunction(yylineno , $2);
+                }
+        }
         | Member {;}
         ;
 
@@ -264,15 +284,28 @@ Block: left_curle_bracket{scopeCounter++;
         ;
 
 
-
-
-Funcdef: Function id {;}
-        | Function left_parenthesis Idlist right_parenthesis {;}
+Funcdef: Function id {
+                         if(!isLibraryFunction($2)){
+                                item* new = newItem($2,"User Function", scopeCounter , yylineno );
+                                insert_symTable(new);
+                        }else{
+                                errorLibFunction(yylineno , $2);
+                        }
+        
+        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;} Block{;}
+        | Function{
+                        char noname[20];
+                        sprintf(noname,"function$%d",functionCounter);
+                        functionCounter++;
+                        item* new = newItem(noname,"User Function", scopeCounter , yylineno );
+                        insert_symTable(new);
+        }
+         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {scopeCounter--;} Block{;}
         ;
 
 
 
-Const: integer {fprintf(stderr,"integer %d on line %d\n",$1,yylineno);;}
+Const:  integer {;}
         | real {;}
         | string {;}
         | nil {;}

@@ -13,15 +13,15 @@ char *libFun[12] = {
     "strtonum",
     "sqrt",
     "cos",
-    "sin"
-};
+    "sin"};
 
 int isLibraryFunction(char *name)
 {
     int i = 0;
     for (i = 0; i < 12; i++)
     {
-        if (strcmp(name, libFun[i]) == 0){
+        if (strcmp(name, libFun[i]) == 0)
+        {
             return 1;
         }
     }
@@ -32,5 +32,19 @@ void errorLibFunction(int lineno, char *name)
 {
     red();
     fprintf(stderr, "Library function detected in line %d   %s\n", lineno, name);
+    wht();
+}
+
+void printdb (char *s)
+{
+    grn();
+    fprintf(stderr, "-- %s --\n", s);
+    wht();
+}
+
+void error(char *str, int lineno)
+{
+    red();
+    fprintf(stderr , "%s : %d\n" , str , lineno);
     wht();
 }

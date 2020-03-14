@@ -48,35 +48,42 @@ void insert_symTable(item *i)
 /*lookup in selected scope*/
 item *lookupScope(char *name, int scope)
 {
-    int index = hash((int)name);
+    int index = hash(strlen(name));
     item *tmp = symtable[index];
     while (tmp != NULL)
     {
         if (!strcmp(tmp->name, name))
         {
-            if (tmp->scope == scope)
+            if (tmp->scope == scope){
+                grn();
+                 printf("lookupscope brika id %s sto scope %d \n",name,scope);
+                 wht();
                 return tmp;
+            }
         }
 
         tmp = tmp->next;
     }
+    printf("lookupscope den brika \n");
     return NULL;
 }
 
 /*returns NULL if name not found with in any scope*/
 item *lookup(char *name)
 {
-    int index = hash((int)name);
+    int index = hash(strlen(name));
     item *tmp = symtable[index];
     while (tmp != NULL)
     {
         if (!strcmp(tmp->name, name))
         {
+            printf("lookup brika id %s\n",name);
             return tmp;
         }
 
         tmp = tmp->next;
     }
+    printf("lookup den brika\n");
     return NULL;
 }
 
@@ -147,8 +154,10 @@ void printHash(){
             if(tmp != NULL)
                 fprintf(stderr , "\n");
             while(tmp != NULL){
-                fprintf(stderr , "   |  %s  |    " , tmp->name);
+                fprintf(stderr , "   |  %s  " , tmp->name);
+                fprintf(stderr , "is  %s|" , tmp->type);
                 tmp = tmp->next;
             }
+            wht();
     }
 }
