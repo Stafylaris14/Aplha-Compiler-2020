@@ -1,20 +1,21 @@
-dataStructs: dataStructs/linkedList.c dataStructs/commentStack.c
+dataStructs: 
 	gcc  -c dataStructs/commentStack.c
 	gcc  -c dataStructs/linkedList.c
 	gcc  -c dataStructs/symb.c
+	gcc  -c utilities/parserUtilities.c
 
-# edw ftiaxnw to parser.c
-parser: parser.y dataStructs
+
+parser: parser.y 
 	bison --yacc --defines --output=parser.c parser.y
 
-scanner:scanner.l parser
+scanner:scanner.l 
 	flex -o scanner.c scanner.l	
 
-lex:
-	flex -o scanner.c scanner.l
+compiler: parser scanner 
 
-compiler:scanner parser
-	gcc -o calc scanner.c parser.c linkedList.c commentStack.c symb.c
+	gcc -c parser.c dataStructs/symb.c utilities/parserUtilities.c
+	gcc -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
+	gcc -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o
 
 clean:
 	rm -f scanner.c
@@ -22,3 +23,8 @@ clean:
 	rm -f *.o
 	rm -f parser.c
 	rm -f parser.h
+	rm -f calc
+
+
+
+

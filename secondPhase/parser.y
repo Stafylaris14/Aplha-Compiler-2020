@@ -3,17 +3,19 @@
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 #include "dataStructs/symb.h"
+#include "utilities/parserUtilities.h"
 
 
-  int yyerror(char *yaccProvideMessage);
-  int yylex(void);
-  
-  
-  extern int yylineno;
-  extern char* yytext;
-  extern FILE* yyin;
+int yyerror(char *yaccProvideMessage);
+int yylex(void);
 
-
+int scopeCounter = 0;
+extern int yylineno;
+extern char* yytext;
+extern FILE* yyin;
+int functionCounter = 0;
+int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
+int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
 
 %}
 
@@ -22,16 +24,14 @@
 %union{
     int intVal;
     char* strVal;
-    symrec *tptr;
     double doubleVal;
-
 }
 
 
 %start program
 
 %token <intVal> integer
-%token <StrVal> id
+%token <strVal> id
 %token <doubleVal> real
 %token <strVal> string
 
@@ -39,20 +39,20 @@
 /*keywords*/
 
 
-%token if
-%token else
-%token while
-%token for
-%token function
-%token return
-%token break
-%token continue
+%token If
+%token Else
+%token While
+%token For
+%token Function
+%token Return
+%token Break
+%token Continue
 %token and
 %token not
 %token or
 %token local
-%token true
-%token false
+%token True
+%token False
 %token nil
 
 
@@ -67,202 +67,283 @@
 %token division
 %token mod
 %token equal
-%token n_equal       
-%token plus_plus     
-%token minus_minus   
-%token greater      
-%token less          
-%token g_equal       
-%token l_equal       
+%token n_equal
+%token plus_plus
+%token minus_minus
+%token greater
+%token less
+%token g_equal
+%token l_equal
 
 
 
 /*braces*/
 
-%token left_curle_bracket    
-%token right_curle_bracket   
-%token left_bracket          
-%token right_bracket         
-%token left_parenthesis      
-%token right_parenthesis     
-%token semicolon             
-%token comma                 
-%token colon                 
-%token double_colons         
-%token dot                   
-%token double_dots           
-%token other       
+%token left_curle_bracket
+%token right_curle_bracket
+%token left_bracket
+%token right_bracket
+%token left_parenthesis
+%token right_parenthesis
+%token semicolon
+%token comma
+%token colon
+%token double_colons
+%token dot
+%token double_dots
+%token other
 
 
 
-/*prepei na kanoume protereothta*/
+/*protereothta*/
 
 %left assign
 %left or
 %left and
+%nonassoc equal n_equal
+%nonassoc greater g_equal less l_equal
+%left plus minus
+%left multiply division mod
+%left not plus_plus minus_minus Uminus
+%left dot
+%left double_dots
+%left left_bracket right_bracket
+%left left_parenthesis right_parenthesis
 
 
 %%
 
-program: States
+program: States {;}
     ;
 
-States: States Stmt 
-    |   /*kati*/
+States: States Stmt {;}
+    |
     ;
 
-Stmt: Expression semicolon
-    | Ifstmt
-    | Whilestmt
-    | Forstmt
-    | Returnstmt
-    | break semicolon
-    | continue semicolon
-    | Block
-    | Funcdef
-    | semicolon    
+Stmt: Expression semicolon {;}
+    | Ifstmt {;}
+    | Whilestmt {;}
+    | Forstmt {;}
+    | Returnstmt {if(functionFlag == 0)error("no function from return" , yylineno);}
+    | Break semicolon {if(loopFlag == 0)error("no loop to break" , yylineno);}
+    | Continue semicolon {if(loopFlag == 0)error("no loop to Continue" , yylineno);}
+    | Block {;}
+    | Funcdef {;}
+    | semicolon   {;}
     ;
 
 
-Expression: Assignexpression
-            | Expression plus Expression {}
-            | Expression minus Expression
-            | Expression multiply Expression
-            | Expression division Expression 
-            | Expression and Expression
-            | Expression or Expression
-            | Expression mod Expression
-            | Expression equal Expression
-            | Expression n_equal Expression
-            | Expression greater Expression
-            | Expression less Expression
-            | Expression g_equal Expression
-            | Expression l_equal Expression
-            | Term
+Expression: Assignexpression {;}
+            | Expression plus Expression {;}
+            | Expression minus Expression {;}
+            | Expression multiply Expression {;}
+            | Expression division Expression {;}
+            | Expression and Expression {;}
+            | Expression or Expression {;}
+            | Expression mod Expression {;}
+            | Expression equal Expression {;}
+            | Expression n_equal Expression {;}
+            | Expression greater Expression {;}
+            | Expression less Expression {;}
+            | Expression g_equal Expression {;}
+            | Expression l_equal Expression {;}
+            | Term {;}
              ;
 
-    
-Term:   left_parenthesis Expression right_parenthesis
-        | minus Expression %prec Uminus             /*na ftia3oume protereothta */
-        | not Expression
-        | plus_plus Lvalue
-        | Lvalue plus_plus
-        | minus_minus Lvalue
-        | Lvalue minus_minus
-        | Primary
+
+Term:   left_parenthesis Expression right_parenthesis {;}
+        | minus Expression %prec Uminus {;}
+        | not Expression {;}
+        | plus_plus Lvalue {;}
+        | Lvalue plus_plus {;}
+        | minus_minus Lvalue {;}
+        | Lvalue minus_minus {;}
+        | Primary {;}
         ;
 
-Assignexpression: Lvalue assign Expression
+Assignexpression: Lvalue assign Expression {;}
                     ;
 
 
 
 
-Primary: Lvalue
-        | Call
-        | Objectdef
-        | left_parenthesis Funcdef right_parenthesis
-        | Const
+Primary: Lvalue {;}
+        | Call {;}
+        | Objectdef {;}
+        | left_parenthesis Funcdef right_parenthesis {;}
+        | Const {;}
         ;
 
 
 
 
-Lvalue: id
-        | Local id
-        | double_colons id 
-        | Member
+Lvalue: id {
+        printdb("id");
+                if(!isLibraryFunction($1)){
+                        if(lookupScope($1 , scopeCounter) != NULL){
+                                error("same id detected POUTSA" , yylineno);
+                        }else{
+                                item* new;
+                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );}
+                                else {item* new = newItem($1,"Var", scopeCounter , yylineno );}
+                                insert_symTable(new);
+                        }
+                }else{
+                        errorLibFunction(yylineno , $1);
+                }
+
+        }
+        | local id {
+                if(!isLibraryFunction($2)){
+                        if(lookupScope($2 , scopeCounter) != NULL){
+                                error("same id detected POUTSA" , yylineno);
+                        }else{
+                                item* new;
+                                if(scopeCounter == 0){new = newItem($2,"Global Var", scopeCounter , yylineno );}
+                                else {new = newItem($2,"Var", scopeCounter , yylineno );}
+                                insert_symTable(new);
+                        }
+                }else{
+                        errorLibFunction(yylineno , $2);
+                }
+        }
+        | double_colons id {
+                if(!isLibraryFunction($2)){
+                        if(lookupScope($2 , scopeCounter) != NULL){
+                                error("same id detected POUTSA" , yylineno);
+                        }else{
+                                item* new = newItem($2,"global id", 0 , yylineno );
+                                insert_symTable(new);
+                        }
+                }else{
+                        errorLibFunction(yylineno , $2);
+                }
+        }
+        | Member {;}
         ;
 
 
-Member: Lvalue dot id
-        | Lvalue left_bracket Expression right_bracket
-        | Call dot id
-        | Call left_bracket Expression right_bracket
+Member: Lvalue dot id {;}
+        | Lvalue left_bracket Expression right_bracket {;}
+        | Call dot id {;}
+        | Call left_bracket Expression right_bracket {;}
         ;
 
 
-Call: Call left_parenthesis Elist right_parenthesis
-        | Lvalue Callsuffix
-        | left_parenthesis Funcdef right_parenthesis left_parenthesis Elist right_parenthesis 
+Call: Call left_parenthesis Elist right_parenthesis {;}
+        | Lvalue Callsuffix {;}
+        | left_parenthesis Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {;}
         ;
 
 
 
-Callsuffix: Normalcall
-            | Methodcall
+Callsuffix: Normalcall {;}
+            | Methodcall {;}
             ;
 
-Normalcall: left_parenthesis Elist right_parenthesis
+Normalcall: left_parenthesis Elist right_parenthesis {;}
             ;
 
 
-            
-MethodCall: double_dots id left_parenthesis Elist right_parenthesis
+
+Methodcall: double_dots id left_parenthesis Elist right_parenthesis {;}
+            ;
 
 
 
-/*na to ftia3oumeee*/
-Elist: 
-        | 
+Elist:  Expression Multy_exp {;}
+        | {;}
+        ;
+
+Multy_exp: comma Expression Multy_exp {;}
+        | {;}
+        ;
+
+Objectdef: left_bracket Elist right_bracket {;}
+        | left_bracket Indexed right_bracket {;}
         ;
 
 
+Indexed: Indexedelement Multy_ind {;}
+         ;
 
-Objectdef: left_bracket Elist right_bracket
-        | left_bracket Indexed right_bracket
-        ;
+Multy_ind: Multy_ind comma Indexedelement {;}
+        | {;}
+         ;
 
-
-/*na to ftia3oume */
-Indexed: Indexedelement
-        | 
-
-
-    ;
-
-Indexedelement: left_curle_bracket Expression colon Expression right_curle_bracket
+Indexedelement: left_curle_bracket{scopeCounter++;
+                if(scopeCounter > maxScope) maxScope = scopeCounter;}
+                Expression colon Expression right_curle_bracket {
+                        hide(scopeCounter);
+                        scopeCounter--;
+                        printSymTable();
+                 }
                 ;
 
 
-Block: left_curle_bracket States right_curle_bracket
+Block: left_curle_bracket{scopeCounter++;
+        if(scopeCounter > maxScope) maxScope = scopeCounter;}
+        States right_curle_bracket {
+            hide(scopeCounter);
+            scopeCounter--;}
         ;
+
+
+Funcdef: Function id {
+                         if(!isLibraryFunction($2)){
+                                item* new = newItem($2,"User Function", scopeCounter , yylineno );
+                                insert_symTable(new);
+                        }else{
+                                errorLibFunction(yylineno , $2);
+                        }
         
-
-
-
-Funcdef: function id
-        | function left_parenthesis idlist right_parenthesis
+        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag = 1;} Block{functionFlag =0;}
+        | Function{
+                        char noname[20];
+                        sprintf(noname,"function$%d",functionCounter);
+                        functionCounter++;
+                        item* new = newItem(noname,"User Function", scopeCounter , yylineno );
+                        insert_symTable(new);
+        }
+         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {scopeCounter--;functionFlag =1;} Block{functionFlag =0;}
         ;
 
 
 
-Const: integer
-        | real
-        | string
-        | nil
-        | true
-        | false
+Const:  integer {;}
+        | real {;}
+        | string {;}
+        | nil {;}
+        | True {;}
+        | False {;}
         ;
 
-/* na to ftia3oume */
 
-Idlist:
+
+Idlist: id Multy_id {;}
+        | {;}
+        ;
+
+Multy_id: Multy_id comma id {;}
+        | {;}
+        ;
+
+
+
+
+Ifstmt: If left_parenthesis Expression right_parenthesis Stmt {;}
+        | If left_parenthesis Expression right_parenthesis Stmt Else Stmt {;}
+        ;
+
+Whilestmt: While left_parenthesis Expression right_parenthesis {loopFlag = 1;} Stmt {loopFlag=0;}
     ;
-    
-Ifstmt: if left_parenthesis Expression right_parenthesis Stmt
-        | if left_parenthesis Expression right_parenthesis Stmt else Stmt
-        ;
 
-Whilestmt: while left_parenthesis Expression right_parenthesis Stmt
-    ;
-
-Forstmt: for left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis Stmt
+Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis {loopFlag = 1;} Stmt {loopFlag = 0;}
         ;
 
 
-Returnstmt: return semicolon
-            | return Expression semicolon
+Returnstmt: Return semicolon 
+            | Return Expression semicolon 
             ;
 
 
@@ -272,26 +353,23 @@ Returnstmt: return semicolon
 
 //tin ftiaxoyme
 
-int yyerror (const char * YaccProvidedMessage){
-
-  exit(1);
+int yyerror (char * YaccProvidedMessage){
+        fprintf(stderr,"%s\n",YaccProvidedMessage);
+        return 0;
 }
 
 
 int main(int argc, char** argv)
 {
+  maxScope = 0;
+  init_symTable();
   if(argc > 1){
     if (!(yyin = fopen(argv[1], "r"))){
         fprintf(stderr,"Cannot read file: %s\n", argv[1]);
 	return 1;
     }
   }
-  else{
-    yyin = stdin;
-  }
-
-  yyparser();
-  return 0;
+    yyparse();
+    printSymTable();
+    printHash();
 }
-
-

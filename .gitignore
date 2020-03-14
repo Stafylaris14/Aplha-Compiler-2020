@@ -16,3 +16,11 @@ firstPhase/scanner.o
 
 *.swp
 kiagias/
+
+secondPhase/calc
+
+secondPhase/parser.c
+
+secondPhase/parser.h
+
+secondPhase/scanner.c
