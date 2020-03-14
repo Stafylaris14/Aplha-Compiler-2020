@@ -14,7 +14,8 @@ extern int yylineno;
 extern char* yytext;
 extern FILE* yyin;
 int functionCounter = 0;
-
+int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
+int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
 
 %}
 
@@ -123,16 +124,16 @@ Stmt: Expression semicolon {;}
     | Ifstmt {;}
     | Whilestmt {;}
     | Forstmt {;}
-    | Returnstmt {;}
-    | Break semicolon {;}
-    | Continue semicolon {;}
+    | Returnstmt {if(functionFlag == 0)error("no function from return" , yylineno);}
+    | Break semicolon {if(loopFlag == 0)error("no loop to break" , yylineno);}
+    | Continue semicolon {if(loopFlag == 0)error("no loop to Continue" , yylineno);}
     | Block {;}
     | Funcdef {;}
     | semicolon   {;}
     ;
 
 
-Expression: Assignexpression {printdb("assignexpression");}
+Expression: Assignexpression {;}
             | Expression plus Expression {;}
             | Expression minus Expression {;}
             | Expression multiply Expression {;}
@@ -182,7 +183,9 @@ Lvalue: id {
                         if(lookupScope($1 , scopeCounter) != NULL){
                                 error("same id detected POUTSA" , yylineno);
                         }else{
-                                item* new = newItem($1,"id", scopeCounter , yylineno );
+                                item* new;
+                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );}
+                                else {item* new = newItem($1,"Var", scopeCounter , yylineno );}
                                 insert_symTable(new);
                         }
                 }else{
@@ -195,7 +198,9 @@ Lvalue: id {
                         if(lookupScope($2 , scopeCounter) != NULL){
                                 error("same id detected POUTSA" , yylineno);
                         }else{
-                                item* new = newItem($2,"local id", scopeCounter , yylineno );
+                                item* new;
+                                if(scopeCounter == 0){new = newItem($2,"Global Var", scopeCounter , yylineno );}
+                                else {new = newItem($2,"Var", scopeCounter , yylineno );}
                                 insert_symTable(new);
                         }
                 }else{
@@ -292,7 +297,7 @@ Funcdef: Function id {
                                 errorLibFunction(yylineno , $2);
                         }
         
-        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;} Block{;}
+        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag = 1;} Block{functionFlag =0;}
         | Function{
                         char noname[20];
                         sprintf(noname,"function$%d",functionCounter);
@@ -300,7 +305,7 @@ Funcdef: Function id {
                         item* new = newItem(noname,"User Function", scopeCounter , yylineno );
                         insert_symTable(new);
         }
-         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {scopeCounter--;} Block{;}
+         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {scopeCounter--;functionFlag =1;} Block{functionFlag =0;}
         ;
 
 
@@ -330,15 +335,15 @@ Ifstmt: If left_parenthesis Expression right_parenthesis Stmt {;}
         | If left_parenthesis Expression right_parenthesis Stmt Else Stmt {;}
         ;
 
-Whilestmt: While left_parenthesis Expression right_parenthesis Stmt {;}
+Whilestmt: While left_parenthesis Expression right_parenthesis {loopFlag = 1;} Stmt {loopFlag=0;}
     ;
 
-Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis Stmt {;}
+Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis {loopFlag = 1;} Stmt {loopFlag = 0;}
         ;
 
 
-Returnstmt: Return semicolon {;}
-            | Return Expression semicolon {;}
+Returnstmt: Return semicolon 
+            | Return Expression semicolon 
             ;
 
 
