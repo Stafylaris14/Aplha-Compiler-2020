@@ -185,8 +185,10 @@ void printHash()
                 fprintf(stderr , "\n");
             while(tmp != NULL){
                 fprintf(stderr , "   |  %s  " , tmp->name);
-                fprintf(stderr , "is  %s|" , tmp->type);
+                mag();
+                fprintf(stderr , "%s|" , tmp->type);
                 tmp = tmp->next;
+                grn();
             }
             wht();
     }

@@ -2,5 +2,5 @@
 function f(){}
 
 f = 1;
-
+dsadsadsadsasadsadsad::sadasdadfa function dsdsa
 f=2;

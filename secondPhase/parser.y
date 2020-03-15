@@ -178,7 +178,6 @@ Primary: Lvalue {;}
 
 
 Lvalue: id {
-                
                 if(!isLibraryFunction($1)){
                         int fun = isFunction($1);
                         if(fun == -1 || fun == 1){
@@ -194,12 +193,11 @@ Lvalue: id {
         }
         | local id {
                 if(!isLibraryFunction($2)){
-                        if(lookupScope($2 , scopeCounter) != NULL){
-                                error("same id detected  " , yylineno);
-                        }else{
+                        int fun = isFunction($2);
+                        if(fun == -1 || fun == 1){
                                 item* new;
-                                if(scopeCounter == 0){new = newItem($2,"Global Var", scopeCounter , yylineno );}
-                                else {new = newItem($2,"Var", scopeCounter , yylineno );}
+                                if(scopeCounter == 0){error("You cant declare a local veriable in global scope" , yylineno);}
+                                else {item* new = newItem($2,"Var", scopeCounter , yylineno );}
                                 insert_symTable(new);
                         }
                 }else{
@@ -207,10 +205,9 @@ Lvalue: id {
                 }
         }
         | double_colons id {
-                if(!isLibraryFunction($2)){
-                        if(lookupScope($2 , scopeCounter) != NULL){
-                                error("same id detected   " , yylineno);
-                        }else{
+                 if(!isLibraryFunction($2)){
+                        int fun = isFunction($2);
+                        if(fun == -1 || fun == 1){
                                 item* new = newItem($2,"global id", 0 , yylineno );
                                 insert_symTable(new);
                         }
@@ -353,7 +350,9 @@ Returnstmt: Return semicolon
 //tin ftiaxoyme
 
 int yyerror (char * YaccProvidedMessage){
-        fprintf(stderr,"%s\n",YaccProvidedMessage);
+        red();
+        fprintf(stderr,"%s in :%d\n",YaccProvidedMessage , yylineno);
+        wht();
         return 0;
 }
 
