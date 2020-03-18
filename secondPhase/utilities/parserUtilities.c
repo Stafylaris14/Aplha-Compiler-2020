@@ -4,6 +4,7 @@
 extern int scopeCounter;
 extern int functionFlag;
 extern int yylineno;
+extern int returnFlag;
 int isLibraryFunction(char *name)
 {
     int i = 0;
@@ -32,6 +33,7 @@ void error(char *str, int lineno)
     fprintf(stderr, "in line : %d ", lineno);
     wht();
     fprintf(stderr, "%s \n", str);
+    exit(1);
 }
 
 int isFunction(char *name)
@@ -45,7 +47,8 @@ int isFunction(char *name)
     if (tmp->isActive == 1 && strcmp(tmp->type, "User Function") == 0)
     {
         red();
-        fprintf(stderr, "function detected in : %d \n", yylineno);
+        if(returnFlag == 0)
+            error("User Function " , yylineno);
         wht();
         return 1;
     }
@@ -56,45 +59,47 @@ int isFunction(char *name)
 /* sprintf(str, "Value of Pi = %f", M_PI); */
 void check(item *new)
 {
-    grn();
-    printf("%d\n", functionFlag);
-    wht();
-    //tsekaroume gia library
-    if (isLibraryFunction(new->name))
-    {
-        char *str = malloc(35 + sizeof(new->name));
-        sprintf(str, "Library Funtion : %s", new->name);
-        error(str, yylineno);
-        return;
-    }
-
-    if (!strcmp(new->type, "local variable"))
-    {
-        item *tmp = lookupScope(new->name, scopeCounter);
-        if (tmp == NULL)
+   
+        //tsekaroume gia library
+        if (isLibraryFunction(new->name))
         {
-            red();
-            printf("komple gia local\n");
-            insert_symTable(new);
-            wht();
+            char *str = malloc(35 + sizeof(new->name));
+            sprintf(str, "Library Funtion : %s", new->name);
+            error(str, yylineno);
             return;
         }
-    }
 
-    //tseck gia function
-    if (isFunction(new->name))
-    {
-        char *str = malloc(35 + sizeof(new->name));
-        sprintf(str, "User Function exist : %s", new->name);
-        error(str, yylineno);
-        return;
-    }
+        if (!strcmp(new->type, "local variable"))
+        {
+            item *tmp = lookupScope(new->name, scopeCounter);
+            if (tmp == NULL)
+            {
+                printf("komple gia local \n");
+                red();
+                insert_symTable(new);
+                wht();
+                return;
+            }
+            else
+            {
+                error("you cant access local veriable", yylineno);
+            }
+        }
 
+        //tseck gia function
+        if (isFunction(new->name))
+        {
+            char *str = malloc(35 + sizeof(new->name));
+            sprintf(str, "User Function exist : %s", new->name);
+            error(str, yylineno);
+            return;
+        }
+
+        //tsekaroume an einai function scope
+        if (isFA(new->name))
+            return;
+    
     item *tmp = lookup(new->name);
-
-    if (isFA(new->name))
-        return;
-
     if (tmp != NULL)
     {
         if (tmp->isActive == 1)
@@ -138,7 +143,7 @@ int isFA(char *name)
             }
 
 
-            if (tmp->isActive && strcmp(tmp->name, name) == 0 && strcmp(tmp->type, "formal argument") == 0 && tmp->scope < functionFlag)
+            if (tmp->isActive && strcmp(tmp->name, name) == 0 && (strcmp(tmp->type, "formal argument") == 0 ||strcmp(tmp->type, "local variable") == 0)  && tmp->scope < functionFlag)
             {
                 if(flag == 0) flag = 2;
             }

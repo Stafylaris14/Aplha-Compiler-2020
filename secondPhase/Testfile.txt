@@ -1,10 +1,7 @@
-{{local x;}}
-
-
-function g(x){
-    function e(y){
-
-        return x;
+function f(){
+    local f = 10 ;
+    function h(){
+        return f ;
     }
 
 }   

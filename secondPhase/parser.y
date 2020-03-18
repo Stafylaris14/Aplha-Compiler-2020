@@ -11,6 +11,7 @@ int yylex(void);
 
 int scopeCounter = 0;
 extern int yylineno;
+int returnFlag = 0;
 extern char* yytext;
 extern FILE* yyin;
 int functionCounter = 0; /* for no name functions */
@@ -321,7 +322,7 @@ Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_p
 
 
 Returnstmt: Return semicolon 
-            | Return Expression semicolon 
+        | Return{returnFlag =1;} Expression semicolon {returnFlag =0;}
             ;
 
 
