@@ -182,9 +182,10 @@ Lvalue: id {
                         int fun = isFunction($1);
                         if(fun == -1 || fun == 1){
                                 item* new;
-                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );}
-                                else {item* new = newItem($1,"Var", scopeCounter , yylineno );}
+                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );error("mpika1" , yylineno);}
+                                else {item* new = newItem($1,"Var", scopeCounter , yylineno );error("mpika" , yylineno);}
                                 insert_symTable(new);
+                                error("telos in" , yylineno);
                         }
                 }else{
                         errorLibFunction(yylineno , $1);
@@ -280,7 +281,7 @@ Indexedelement: left_curle_bracket{scopeCounter++;
 Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         States right_curle_bracket {
-            hide(scopeCounter);
+          //  hide(scopeCounter);
             scopeCounter--;}
         ;
 
@@ -367,7 +368,10 @@ int main(int argc, char** argv)
 	return 1;
     }
   }
+    error("pase" , yylineno);
     yyparse();
     printSymTable();
-    printHash();
+    error("printSym" , yylineno);
+   // printHash();
+   // error("print hash" , yylineno);
 }

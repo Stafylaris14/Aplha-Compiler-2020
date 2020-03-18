@@ -37,6 +37,7 @@ void insert_list(item *i, int index)
         while (tmp->next != NULL)
         {
             tmp = tmp->next;
+           // printf("sto insert\n");
         }
         tmp->next = i;
     }
@@ -65,7 +66,7 @@ item *lookupScope(char *name, int scope)
                 return tmp;
             }
         }
-
+      //  printf("mesa lookupscope");
         tmp = tmp->next;
     }
     printf("lookupscope den brika \n");
@@ -107,7 +108,7 @@ item *lookup(char *name)
         {
             return tmp;
         }
-
+       // printf("sto lookup apli\n");
         tmp = tmp->next;
     }
     printf("lookupscope den brika \n");
@@ -169,6 +170,7 @@ void printSymTable()
                     
                 }
                 tmp = tmp->next;
+             //   printf("sti sprint\n");
                 wht();
             }
         }

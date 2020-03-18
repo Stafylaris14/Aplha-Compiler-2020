@@ -1,5 +1,5 @@
-function f(a , s){}
+x = 5;
 
-f = 1;
+x = 7;
 
-break;
+{a = 6;}
