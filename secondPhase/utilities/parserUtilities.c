@@ -4,6 +4,7 @@
 extern int scopeCounter;
 extern int functionFlag;
 extern int yylineno;
+extern int returnFlag;
 int isLibraryFunction(char *name)
 {
     int i = 0;
@@ -32,6 +33,7 @@ void error(char *str, int lineno)
     fprintf(stderr, "in line : %d ", lineno);
     wht();
     fprintf(stderr, "%s \n", str);
+    exit(1);
 }
 
 int isFunction(char *name)
@@ -59,42 +61,49 @@ void check(item *new)
     grn();
     printf("%d\n", functionFlag);
     wht();
-    //tsekaroume gia library
-    if (isLibraryFunction(new->name))
+    printf("to returnFlag einai %d kai onoma %s\n",returnFlag,new->name);
+    if (returnFlag == 1)
     {
-        char *str = malloc(35 + sizeof(new->name));
-        sprintf(str, "Library Funtion : %s", new->name);
-        error(str, yylineno);
-        return;
-    }
-
-    if (!strcmp(new->type, "local variable"))
-    {
-        item *tmp = lookupScope(new->name, scopeCounter);
-        if (tmp == NULL)
+        //tsekaroume gia library
+        if (isLibraryFunction(new->name))
         {
-            red();
-            printf("komple gia local\n");
-            insert_symTable(new);
-            wht();
+            char *str = malloc(35 + sizeof(new->name));
+            sprintf(str, "Library Funtion : %s", new->name);
+            error(str, yylineno);
             return;
         }
-    }
 
-    //tseck gia function
-    if (isFunction(new->name))
-    {
-        char *str = malloc(35 + sizeof(new->name));
-        sprintf(str, "User Function exist : %s", new->name);
-        error(str, yylineno);
-        return;
-    }
+        if (!strcmp(new->type, "local variable"))
+        {
+            item *tmp = lookupScope(new->name, scopeCounter);
+            if (tmp == NULL)
+            {
+                red();
+                /* printf("komple gia local\n" ); */
+                insert_symTable(new);
+                wht();
+                return;
+            }
+            else
+            {
+                error("you cant access local veriable", yylineno);
+            }
+        }
 
+        //tseck gia function
+        if (isFunction(new->name))
+        {
+            char *str = malloc(35 + sizeof(new->name));
+            sprintf(str, "User Function exist : %s", new->name);
+            //error(str, yylineno);
+            return;
+        }
+
+        //tsekaroume an einai function scope
+        if (isFA(new->name))
+            return;
+    }
     item *tmp = lookup(new->name);
-
-    if (isFA(new->name))
-        return;
-
     if (tmp != NULL)
     {
         if (tmp->isActive == 1)
@@ -133,20 +142,27 @@ int isFA(char *name)
                 return 0;
             } */
 
-            if(!strcmp(tmp->type, "local variable") && !strcmp(tmp->name, name) && tmp->scope == scopeCounter && tmp->isActive){
-                flag =1;
+            if (!strcmp(tmp->type, "local variable") && !strcmp(tmp->name, name) && tmp->scope == scopeCounter && tmp->isActive)
+            {
+                flag = 1;
             }
-
 
             if (tmp->isActive && strcmp(tmp->name, name) == 0 && strcmp(tmp->type, "formal argument") == 0 && tmp->scope < functionFlag)
             {
-                if(flag == 0) flag = 2;
+                if (flag == 0)
+                    flag = 2;
             }
 
             tmp = tmp->next;
         }
     }
-    if(flag == 0) return 0; //den brike tpt
-    else if(flag ==1)return 0;//brike local se idio scope
-    else{error("RIPAPAS", yylineno); return 1;} //einai formal varaible
+    if (flag == 0)
+        return 0; //den brike tpt
+    else if (flag == 1)
+        return 0; //brike local se idio scope
+    else
+    {
+        error("RIPAPAS", yylineno);
+        return 1;
+    } //einai formal varaible
 }

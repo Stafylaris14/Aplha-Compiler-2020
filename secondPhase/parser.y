@@ -10,6 +10,7 @@ int yyerror(char *yaccProvideMessage);
 int yylex(void);
 
 int scopeCounter = 0;
+int returnFlag = 0;
 extern int yylineno;
 extern char* yytext;
 extern FILE* yyin;
@@ -321,7 +322,7 @@ Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_p
 
 
 Returnstmt: Return semicolon 
-            | Return Expression semicolon 
+            | Return{returnFlag =1;} Expression semicolon {returnFlag =0;}
             ;
 
 
