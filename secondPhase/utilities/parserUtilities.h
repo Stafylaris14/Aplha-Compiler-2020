@@ -22,5 +22,6 @@ returns 1 if is function
 */
 int isFunction(char *name);
 
-void check(item* new);
+int isFA(char *name);
 
+void check(item *new);

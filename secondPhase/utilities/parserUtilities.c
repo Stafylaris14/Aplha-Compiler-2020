@@ -1,8 +1,9 @@
 #include "parserUtilities.h"
 
 #include "../dataStructs/linkedList.h"
-
-
+extern int scopeCounter;
+extern int functionFlag;
+extern int yylineno;
 int isLibraryFunction(char *name)
 {
     int i = 0;
@@ -57,6 +58,10 @@ int isFunction(char *name)
 /* sprintf(str, "Value of Pi = %f", M_PI); */
 void check(item *new)
 {
+    grn();
+    printf("%d\n" , functionFlag);
+    wht();
+    //tsekaroume gia library
     if (isLibraryFunction(new->name))
     {
         char *str = malloc(35+sizeof(new->name));
@@ -64,6 +69,8 @@ void check(item *new)
         error(str, yylineno);
         return;
     }
+    
+    //tseck gia function
     if (isFunction(new->name))
     {
         char *str = malloc(35+sizeof(new->name));
@@ -73,6 +80,9 @@ void check(item *new)
     }
 
     item *tmp = lookup(new->name);
+    
+    if (isFA(new->name)) return;
+    
     if (tmp != NULL)
     {
         if (tmp->isActive == 1)
@@ -83,5 +93,41 @@ void check(item *new)
             return;
         }
     }
+
+    
+
     insert_symTable(new);
+}
+
+/* is Formal Argument
+    
+*/
+int isFA(char* name)
+{
+    item* tmp = NULL;
+    int i;
+    for(i = 0; i < HASH_SIZE; i++)
+    {
+        tmp =  symtable[i];
+        while(tmp != NULL)
+        {   
+
+            if(!strcmp(tmp->name , name)){
+                printf("type %s kai scope %d kai scopecounter %d\n",tmp->type,tmp->scope,scopeCounter);
+
+            }
+            if(!strcmp(tmp->type , "local variable")  && !strcmp(tmp->name , name)){
+                printf("komple gia local\n");
+                return 0;
+            }
+            if(tmp->isActive && strcmp(tmp->name , name)==0 && strcmp(tmp->type , "formal argument") == 0 && tmp->scope < functionFlag ){
+                error("RIPAPAS" , yylineno);
+                return 1;
+            }
+
+
+            tmp  = tmp->next;
+        }
+    }
+    return 0;
 }

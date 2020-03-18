@@ -16,6 +16,7 @@ char *libFun[12] = {
     "sqrt",
     "cos",
     "sin"};
+    
 void init_symTable()
 {
     int index;
@@ -38,7 +39,7 @@ int hash(int val)
 void insert_list(item *i, int index)
 {
     item *tmp = symtable[index];
-    printf("kanw insert sto sym to %s\n",i->name);
+    /* printf("kanw insert sto sym to %s\n",i->name); */
     if (symtable[index] == NULL)
     {
         symtable[index] = i;
@@ -75,7 +76,7 @@ item *lookupScope(char *name, int scope)
         {
             if (tmp->scope == scope){
                 grn();
-                 printf("lookupscope brika id %s sto scope %d \n",name,scope);
+                 /* printf("lookupscope brika id %s sto scope %d \n",name,scope); */
                  wht();
                 return tmp;
             }
@@ -83,7 +84,7 @@ item *lookupScope(char *name, int scope)
       //  printf("mesa lookupscope");
         tmp = tmp->next;
     }
-    printf("lookupscope den brika \n");
+    /* printf("lookupscope den brika \n"); */
     return NULL;
 }
 
@@ -103,7 +104,7 @@ item *lookup(char *name)
        // printf("sto lookup apli\n");
         tmp = tmp->next;
     }
-    printf("lookupscope den brika \n");
+    /* printf("lookupscope den brika \n"); */
     return NULL;
 }
 
@@ -134,7 +135,7 @@ void hide(int scope)
                 if (tmp->scope == scope && tmp->isActive == 1)
                  {
                      tmp->isActive = 0;
-                     printf("inactive %s\n",tmp->name );
+                     /* printf("inactive %s\n",tmp->name ); */
                  }
             }
             tmp = tmp->next;

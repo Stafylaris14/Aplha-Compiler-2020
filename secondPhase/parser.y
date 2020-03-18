@@ -162,10 +162,10 @@ Term:   left_parenthesis Expression right_parenthesis {;}
         ;
 
 Assignexpression: Lvalue assign Expression {
-                      
+                        
                     
                 }
-                    ;
+                ;
 
 
 
@@ -183,13 +183,13 @@ Primary: Lvalue {;}
 Lvalue: id {
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );check(new); }
-                                else {item* new = newItem($1,"Var", scopeCounter , yylineno );check(new);}
+                                else {item* new = newItem($1,"variable", scopeCounter , yylineno );check(new);}
 
         }
         | local id {
                                 item* new = NULL;
                                 if(scopeCounter == 0){error("You cant declare a local veriable in global scope" , yylineno);}
-                                else {new = newItem($2,"Var", scopeCounter , yylineno );}
+                                else {new = newItem($2,"local variable", scopeCounter , yylineno );}
                                 check(new);
         }
         | double_colons id {
@@ -293,14 +293,14 @@ Const:  integer {;}
 
 
 Idlist: id Multy_id {
-                item* new = newItem($1,"Formal", scopeCounter , yylineno );
+                item* new = newItem($1,"formal argument", scopeCounter , yylineno );
                     check(new);
         }
         | {;}
         ;
 
 Multy_id: Multy_id comma id {
-                item* new = newItem($3,"Formal", scopeCounter , yylineno );
+                item* new = newItem($3,"formal argument", scopeCounter , yylineno );
                   check(new);
         }
         | {;}
