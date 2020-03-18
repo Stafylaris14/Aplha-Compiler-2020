@@ -13,7 +13,7 @@ int scopeCounter = 0;
 extern int yylineno;
 extern char* yytext;
 extern FILE* yyin;
-int functionCounter = 0;
+int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
 
@@ -161,7 +161,10 @@ Term:   left_parenthesis Expression right_parenthesis {;}
         | Primary {;}
         ;
 
-Assignexpression: Lvalue assign Expression {;}
+Assignexpression: Lvalue assign Expression {
+                      
+                    
+                }
                     ;
 
 
@@ -184,9 +187,9 @@ Lvalue: id {
 
         }
         | local id {
-                                item* new;
+                                item* new = NULL;
                                 if(scopeCounter == 0){error("You cant declare a local veriable in global scope" , yylineno);}
-                                else {item* new = newItem($2,"Var", scopeCounter , yylineno );}
+                                else {new = newItem($2,"Var", scopeCounter , yylineno );}
                                 check(new);
         }
         | double_colons id {
@@ -248,9 +251,9 @@ Multy_ind: Multy_ind comma Indexedelement {;}
 Indexedelement: left_curle_bracket{scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
                 Expression colon Expression right_curle_bracket {
-                      //  hide(scopeCounter);
+                        hide(scopeCounter);
                         scopeCounter--;
-                      //  printSymTable();
+                     
                  }
                 ;
 
@@ -258,15 +261,15 @@ Indexedelement: left_curle_bracket{scopeCounter++;
 Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         States right_curle_bracket {
-          //  hide(scopeCounter);
-            scopeCounter--;}
+                hide(scopeCounter);
+                scopeCounter--;}
         ;
 
 
 Funcdef: Function id {
                                 item* new = newItem($2,"User Function", scopeCounter , yylineno );
                                 check(new);
-        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag = 1;} Block{functionFlag =0;}
+        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag++;} Block{functionFlag --;}
         | Function{
                         char noname[20];
                         sprintf(noname,"function$%d",functionCounter);
@@ -274,7 +277,7 @@ Funcdef: Function id {
                         item* new = newItem(noname,"User Function", scopeCounter , yylineno );
                         check(new);
         }
-         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {scopeCounter--;functionFlag =1;} Block{functionFlag =0;}
+         left_parenthesis{scopeCounter++;grn(); fprintf(stderr , "%d\n" , scopeCounter);wht();} Idlist right_parenthesis {scopeCounter--;functionFlag++;} Block{functionFlag --;}
         ;
 
 
@@ -289,11 +292,17 @@ Const:  integer {;}
 
 
 
-Idlist: id Multy_id {;}
+Idlist: id Multy_id {
+                item* new = newItem($1,"Formal", scopeCounter , yylineno );
+                    check(new);
+        }
         | {;}
         ;
 
-Multy_id: Multy_id comma id {;}
+Multy_id: Multy_id comma id {
+                item* new = newItem($3,"Formal", scopeCounter , yylineno );
+                  check(new);
+        }
         | {;}
         ;
 
@@ -326,6 +335,7 @@ int yyerror (char * YaccProvidedMessage){
         red();
         fprintf(stderr,"%s in :%d\n",YaccProvidedMessage , yylineno);
         wht();
+        exit(1);
         return 0;
 }
 
