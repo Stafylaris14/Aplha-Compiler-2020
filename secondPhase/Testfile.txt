@@ -1,7 +1,10 @@
+{{local x;}}
+
+
 function g(x){
     function e(y){
-local x;
+
         return x;
     }
 
-}
+}   

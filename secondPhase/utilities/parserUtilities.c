@@ -17,8 +17,6 @@ int isLibraryFunction(char *name)
     return 0;
 }
 
-
-
 void printdb(char *s)
 {
     grn();
@@ -59,42 +57,54 @@ int isFunction(char *name)
 void check(item *new)
 {
     grn();
-    printf("%d\n" , functionFlag);
+    printf("%d\n", functionFlag);
     wht();
     //tsekaroume gia library
     if (isLibraryFunction(new->name))
     {
-        char *str = malloc(35+sizeof(new->name));
-        sprintf(str , "Library Funtion : %s" , new->name);
+        char *str = malloc(35 + sizeof(new->name));
+        sprintf(str, "Library Funtion : %s", new->name);
         error(str, yylineno);
         return;
     }
-    
+
+    if (!strcmp(new->type, "local variable"))
+    {
+        item *tmp = lookupScope(new->name, scopeCounter);
+        if (tmp == NULL)
+        {
+            red();
+            printf("komple gia local\n");
+            insert_symTable(new);
+            wht();
+            return;
+        }
+    }
+
     //tseck gia function
     if (isFunction(new->name))
     {
-        char *str = malloc(35+sizeof(new->name));
+        char *str = malloc(35 + sizeof(new->name));
         sprintf(str, "User Function exist : %s", new->name);
         error(str, yylineno);
         return;
     }
 
     item *tmp = lookup(new->name);
-    
-    if (isFA(new->name)) return;
-    
+
+    if (isFA(new->name))
+        return;
+
     if (tmp != NULL)
     {
         if (tmp->isActive == 1)
         {
-            char *str = malloc(35+sizeof(new->name));
+            char *str = malloc(35 + sizeof(new->name));
             sprintf(str, "Already Exists: %s", new->name);
             error(str, yylineno);
             return;
         }
     }
-
-    
 
     insert_symTable(new);
 }
@@ -102,32 +112,41 @@ void check(item *new)
 /* is Formal Argument
     
 */
-int isFA(char* name)
+int isFA(char *name)
 {
-    item* tmp = NULL;
+    item *tmp = NULL;
     int i;
-    for(i = 0; i < HASH_SIZE; i++)
+    int flag = 0;
+    for (i = 0; i < HASH_SIZE; i++)
     {
-        tmp =  symtable[i];
-        while(tmp != NULL)
-        {   
+        tmp = symtable[i];
+        while (tmp != NULL)
+        {
 
-            if(!strcmp(tmp->name , name)){
-                printf("type %s kai scope %d kai scopecounter %d\n",tmp->type,tmp->scope,scopeCounter);
-
+            if (!strcmp(tmp->name, name))
+            {
+                printf("type %s kai scope %d kai scopecounter %d\n", tmp->type, tmp->scope, scopeCounter);
             }
-            if(!strcmp(tmp->type , "local variable")  && !strcmp(tmp->name , name)){
+            /* if (!strcmp(tmp->type, "local variable") && !strcmp(tmp->name, name))
+            {
                 printf("komple gia local\n");
                 return 0;
-            }
-            if(tmp->isActive && strcmp(tmp->name , name)==0 && strcmp(tmp->type , "formal argument") == 0 && tmp->scope < functionFlag ){
-                error("RIPAPAS" , yylineno);
-                return 1;
+            } */
+
+            if(!strcmp(tmp->type, "local variable") && !strcmp(tmp->name, name) && tmp->scope == scopeCounter && tmp->isActive){
+                flag =1;
             }
 
 
-            tmp  = tmp->next;
+            if (tmp->isActive && strcmp(tmp->name, name) == 0 && strcmp(tmp->type, "formal argument") == 0 && tmp->scope < functionFlag)
+            {
+                if(flag == 0) flag = 2;
+            }
+
+            tmp = tmp->next;
         }
     }
-    return 0;
+    if(flag == 0) return 0; //den brike tpt
+    else if(flag ==1)return 0;//brike local se idio scope
+    else{error("RIPAPAS", yylineno); return 1;} //einai formal varaible
 }
