@@ -2,8 +2,8 @@
 
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
-#include "dataStructs/symb.h"
-#include "utilities/parserUtilities.h"
+
+#include "./utilities/parserUtilities.h"
 
 
 int yyerror(char *yaccProvideMessage);
@@ -178,44 +178,20 @@ Primary: Lvalue {;}
 
 
 Lvalue: id {
-                if(!isLibraryFunction($1)){
-                        int fun = isFunction($1);
-                        if(fun == -1 || fun == 1){
                                 item* new;
-                                
-                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );error("mpika1" , yylineno);}
-                                else {item* new = newItem($1,"Var", scopeCounter , yylineno );error("mpika" , yylineno);}
-                                insert_symTable(new);
-                                error("telos in" , yylineno);
-                        }
-                }else{
-                        errorLibFunction(yylineno , $1);
-                }
+                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );check(new); }
+                                else {item* new = newItem($1,"Var", scopeCounter , yylineno );check(new);}
 
         }
         | local id {
-                if(!isLibraryFunction($2)){
-                        int fun = isFunction($2);
-                        if(fun == -1 || fun == 1){
                                 item* new;
                                 if(scopeCounter == 0){error("You cant declare a local veriable in global scope" , yylineno);}
                                 else {item* new = newItem($2,"Var", scopeCounter , yylineno );}
-                                insert_symTable(new);
-                        }
-                }else{
-                        errorLibFunction(yylineno , $2);
-                }
+                                check(new);
         }
         | double_colons id {
-                 if(!isLibraryFunction($2)){
-                        int fun = isFunction($2);
-                        if(fun == -1 || fun == 1){
                                 item* new = newItem($2,"global id", 0 , yylineno );
-                                insert_symTable(new);
-                        }
-                }else{
-                        errorLibFunction(yylineno , $2);
-                }
+                                check(new);
         }
         | Member {;}
         ;
@@ -282,26 +258,21 @@ Indexedelement: left_curle_bracket{scopeCounter++;
 Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         States right_curle_bracket {
-          //  hide(scopeCounter);
+            hide(scopeCounter);
             scopeCounter--;}
         ;
 
 
 Funcdef: Function id {
-                         if(!isLibraryFunction($2)){
                                 item* new = newItem($2,"User Function", scopeCounter , yylineno );
-                                insert_symTable(new);
-                        }else{
-                                errorLibFunction(yylineno , $2);
-                        }
-        
+                                check(new);
         } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag = 1;} Block{functionFlag =0;}
         | Function{
                         char noname[20];
                         sprintf(noname,"function$%d",functionCounter);
                         functionCounter++;
                         item* new = newItem(noname,"User Function", scopeCounter , yylineno );
-                        insert_symTable(new);
+                        check(new);
         }
          left_parenthesis{scopeCounter++;} Idlist right_parenthesis {scopeCounter--;functionFlag =1;} Block{functionFlag =0;}
         ;
@@ -369,10 +340,10 @@ int main(int argc, char** argv)
 	return 1;
     }
   }
-    error("pase" , yylineno);
+    
     yyparse();
     printSymTable();
-    error("printSym" , yylineno);
-   // printHash();
+    
+    printHash();
    // error("print hash" , yylineno);
 }

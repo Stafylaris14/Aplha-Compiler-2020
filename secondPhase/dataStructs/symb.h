@@ -1,8 +1,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #define HASH_SIZE 509
 
+char *libFun[12];
 int maxScope;
 
 typedef struct Item
@@ -37,9 +39,3 @@ void printHash();
 
 void hide(int scope);
 
-/*
-returns -1 if item with name is not found
-returns 0 if is not a function
-returns 1 if is function
-*/
-int isFunction(char *name);

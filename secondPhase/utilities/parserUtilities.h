@@ -2,14 +2,25 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../dataStructs/symb.h"
+extern int yylineno;
 
-
-char *libFun[12];
+/* extern char*libFun[]; */
 
 int isLibraryFunction(char *name);
 
-void errorLibFunction(int lineno, char *name);
+
 
 void printdb(char *s);
 
 void error(char *str, int lineno);
+
+/*
+returns -1 if item with name is not found
+returns 0 if is not a function
+returns 1 if is function
+*/
+int isFunction(char *name);
+
+void check(item* new);
+

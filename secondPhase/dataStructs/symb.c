@@ -1,9 +1,21 @@
 #include "symb.h"
-#include "../utilities/parserUtilities.h"
+
 #include "../dataStructs/linkedList.h"
 
 extern int yylineno;
-
+char *libFun[12] = {
+    "print",
+    "input",
+    "objectmemberkeys",
+    "objecttotalmembers",
+    "objectcopy",
+    "totalarguments",
+    "argument",
+    "typeof",
+    "strtonum",
+    "sqrt",
+    "cos",
+    "sin"};
 void init_symTable()
 {
     int index;
@@ -26,6 +38,7 @@ int hash(int val)
 void insert_list(item *i, int index)
 {
     item *tmp = symtable[index];
+    printf("kanw insert sto sym to %s\n",i->name);
     if (symtable[index] == NULL)
     {
         symtable[index] = i;
@@ -34,14 +47,13 @@ void insert_list(item *i, int index)
     }
     else
     {
-        while (tmp != NULL)
+        while (tmp->next != NULL)
         {
             tmp = tmp->next;
     
-        }
-
-        tmp = i;
-       wht();
+        }  
+        tmp->next = i;
+       
     }
 }
 
@@ -74,28 +86,6 @@ item *lookupScope(char *name, int scope)
     printf("lookupscope den brika \n");
     return NULL;
 }
-
-
-int isFunction(char* name)
-{
-    item* tmp = lookup(name);
-    
-    if(tmp == NULL)return -1;
-    
-    if(tmp->isActive == 1){
-        red();
-        fprintf(stderr , "function detected in : %d \n" , yylineno);
-        wht();
-        return 0;
-    }
-    
-    if (strcmp(tmp->type, "User Function") == 0)return 1;
-
-    return -1;
-}
-
-
-
 
 
 
@@ -140,10 +130,12 @@ void hide(int scope)
         item *tmp = symtable[i];
         while (tmp != NULL)
         {
-            if (tmp->scope == scope && tmp->isActive == 1)
-            {
-                printf("inactive %s\n",tmp->name );
-                tmp->isActive = 0;
+            if(tmp->scope != 0){
+                if (tmp->scope == scope && tmp->isActive == 1)
+                 {
+                     printf("inactive %s\n",tmp->name );
+                     tmp->isActive = 0;
+                 }
             }
             tmp = tmp->next;
         }
