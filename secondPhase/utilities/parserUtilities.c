@@ -45,6 +45,10 @@ void printdb (char *s)
 void error(char *str, int lineno)
 {
     red();
-    fprintf(stderr , "%s : %d\n" , str , lineno);
+    fprintf(stderr , "error ");
+    mag();
+    fprintf(stderr , "in line : %d " , lineno);
     wht();
+    fprintf(stderr , "%s \n" , str );
+    
 }

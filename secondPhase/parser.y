@@ -124,7 +124,7 @@ Stmt: Expression semicolon {;}
     | Ifstmt {;}
     | Whilestmt {;}
     | Forstmt {;}
-    | Returnstmt {if(functionFlag == 0)error("no function from return" , yylineno);}
+    | Returnstmt {if(functionFlag == 0)error("no function to return" , yylineno);}
     | Break semicolon {if(loopFlag == 0)error("no loop to break" , yylineno);}
     | Continue semicolon {if(loopFlag == 0)error("no loop to Continue" , yylineno);}
     | Block {;}

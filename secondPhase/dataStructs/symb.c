@@ -193,7 +193,3 @@ void printHash()
             wht();
     }
 }
-   
-
-
-
