@@ -182,6 +182,7 @@ Lvalue: id {
                         int fun = isFunction($1);
                         if(fun == -1 || fun == 1){
                                 item* new;
+                                
                                 if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );error("mpika1" , yylineno);}
                                 else {item* new = newItem($1,"Var", scopeCounter , yylineno );error("mpika" , yylineno);}
                                 insert_symTable(new);

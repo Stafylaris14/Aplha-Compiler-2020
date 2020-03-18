@@ -34,12 +34,14 @@ void insert_list(item *i, int index)
     }
     else
     {
-        while (tmp->next != NULL)
+        while (tmp != NULL)
         {
             tmp = tmp->next;
-           // printf("sto insert\n");
+    
         }
-        tmp->next = i;
+
+        tmp = i;
+       wht();
     }
 }
 
@@ -120,6 +122,7 @@ item *lookup(char *name)
 item *newItem(char *name, char *type, int scope, double lineno)
 {
     item *tmp = malloc(sizeof(item));
+    if(tmp == NULL)exit(1);
     tmp->name = strdup(name);
     tmp->type = strdup(type);
     tmp->scope = scope;
