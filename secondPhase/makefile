@@ -17,6 +17,12 @@ compiler: parser scanner
 	gcc -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
 	gcc -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o
 
+compiler-debug:parser scanner 
+
+	gcc -c parser.c dataStructs/symb.c utilities/parserUtilities.c
+	gcc -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
+	gcc -o calc -g parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o
+
 clean:
 	rm -f scanner.c
 	rm -f scanner

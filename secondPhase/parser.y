@@ -248,9 +248,9 @@ Multy_ind: Multy_ind comma Indexedelement {;}
 Indexedelement: left_curle_bracket{scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
                 Expression colon Expression right_curle_bracket {
-                        hide(scopeCounter);
+                      //  hide(scopeCounter);
                         scopeCounter--;
-                        printSymTable();
+                      //  printSymTable();
                  }
                 ;
 
@@ -258,7 +258,7 @@ Indexedelement: left_curle_bracket{scopeCounter++;
 Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         States right_curle_bracket {
-            hide(scopeCounter);
+          //  hide(scopeCounter);
             scopeCounter--;}
         ;
 

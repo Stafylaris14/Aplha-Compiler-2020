@@ -59,14 +59,14 @@ void check(item *new)
 {
     if (isLibraryFunction(new->name))
     {
-        char* str;
+        char *str = malloc(35+sizeof(new->name));
         sprintf(str , "Library Funtion : %s" , new->name);
         error(str, yylineno);
         return;
     }
     if (isFunction(new->name))
     {
-        char *str;
+        char *str = malloc(35+sizeof(new->name));
         sprintf(str, "User Function exist : %s", new->name);
         error(str, yylineno);
         return;
@@ -77,7 +77,7 @@ void check(item *new)
     {
         if (tmp->isActive == 1)
         {
-            char *str;
+            char *str = malloc(35+sizeof(new->name));
             sprintf(str, "Already Exists: %s", new->name);
             error(str, yylineno);
             return;

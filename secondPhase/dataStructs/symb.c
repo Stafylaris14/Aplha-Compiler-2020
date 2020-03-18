@@ -133,8 +133,8 @@ void hide(int scope)
             if(tmp->scope != 0){
                 if (tmp->scope == scope && tmp->isActive == 1)
                  {
-                     printf("inactive %s\n",tmp->name );
                      tmp->isActive = 0;
+                     printf("inactive %s\n",tmp->name );
                  }
             }
             tmp = tmp->next;

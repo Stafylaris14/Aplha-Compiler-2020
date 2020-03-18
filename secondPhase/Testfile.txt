@@ -1,5 +1,3 @@
-function x(){}
+function a(){}
 
-x = 7;
-
-{a = 6;}
+a;
