@@ -57,14 +57,14 @@ void linkItemToScope(item *new)
    
     int scope = new->scope;
     grn();
-    printf("------------eimai gia na valw to  %s --------\n",new->name);
+    
 
     scopeItem *scopeHead = search(scope);
 
     if (scopeHead == NULL)
     {
         red();
-        printf("cant find scope %d to insert item %s ... with maxscope = %d\n", scope, new->name, maxScope);
+        
 
         /* Creating one */
         scopeHead = addNewScope(new->scope);
@@ -72,13 +72,13 @@ void linkItemToScope(item *new)
         if (scopeHead->sameScope == NULL)
         {
             red();
-            printf("list is empty\n");
+        
             scopeHead->sameScope = new;
             new->sameScope = NULL;
         }
         else
         {
-            printf("list is not empty %d \n", scope);
+        
           
             item *tmp = scopeHead->sameScope;
             
@@ -98,7 +98,7 @@ void linkItemToScope(item *new)
         if (scopeHead->sameScope == NULL)
         {
             grn();
-            printf("list is empty denneinai NULL\n");
+        
             scopeHead->sameScope = new;
             new->sameScope = NULL;
         }
@@ -106,7 +106,7 @@ void linkItemToScope(item *new)
         {
             grn();
             item *tmp = scopeHead->sameScope;
-            printf("list is not empty %d \n", scope);
+        
             while (tmp->sameScope != NULL)
             {
                 tmp = tmp->sameScope;
@@ -127,11 +127,11 @@ void printScopeList()
     {
         item *tmpItem = tmp->sameScope;
         cyn();
-        printf("| %d | --->>", tmp->scope);
+        printf("|%d|---> ", tmp->scope);
         while (tmpItem != NULL)
         {
             mag();
-            printf(" ( %s ) ", tmpItem->name);
+            printf("(%s) ", tmpItem->name);
             tmpItem = tmpItem->sameScope;
         }
         printf("\n");
