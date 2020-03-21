@@ -1,7 +1,8 @@
-function f(){
-    local f = 10 ;
-    function h(){
-        return f ;
-    }
+x = 1;
 
-}   
+{
+    this = 1;
+    function f(){
+        scope = 2;
+    }
+}

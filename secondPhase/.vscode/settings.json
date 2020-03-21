@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "symb.h": "c",
-        "linkedlist.h": "c"
+        "linkedlist.h": "c",
+        "scopelist.h": "c"
     }
 }

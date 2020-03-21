@@ -1,18 +1,20 @@
-#include "../dataStructs/linkedList.h"
 #include "scopeList.h"
+
+#include "linkedList.h"
+
 
 scopeItem *head;
 int maxScope;
 void initList()
 {
     maxScope = 0;
-    head = newItem(0);
+    head = newScope(0);
 }
 
-scopeItem *newItem(int scope)
+scopeItem *newScope(int scope)
 {
-    scopeItem* tmp = malloc(sizeof(scopeItem));
-    tmp ->scope = 0;
+    scopeItem *tmp = malloc(sizeof(scopeItem));
+    tmp->scope = scope;
     tmp->sameScope = NULL;
     tmp->next = NULL;
     return tmp;
@@ -45,3 +47,89 @@ scopeItem *search(int scope)
         tmpItem = tmpItem->sameScope;
     }
 } */
+
+scopeItem *addNewScope()
+{
+    maxScope++;
+    scopeItem *tmp = newScope(maxScope);
+    return tmp;
+}
+
+void linkItemToScope(item *new)
+{
+    int scope = new->scope;
+    mag();
+    printf("trying to link with maxScope ==  %d\n" , maxScope);
+    scopeItem *scopeHead = search(scope);
+
+    if (scopeHead == NULL)
+    {
+        red();
+        printf("cant find scope %d to insert item %s ... with maxscope = %d\n", scope, new->name , maxScope);
+
+        /* Creating one */
+        scopeHead = addNewScope();
+
+        if (scopeHead->sameScope == NULL)
+        {
+            grn();
+            printf("list is empty\n");
+            scopeHead->sameScope = new;
+            new->sameScope = NULL;
+        }
+        else
+        {
+            printf("list is not empty %d \n" , scope);
+            item *tmp = scopeHead->sameScope;
+            while (tmp != NULL)
+            {
+                tmp = tmp->sameScope;
+            }
+            tmp = new;
+            wht();
+        }
+    }
+    else
+    {
+        if (scopeHead->sameScope == NULL)
+        {
+            grn();
+            printf("list is empty\n");
+            scopeHead->sameScope = new;
+            new->sameScope = NULL;
+        }
+        else
+        {
+            red();
+            printf("list is not empty %d \n", scope);
+            item *tmp = scopeHead->sameScope;
+            while (tmp != NULL)
+            {
+                tmp = tmp->sameScope;
+            }
+            tmp = new;
+            wht();
+        }
+    }
+    
+}
+
+void printScopeList()
+{
+    scopeItem *tmp = head;
+    
+    while (tmp != NULL)
+    {
+        item *tmpItem = tmp->sameScope;
+        cyn();
+        printf("| %d | --->>" ,tmp->scope );
+        while (tmpItem != NULL)
+        {
+            mag();
+            printf(" ( %s ) " , tmpItem->name);
+            tmpItem = tmpItem->sameScope;
+        }
+        printf("\n");
+        tmp = tmp->next;
+    }
+}

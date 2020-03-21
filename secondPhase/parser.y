@@ -3,6 +3,7 @@
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 
+
 #include "./utilities/parserUtilities.h"
 
 
@@ -356,5 +357,6 @@ int main(int argc, char** argv)
     printSymTable();
     
     printHash();
+    
    // error("print hash" , yylineno);
 }
