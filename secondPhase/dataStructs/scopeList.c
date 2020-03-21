@@ -2,14 +2,14 @@
 
 #include "linkedList.h"
 
-scopeItem *head;
+scopeItem *scopeHead;
 int maxScope;
 
 
 void initList()
 {
     maxScope = 0;
-    head = newScope(0);
+    scopeHead = newScope(0);
 }
 
 scopeItem *newScope(int scope)
@@ -29,8 +29,7 @@ scopeItem *newScope(int scope)
 
 scopeItem *search(int scope)
 {
-    scopeItem *tmp = head;
-
+    scopeItem *tmp = scopeHead;
     while (tmp != NULL)
     {
         if (tmp->scope == scope)
@@ -43,7 +42,7 @@ scopeItem *search(int scope)
 scopeItem *addNewScope(int scope)
 {
     
-    scopeItem* main = head;
+    scopeItem* main = scopeHead;
     scopeItem *tmp = newScope(scope);
     while(main->next!= NULL)
     {
@@ -55,10 +54,10 @@ scopeItem *addNewScope(int scope)
 
 void linkItemToScope(item *new)
 {
-
+   
     int scope = new->scope;
     grn();
-    printf("------------eimai gia na valw to %s  --------\n", new->name);
+    printf("------------eimai gia na valw to  %s --------\n",new->name);
 
     scopeItem *scopeHead = search(scope);
 
@@ -80,13 +79,17 @@ void linkItemToScope(item *new)
         else
         {
             printf("list is not empty %d \n", scope);
+          
             item *tmp = scopeHead->sameScope;
+            
             while (tmp->sameScope != NULL)
             {
                 tmp = tmp->sameScope;
             }
+     
             tmp->sameScope = new;
             wht();
+             
         }
     }
     else
@@ -110,6 +113,7 @@ void linkItemToScope(item *new)
             }
             tmp->sameScope = new;
             wht();
+            
         }
     }
     printScopeList();
@@ -117,7 +121,7 @@ void linkItemToScope(item *new)
 
 void printScopeList()
 {
-    scopeItem *tmp = head;
+    scopeItem *tmp = scopeHead;
 
     while (tmp != NULL)
     {
