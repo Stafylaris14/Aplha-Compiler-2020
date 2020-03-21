@@ -91,16 +91,17 @@ void linkItemToScope(item *new)
     }
     else
     {
+        /* EDW TON PAIZEI */
         if (scopeHead->sameScope == NULL)
         {
             grn();
-            printf("list is empty\n");
+            printf("list is empty denneinai NULL\n");
             scopeHead->sameScope = new;
             new->sameScope = NULL;
         }
         else
         {
-            red();
+            grn();
             printf("list is not empty %d \n", scope);
             item *tmp = scopeHead->sameScope;
             while (tmp != NULL)
