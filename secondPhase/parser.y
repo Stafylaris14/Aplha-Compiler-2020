@@ -17,7 +17,7 @@ extern FILE* yyin;
 int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
-
+int libcheck = 0;
 %}
 
 
@@ -155,16 +155,16 @@ Expression: Assignexpression {;}
 Term:   left_parenthesis Expression right_parenthesis {;}
         | minus Expression %prec Uminus {;}
         | not Expression {;}
-        | plus_plus Lvalue {;}
-        | Lvalue plus_plus {;}
-        | minus_minus Lvalue {;}
-        | Lvalue minus_minus {;}
+        | plus_plus Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n"); libcheck=0;}}
+        | Lvalue plus_plus {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
+        | minus_minus Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
+        | Lvalue minus_minus {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
         | Primary {;}
         ;
 
-Assignexpression: Lvalue assign Expression {
-                        
-                    
+Assignexpression: Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}} assign Expression {
+
+
                 }
                 ;
 
@@ -182,20 +182,23 @@ Primary: Lvalue {;}
 
 
 Lvalue: id {
+                                if(isLibraryFunction($1))libcheck =1;
                                 item* new;
-                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );check(new); }
-                                else {item* new = newItem($1,"variable", scopeCounter , yylineno );check(new);}
+                                if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno );new_check(new); }
+                                else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
 
         }
         | local id {
+                                if(isLibraryFunction($2))libcheck =1;
                                 item* new = NULL;
                                 if(scopeCounter == 0){error("You cant declare a local veriable in global scope" , yylineno);}
                                 else {new = newItem($2,"local variable", scopeCounter , yylineno );}
-                                check(new);
+                                new_check(new);
         }
         | double_colons id {
-                                item* new = newItem($2,"global id", 0 , yylineno );
-                                check(new);
+                                if(isLibraryFunction($2))libcheck = 1;
+                                item* new = newItem($2,"global variable", 0 , yylineno );
+                                new_check(new);
         }
         | Member {;}
         ;
@@ -254,7 +257,7 @@ Indexedelement: left_curle_bracket{scopeCounter++;
                 Expression colon Expression right_curle_bracket {
                         hide(scopeCounter);
                         scopeCounter--;
-                     
+
                  }
                 ;
 
@@ -269,14 +272,14 @@ Block: left_curle_bracket{scopeCounter++;
 
 Funcdef: Function id {
                                 item* new = newItem($2,"User Function", scopeCounter , yylineno );
-                                check(new);
+                                new_check(new);
         } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag++;} Block{functionFlag --;}
         | Function{
                         char noname[20];
                         sprintf(noname,"function$%d",functionCounter);
                         functionCounter++;
                         item* new = newItem(noname,"User Function", scopeCounter , yylineno );
-                        check(new);
+                        new_check(new);
         }
          left_parenthesis{scopeCounter++;grn(); fprintf(stderr , "%d\n" , scopeCounter);wht();} Idlist right_parenthesis {scopeCounter--;functionFlag++;} Block{functionFlag --;}
         ;
@@ -295,14 +298,14 @@ Const:  integer {;}
 
 Idlist: id Multy_id {
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
-                    check(new);
+                    new_check(new);
         }
         | {;}
         ;
 
 Multy_id: Multy_id comma id {
                 item* new = newItem($3,"formal argument", scopeCounter , yylineno );
-                  check(new);
+                  new_check(new);
         }
         | {;}
         ;
@@ -321,7 +324,7 @@ Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_p
         ;
 
 
-Returnstmt: Return semicolon 
+Returnstmt: Return semicolon
         | Return{returnFlag =1;} Expression semicolon {returnFlag =0;}
             ;
 
@@ -351,10 +354,10 @@ int main(int argc, char** argv)
 	return 1;
     }
   }
-    
+
     yyparse();
     printSymTable();
-    
-    printHash();
+
+  //  printHash();
    // error("print hash" , yylineno);
 }

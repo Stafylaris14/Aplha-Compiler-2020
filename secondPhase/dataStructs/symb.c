@@ -16,7 +16,7 @@ char *libFun[12] = {
     "sqrt",
     "cos",
     "sin"};
-    
+
 void init_symTable()
 {
     int index;
@@ -51,10 +51,10 @@ void insert_list(item *i, int index)
         while (tmp->next != NULL)
         {
             tmp = tmp->next;
-    
-        }  
+
+        }
         tmp->next = i;
-       
+
     }
 }
 
@@ -62,7 +62,7 @@ void insert_symTable(item *i)
 {
     int index = hash(strlen(i->name));
     insert_list(i, index);
-    
+
 }
 
 /*lookup in selected scope*/
@@ -160,10 +160,11 @@ void printSymTable()
                     if(tmp->isActive == 0){
                         red();
                     }else {
-                        cyn();
+                       if(isLibraryFunction(tmp->name))cyn();
+                       else red();
                     }
                     fprintf(stderr, "\"%s\" [%s] (line %d) (scope %d) \n", tmp->name, tmp->type, tmp->lineno, tmp->scope);
-                    
+
                 }
                 tmp = tmp->next;
              //   printf("sti sprint\n");
