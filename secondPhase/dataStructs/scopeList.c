@@ -72,7 +72,7 @@ void linkItemToScope(item *new)
 
         if (scopeHead->sameScope == NULL)
         {
-            grn();
+            red();
             printf("list is empty\n");
             scopeHead->sameScope = new;
             new->sameScope = NULL;
@@ -81,11 +81,11 @@ void linkItemToScope(item *new)
         {
             printf("list is not empty %d \n" , scope);
             item *tmp = scopeHead->sameScope;
-            while (tmp != NULL)
+            while (tmp->sameScope != NULL)
             {
                 tmp = tmp->sameScope;
             }
-            tmp = new;
+            tmp->sameScope = new;
             wht();
         }
     }
