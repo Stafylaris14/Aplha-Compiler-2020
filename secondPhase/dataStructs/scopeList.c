@@ -111,7 +111,7 @@ void linkItemToScope(item *new)
             wht();
         }
     }
-    
+    printScopeList();
 }
 
 void printScopeList()

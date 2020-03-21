@@ -64,7 +64,7 @@ void insert_symTable(item *i)
 {
     int index = hash(strlen(i->name));
     insert_list(i, index);
-    /* linkItemToScope(i); */
+    linkItemToScope(i);
 }
 
 /*lookup in selected scope*/
