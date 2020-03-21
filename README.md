@@ -1,10 +1,10 @@
-#Aplha-Compiler-2020
+# Aplha-Compiler-2020
 
 
-####prepei na alla3oyme to function pou mpainei mesa ston symb giati leei ston front oti prepei na vazoyme kai ta Fromal args poy antistoixoyn sthn synarthsh
+#### prepei na alla3oyme to function pou mpainei mesa ston symb giati leei ston front oti prepei na vazoyme kai ta Fromal args poy antistoixoyn sthn synarthsh
 
 
-ean exw 
+##### ean exw 
 
 
 
