@@ -9,7 +9,7 @@ int maxScope;
 
 typedef struct formalArgs
 {
-    char* name;
+    item* arg;
     struct formalArgs* next;
 } formal;
 
@@ -23,7 +23,7 @@ typedef struct Item
     int scope;
     struct Item *sameScope; /* dixnei sto epomeno me to idio scope */
     int lineno;
-    formal *head;
+    formal *formalArg;
     struct Item *next;
 } item;
 

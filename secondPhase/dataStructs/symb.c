@@ -1,6 +1,6 @@
-#include "symb.h"
 
-#include "../dataStructs/linkedList.h"
+#include "scopeList.h"
+#include "linkedList.h"
 
 extern int yylineno;
 char *libFun[12] = {
@@ -20,6 +20,7 @@ char *libFun[12] = {
 void init_symTable()
 {
     int index;
+    initList();
     for (index = 0; index < HASH_SIZE; index++)
     {
         symtable[index] = NULL;
@@ -29,6 +30,7 @@ void init_symTable()
         item *tmp = newItem(libFun[index], "library function", 0, 0);
         insert_symTable(tmp);
     }
+
 }
 
 int hash(int val)
@@ -62,7 +64,7 @@ void insert_symTable(item *i)
 {
     int index = hash(strlen(i->name));
     insert_list(i, index);
-    
+    linkItemToScope(i);
 }
 
 /*lookup in selected scope*/
@@ -120,6 +122,8 @@ item *newItem(char *name, char *type, int scope, double lineno)
     tmp->lineno = lineno;
     tmp->isActive = 1;
     tmp->next = NULL;
+    tmp->sameScope = NULL;
+    tmp->head = NULL;
     return tmp;
 }
 
