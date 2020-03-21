@@ -20,6 +20,16 @@ function x(){               //ti tha ginei me to ::??
 
 
 
-mporei na einai ::print(x) kai print(::x)
 
 
+
+den mporei na kanei dilosi me to :: einai mono gia na kanei access se mia global metavliti kai oxi na thn deilosei . genika kanei mono lookup kai ean den to vrei tote petasei error
+
+sto front leei oti ean kanw read(a) tha deilvsei mia nea metavliti thn read kai to a (ti tha einai to read) den mas noiazei se aythn thn fasi
+
+prepei anagkastka na kanoyme thn scope list??
+
+# SOS
+#### prepei na alla3oyme ton symTable 
+
+#### tha ta rwthsw sto front apo to dis
