@@ -123,7 +123,7 @@ item *newItem(char *name, char *type, int scope, double lineno)
     tmp->isActive = 1;
     tmp->next = NULL;
     tmp->sameScope = NULL;
-    tmp->head = NULL;
+    tmp->formalArg = NULL;
     return tmp;
 }
 

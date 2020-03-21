@@ -185,7 +185,7 @@ Primary: Lvalue {;}
 Lvalue: id {
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );check(new); }
-                                else {item* new = newItem($1,"variable", scopeCounter , yylineno );check(new);}
+                                else {new = newItem($1,"variable", scopeCounter , yylineno );check(new);}
 
         }
         | local id {

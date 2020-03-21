@@ -59,7 +59,8 @@ int isFunction(char *name)
 /* sprintf(str, "Value of Pi = %f", M_PI); */
 void check(item *new)
 {
-    
+        grn();
+        printf("eimai edw gia na checkarw ------------%s\n" , new->name);
         //tsekaroume gia library
         if (isLibraryFunction(new->name))
         {
