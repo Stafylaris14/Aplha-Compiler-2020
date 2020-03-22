@@ -197,8 +197,8 @@ Lvalue: id {
         }
         | double_colons id {
                                 item* tmp = lookupScope($2 , 0);
-                                if(tmp == NULL){error("Cant find Global var :" , yylineno);}
-                                else{DEBUG("NOT NULL");}
+                                if(tmp == NULL){error("Cant find Global " , yylineno);}
+                                
                                 
         }
         | Member {;}
