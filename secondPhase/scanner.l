@@ -12,6 +12,7 @@
     #include "dataStructs/linkedList.h"
     #include "dataStructs/commentStack.h"
     #include "parser.h"
+    #include <string.h>
 
     #define  YY_DECL int yylex (token *lvalp)
 
@@ -163,11 +164,10 @@ other                 .
 
         token* tmp = createNewNode(yylineno , token_counter++ , myString ,"STRING", myString,"char*");
         insert(tmp);
-        return string;
 
-        myString = NULL;
+
         BEGIN(INITIAL);
-
+        return string;
     }
     "\\\'" {
             count++;
@@ -260,7 +260,6 @@ other                 .
             strcat(myString , yytext);
     }
     <<EOF>> {
-
         red();
         fprintf(stderr , "ERROR : EXPECTED  CLOSING STRING WITH \" IN LINE %d  exit \n" , yylineno);
         wht();
@@ -415,8 +414,3 @@ other                 .
     }
 
 %%
-
-
-
-
-
