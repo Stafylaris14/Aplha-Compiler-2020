@@ -18,7 +18,7 @@ scopeItem *newScope(int scope);
 
 scopeItem *search(int scope);
 
-scopeItem *addNewScope();
+scopeItem *addNewScope( int scope);
 
 void linkItemToScope(item *new);
 

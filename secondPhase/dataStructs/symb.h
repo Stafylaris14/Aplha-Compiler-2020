@@ -6,14 +6,7 @@
 
 char *libFun[12];
 int maxScope;
-
-typedef struct formalArgs
-{
-    item* arg;
-    struct formalArgs* next;
-} formal;
-
-
+typedef struct formalArgs formal;
 
 typedef struct Item
 {
@@ -27,6 +20,12 @@ typedef struct Item
     struct Item *next;
 } item;
 
+
+struct formalArgs
+{
+    item *arg;
+    struct formalArgs *next;
+};
 
 item *symtable[HASH_SIZE];
 
@@ -49,3 +48,5 @@ void printSymTable();
 void printHash();
 
 void hide(int scope);
+
+item *lookupScopeAbove(char *name, int scope);

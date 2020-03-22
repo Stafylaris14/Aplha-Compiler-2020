@@ -184,19 +184,20 @@ Primary: Lvalue {;}
 
 Lvalue: id {
                                 item* new;
-                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );check(new); }
-                                else {item* new = newItem($1,"variable", scopeCounter , yylineno );check(new);}
+                                if(scopeCounter == 0){new = newItem($1,"Global Var", scopeCounter , yylineno );insert_symTable(new); }
+                                else {new = newItem($1,"variable", scopeCounter , yylineno );insert_symTable(new);}
 
         }
         | local id {
                                 item* new = NULL;
                                 if(scopeCounter == 0){error("You cant declare a local veriable in global scope" , yylineno);}
                                 else {new = newItem($2,"local variable", scopeCounter , yylineno );}
-                                check(new);
+                                
+                                insert_symTable(new);
         }
         | double_colons id {
                                 item* new = newItem($2,"global id", 0 , yylineno );
-                                check(new);
+                                insert_symTable(new);
         }
         | Member {;}
         ;
@@ -270,14 +271,14 @@ Block: left_curle_bracket{scopeCounter++;
 
 Funcdef: Function id {
                                 item* new = newItem($2,"User Function", scopeCounter , yylineno );
-                                check(new);
+                                insert_symTable(new);
         } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag++;} Block{functionFlag --;}
         | Function{
                         char noname[20];
                         sprintf(noname,"function$%d",functionCounter);
                         functionCounter++;
                         item* new = newItem(noname,"User Function", scopeCounter , yylineno );
-                        check(new);
+                        insert_symTable(new);
         }
          left_parenthesis{scopeCounter++;grn(); fprintf(stderr , "%d\n" , scopeCounter);wht();} Idlist right_parenthesis {scopeCounter--;functionFlag++;} Block{functionFlag --;}
         ;
@@ -296,14 +297,14 @@ Const:  integer {;}
 
 Idlist: id Multy_id {
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
-                    check(new);
+                    insert_symTable(new);
         }
         | {;}
         ;
 
 Multy_id: Multy_id comma id {
                 item* new = newItem($3,"formal argument", scopeCounter , yylineno );
-                  check(new);
+                  insert_symTable(new);
         }
         | {;}
         ;

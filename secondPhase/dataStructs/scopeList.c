@@ -2,18 +2,24 @@
 
 #include "linkedList.h"
 
-
-scopeItem *head;
+scopeItem *scopeHead;
 int maxScope;
+
+
 void initList()
 {
     maxScope = 0;
-    head = newScope(0);
+    scopeHead = newScope(0);
 }
 
 scopeItem *newScope(int scope)
 {
     scopeItem *tmp = malloc(sizeof(scopeItem));
+    if(tmp == NULL)
+    {
+        red();
+        exit(1);
+    }
     tmp->scope = scope;
     tmp->sameScope = NULL;
     tmp->next = NULL;
@@ -22,8 +28,7 @@ scopeItem *newScope(int scope)
 
 scopeItem *search(int scope)
 {
-    scopeItem *tmp = head;
-
+    scopeItem *tmp = scopeHead;
     while (tmp != NULL)
     {
         if (tmp->scope == scope)
@@ -33,101 +38,99 @@ scopeItem *search(int scope)
     return tmp;
 }
 
-/* void addNewItem(item* new)
+scopeItem *addNewScope(int scope)
 {
-    int scope = new->scope;
-
-    scopeItem* tmpScope = search(scope);
-
-    item* tmpItem = tmpScope->sameScope;
-
-    while(tmpItem!=NULL)
+    
+    scopeItem* main = scopeHead;
+    scopeItem *tmp = newScope(scope);
+    while(main->next!= NULL)
     {
-        
-        tmpItem = tmpItem->sameScope;
+        main = main->next;
     }
-} */
-
-scopeItem *addNewScope()
-{
-    maxScope++;
-    scopeItem *tmp = newScope(maxScope);
+    main->next = tmp;
     return tmp;
 }
 
 void linkItemToScope(item *new)
 {
+   
     int scope = new->scope;
-    mag();
-    printf("trying to link with maxScope ==  %d\n" , maxScope);
+    grn();
+    
+
     scopeItem *scopeHead = search(scope);
 
     if (scopeHead == NULL)
     {
         red();
-        printf("cant find scope %d to insert item %s ... with maxscope = %d\n", scope, new->name , maxScope);
+        
 
         /* Creating one */
-        scopeHead = addNewScope();
+        scopeHead = addNewScope(new->scope);
 
         if (scopeHead->sameScope == NULL)
         {
             red();
-            printf("list is empty\n");
+        
             scopeHead->sameScope = new;
             new->sameScope = NULL;
         }
         else
         {
-            printf("list is not empty %d \n" , scope);
+        
+          
             item *tmp = scopeHead->sameScope;
+            
+            while (tmp->sameScope != NULL)
+            {
+                tmp = tmp->sameScope;
+            }
+     
+            tmp->sameScope = new;
+            wht();
+             
+        }
+    }
+    else
+    {
+
+        if (scopeHead->sameScope == NULL)
+        {
+            grn();
+        
+            scopeHead->sameScope = new;
+            new->sameScope = NULL;
+        }
+        else
+        {
+            grn();
+            item *tmp = scopeHead->sameScope;
+        
             while (tmp->sameScope != NULL)
             {
                 tmp = tmp->sameScope;
             }
             tmp->sameScope = new;
             wht();
+            
         }
     }
-    else
-    {
-        /* EDW TON PAIZEI */
-        if (scopeHead->sameScope == NULL)
-        {
-            grn();
-            printf("list is empty denneinai NULL\n");
-            scopeHead->sameScope = new;
-            new->sameScope = NULL;
-        }
-        else
-        {
-            grn();
-            printf("list is not empty %d \n", scope);
-            item *tmp = scopeHead->sameScope;
-            while (tmp->sameScope != NULL)
-            {
-                tmp = tmp->sameScope;
-            }
-            tmp ->sameScope = new;
-            wht();
-        }
-    }
-    printScopeList();
+    
 }
 
 void printScopeList()
 {
-    scopeItem *tmp = head;
-    
+    scopeItem *tmp = scopeHead;
+
     while (tmp != NULL)
     {
         item *tmpItem = tmp->sameScope;
         cyn();
-        printf("| %d | --->>" ,tmp->scope );
+        printf("|%d|---> ", tmp->scope);
         while (tmpItem != NULL)
         {
             mag();
-            printf(" ( %s ) " , tmpItem->name);
+            printf("(%s) ", tmpItem->name);
             tmpItem = tmpItem->sameScope;
         }
         printf("\n");

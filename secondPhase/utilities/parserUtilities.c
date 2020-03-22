@@ -59,7 +59,8 @@ int isFunction(char *name)
 /* sprintf(str, "Value of Pi = %f", M_PI); */
 void check(item *new)
 {
-    
+        grn();
+        printf("eimai edw gia na checkarw ------------%s\n" , new->name);
         //tsekaroume gia library
         if (isLibraryFunction(new->name))
         {
@@ -154,4 +155,12 @@ int isFA(char *name)
     if(flag == 0) return 0; //den brike tpt
     else if(flag ==1)return 0;//brike local se idio scope
     else{error("RIPAPAS", yylineno); return 1;} //einai formal varaible
+}
+
+
+void DEBUG(char* s)
+{
+    red();
+    printf("%s:%d  -> %s\n" , __FILE__ , __LINE__ , s);
+    wht();
 }
