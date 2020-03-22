@@ -196,8 +196,10 @@ Lvalue: id {
                                 insert_symTable(new);
         }
         | double_colons id {
-                                item* new = newItem($2,"global id", 0 , yylineno );
-                                insert_symTable(new);
+                                item* tmp = lookupScope($2 , 0);
+                                if(tmp == NULL){error("Cant find Global var :" , yylineno);}
+                                else{DEBUG("NOT NULL");}
+                                
         }
         | Member {;}
         ;
