@@ -22,7 +22,7 @@ compiler-debug:parser scanner
 	gcc -c parser.c dataStructs/symb.c utilities/parserUtilities.c
 	gcc -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
 	clang -g -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o
-
+	lldb calc
 clean:
 	rm -f scanner.c
 	rm -f scanner

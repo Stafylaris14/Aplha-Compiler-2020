@@ -5,6 +5,7 @@ extern int scopeCounter;
 extern int functionFlag;
 extern int yylineno;
 extern int returnFlag;
+extern char* functionName;
 int isLibraryFunction(char *name)
 {
     int i = 0;
@@ -158,9 +159,60 @@ int isFA(char *name)
 }
 
 
-void DEBUG(char* s)
+void DEBUG(char* s )
 {
     red();
     printf("%s:%d  -> %s\n" , __FILE__ , __LINE__ , s);
     wht();
+}
+
+void insert_formal_arg(char* functionName , char* name)
+{
+    item* tmp = lookup(functionName);
+    if(!tmp)return ;
+    formal* formals = tmp->formalArg;
+
+    if(formals == NULL)
+    {
+        DEBUG("EINAI ADEIA");
+        formals = malloc(sizeof(formal));
+        formals->arg = lookupScope(name , tmp->scope+1);
+        formals->next = NULL;
+        tmp->formalArg = formals;
+    }
+    else
+    {
+        DEBUG("DEN EINAI ADEIA");
+        formal* tmp_f = formals;
+        while(tmp_f->next!=NULL)
+        {
+            tmp_f = tmp_f->next;
+        }
+        
+        tmp_f->next = malloc(sizeof(formal));
+        tmp_f->next->arg = lookupScope(name, tmp->scope + 1);
+        tmp_f->next->next = NULL;
+        tmp->formalArg = formals;
+    }
+    /* print_formal_arguments(); */
+
+}
+/* just for debug */
+void print_formal_arguments()
+{
+    item* funciton = lookup(functionName);
+    formal* args = funciton->formalArg;
+    cyn();
+    printf("---%s---\n" , functionName);
+    grn();
+    if(args == NULL) DEBUG("EINAI NULL");
+    else
+    {
+        while (args != NULL)
+        {
+            printf("(%s)\n" , args->arg->name);
+            args = args->next;
+            
+        }
+    }
 }

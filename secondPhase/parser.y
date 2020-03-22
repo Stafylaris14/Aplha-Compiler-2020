@@ -18,7 +18,7 @@ extern FILE* yyin;
 int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
-
+char* functionName ; /* used to add formal arguments to linked list */
 %}
 
 
@@ -272,11 +272,13 @@ Block: left_curle_bracket{scopeCounter++;
 Funcdef: Function id {
                                 item* new = newItem($2,"User Function", scopeCounter , yylineno );
                                 insert_symTable(new);
-        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag++;} Block{functionFlag --;}
+                                functionName = strdup($2);
+        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag++;} Block{functionFlag --;print_formal_arguments();}
         | Function{
                         char noname[20];
                         sprintf(noname,"function$%d",functionCounter);
                         functionCounter++;
+                        functionName = strdup(noname);
                         item* new = newItem(noname,"User Function", scopeCounter , yylineno );
                         insert_symTable(new);
         }
@@ -298,6 +300,7 @@ Const:  integer {;}
 Idlist: id Multy_id {
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
                     insert_symTable(new);
+                    insert_formal_arg(functionName , $1);
         }
         | {;}
         ;
@@ -305,6 +308,7 @@ Idlist: id Multy_id {
 Multy_id: Multy_id comma id {
                 item* new = newItem($3,"formal argument", scopeCounter , yylineno );
                   insert_symTable(new);
+                  insert_formal_arg(functionName , $3);
         }
         | {;}
         ;
