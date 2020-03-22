@@ -1,1 +1,9 @@
-s = "print new line 
+function f(x,a,t,s)
+{
+
+}
+
+function ssadasd(q , e , r){
+
+
+}
