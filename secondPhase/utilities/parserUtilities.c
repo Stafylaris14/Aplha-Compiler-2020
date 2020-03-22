@@ -119,10 +119,12 @@ void check(item *new)
 int new_check(item *new){
   int i=0;
   item *tmp = NULL;
+
   for (i = 0; i < HASH_SIZE; i++) {
       tmp = symtable[i];
       while (tmp != NULL){
         if (!strcmp(tmp->name, new->name) && tmp->isActive){      //an einai idio onoma meta 3ekinaw elenxoys
+        //  printf("idio onoma %s ka newitype %s kai tmptypw %s kai scope %d k scope idio %d\n",tmp->name,new->type,tmp->type,new->scope,tmp->scope);
           //tsekarw an einai local to type pou 8elw na balw
           if(!strcmp(new->type, "local variable")){
             //den borei na einai library
@@ -142,24 +144,50 @@ int new_check(item *new){
                 //error(str, yylineno);
                 return;
                 //den kanei insert gt iparxei idi
-              }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && tmp->scope == new->scope){
-                return;
-              }else if(!strcmp(tmp->type, "global variable")){
-                return;
-              }
+              }else return;
 
           //tsekarw an einai global
-          }else if(!strcmp(new->type, "global variable")){
-            //yparxei sto scope 0 ara dn kanw init
-            if(!strcmp(tmp->type, "global variable")){
+          }else if(!strcmp(new->type, "local")){
+            new->type = strdup("local variable");
+
+            //den borei na einai library
+            if (isLibraryFunction(new->name)){
+              char *str = malloc(35 + sizeof(new->name));
+              red();
+              printf( "Library Funtion : %s\n", new->name);
+              wht();
+              //error(str, yylineno);
               return;
+              //den borei na exei idio onoma me function
+            }else if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
+                char *str = malloc(35 + sizeof(new->name));
+                red();
+                printf( "Redeclaration Function : %s\n", new->name);
+                wht();
+                //error(str, yylineno);
+                return;
+                //den kanei insert gt iparxei idi
+              }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && tmp->scope == new->scope){
+                return;
+              }
+          //tsekarw an einai global
+          }  else if(!strcmp(new->type, "global variable")){
+            if (isLibraryFunction(new->name)){
+                      char *str = malloc(35 + sizeof(new->name));
+                      red();
+                      printf( "Library Funtion : %s\n", new->name);
+                      wht();
+                      //error(str, yylineno);
+                      return;
+
               //den borei na exei idio onoma me function
             }else if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
               char *str = malloc(35 + sizeof(new->name));
               red();
-              printf( "Redeclaration Function : %s\n", new->name);
+
+              printf(str, "Redeclaration Function : %s", new->name);
               wht();
-              //error(str, yylineno);
+            //  error(str, yylineno);
               return;
             }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && new->scope !=tmp->scope){
                 red();
@@ -167,17 +195,22 @@ int new_check(item *new){
               //yparxei swsta
             }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument"))&& new->scope == tmp->scope){
               return;
-            }else if (isLibraryFunction(new->name)){
-                      char *str = malloc(35 + sizeof(new->name));
-                      red();
-                      printf( "Library Funtion : %s\n", new->name);
-                      wht();
-                      //error(str, yylineno);
-                      return;
+              //yparxei sto scope 0 ara dn kanw init
+            }else if(new->scope == tmp->scope){
+                return;
               }
           //koitaw an einai function
           }else if(!strcmp(new->type, "User Function")){
-            if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
+             if (isLibraryFunction(new->name)){
+                      char *str = malloc(35 + sizeof(new->name));
+                      red();
+                      //printf( "Library Funtion : %s\n", new->name);
+                      wht();
+                      sprintf(str, "Library same Function : %s", new->name);
+                      error(str, yylineno);
+                      return;
+              }
+            else if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
               char *str = malloc(35 + sizeof(new->name));
               red();
               printf( "Redeclaration Function : %s\n", new->name);
@@ -190,17 +223,19 @@ int new_check(item *new){
               sprintf(str, "Redeclaration with variable : %s", new->name);
               error(str, yylineno);
               return;
-            } else if (isLibraryFunction(new->name)){
+            }
+          }else if(!strcmp(new->type, "formal argument")){
+
+            if (isLibraryFunction(new->name)){
                       char *str = malloc(35 + sizeof(new->name));
                       red();
-                      printf( "Library Funtion : %s\n", new->name);
+                    //  printf( "Library Funtion : %s\n", new->name);
                       wht();
-                      //error(str, yylineno);
+                      sprintf(str, "Formal same Function : %s", new->name);
+                      error(str, yylineno);
                       return;
               }
-
-          }else if(!strcmp(new->type, "formal argument")){
-            if(!strcmp(tmp->type, "formal argument") && tmp->scope == new->scope){
+            else if(!strcmp(tmp->type, "formal argument") && tmp->scope == new->scope){
               char *str = malloc(35 + sizeof(new->name));
               sprintf(str, "Redeclaration formal argument : %s", new->name);
               error(str, yylineno);
@@ -213,15 +248,7 @@ int new_check(item *new){
                 sprintf(str, "Function argument : %s", new->name);
                 error(str, yylineno);
                 return;
-            }else if (isLibraryFunction(new->name)){
-                      char *str = malloc(35 + sizeof(new->name));
-                      red();
-                      printf( "Library Funtion : %s\n", new->name);
-                      wht();
-                      //error(str, yylineno);
-                      return;
             }
-
 
           }
 
@@ -229,9 +256,8 @@ int new_check(item *new){
         tmp = tmp->next;
       }
   }
-
+  if(!strcmp(new->type, "local"))new->type = strdup("local variable");
   insert_symTable(new);
-
 }
 
 

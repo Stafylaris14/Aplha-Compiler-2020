@@ -191,8 +191,7 @@ Lvalue: id {
         | local id {
                                 if(isLibraryFunction($2))libcheck =1;
                                 item* new = NULL;
-                                if(scopeCounter == 0){error("You cant declare a local veriable in global scope" , yylineno);}
-                                else {new = newItem($2,"local variable", scopeCounter , yylineno );}
+                                new = newItem($2,"local", scopeCounter , yylineno );    
                                 new_check(new);
         }
         | double_colons id {
