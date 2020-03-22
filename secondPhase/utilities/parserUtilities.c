@@ -116,7 +116,7 @@ void check(item *new)
 }
 
 
-int new_check(item *new){
+void new_check(item *new){
   int i=0;
   item *tmp = NULL;
 

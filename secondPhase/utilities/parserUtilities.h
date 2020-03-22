@@ -32,3 +32,5 @@ void DEBUG(char *s);
 void insert_formal_arg(char *functionName, char *name);
 
 void print_formal_arguments();
+
+void new_check(item *new);

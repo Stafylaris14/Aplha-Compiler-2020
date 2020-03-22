@@ -1,6 +1,4 @@
-function foo1(){
-         x = 1;
-        function foo() {
-          x = 9;
-}       
+x = 2;
+function f(){
+    ::x = 1;
 }

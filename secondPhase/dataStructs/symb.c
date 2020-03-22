@@ -175,7 +175,7 @@ void printSymTable()
                         red();
                     }else {
                        if(isLibraryFunction(tmp->name))cyn();
-                       else red();
+                       /* else red(); */
                     }
                     fprintf(stderr, "\"%s\" [%s] (line %d) (scope %d) \n", tmp->name, tmp->type, tmp->lineno, tmp->scope);
 

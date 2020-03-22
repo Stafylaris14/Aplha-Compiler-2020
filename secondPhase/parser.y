@@ -367,6 +367,6 @@ int main(int argc, char** argv)
     printSymTable();
     
     printHash();
-    
+    printScopeList();
    // error("print hash" , yylineno);
 }
