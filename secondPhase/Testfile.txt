@@ -1,6 +1,6 @@
-
-function g(){
-    function f(){}
-
-    ::f();
+function foo1(){
+         x = 1;
+        function foo() {
+          x = 9;
+}       
 }
