@@ -1,9 +1,6 @@
-function f(x,a,t,s)
-{
 
-}
+function g(){
+    function f(){}
 
-function ssadasd(q , e , r){
-
-
+    ::f();
 }
