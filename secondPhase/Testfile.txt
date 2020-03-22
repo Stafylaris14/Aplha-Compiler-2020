@@ -1,7 +1,1 @@
-a;
-
-{
-    {
-        b = 1;
-    }
-}
+s = "print new line 

@@ -26,3 +26,5 @@ int isFunction(char *name);
 int isFA(char *name);
 
 void check(item *new);
+
+void DEBUG(char *s);

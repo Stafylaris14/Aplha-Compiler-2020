@@ -48,3 +48,5 @@ void printSymTable();
 void printHash();
 
 void hide(int scope);
+
+item *lookupScopeAbove(char *name, int scope);

@@ -18,7 +18,6 @@ scopeItem *newScope(int scope)
     if(tmp == NULL)
     {
         red();
-        printf("isNULL\n");
         exit(1);
     }
     tmp->scope = scope;
@@ -116,7 +115,7 @@ void linkItemToScope(item *new)
             
         }
     }
-    printScopeList();
+    
 }
 
 void printScopeList()

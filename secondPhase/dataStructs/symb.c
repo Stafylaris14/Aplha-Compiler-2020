@@ -67,27 +67,37 @@ void insert_symTable(item *i)
     linkItemToScope(i);
 }
 
+item* lookupScopeAbove(char* name , int scope)
+{
+    int index = scope;
+    item *tmp = lookupScope(name, scope);
+    while(scope != 0 && tmp !=NULL){
+        scope--;
+        tmp = lookupScope(name , scope);
+    }
+    return tmp;
+}
+
+
 /*lookup in selected scope*/
 item *lookupScope(char *name, int scope)
 {
     int index = hash(strlen(name));
     item *tmp = symtable[index];
-    while (tmp != NULL)
+    
+    scopeItem* headScope = search(scope);
+
+    if(headScope == NULL)return NULL;
+
+    item *indexScope = headScope->sameScope;
+
+    while (indexScope != NULL)
     {
-        if (!strcmp(tmp->name, name))
-        {
-            if (tmp->scope == scope){
-                grn();
-                 /* printf("lookupscope brika id %s sto scope %d \n",name,scope); */
-                 wht();
-                return tmp;
-            }
-        }
-      //  printf("mesa lookupscope");
-        tmp = tmp->next;
+        if(!strcmp(name , indexScope->name)) break;
+        indexScope = indexScope->sameScope;
     }
-    /* printf("lookupscope den brika \n"); */
-    return NULL;
+    
+    return indexScope;
 }
 
 

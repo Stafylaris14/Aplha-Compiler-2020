@@ -156,3 +156,11 @@ int isFA(char *name)
     else if(flag ==1)return 0;//brike local se idio scope
     else{error("RIPAPAS", yylineno); return 1;} //einai formal varaible
 }
+
+
+void DEBUG(char* s)
+{
+    red();
+    printf("%s:%d  -> %s\n" , __FILE__ , __LINE__ , s);
+    wht();
+}
