@@ -2,6 +2,7 @@
 #include "scopeList.h"
 #include "linkedList.h"
 
+int isLibraryFunction(char *name);
 extern int yylineno;
 char *libFun[12] = {
     "print",
