@@ -17,6 +17,9 @@ extern char* yytext;
 extern FILE* yyin;
 int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
+int callFlag =0; // an exw call
+
+
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
 int libcheck = 0;
 char* functionName ; /* used to add formal arguments to linked list */
@@ -174,7 +177,7 @@ Assignexpression: Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai li
 
 
 Primary: Lvalue {;}
-        | Call {;}
+        | Call {callFlag =1;}
         | Objectdef {;}
         | left_parenthesis Funcdef right_parenthesis {;}
         | Const {;}
@@ -202,34 +205,34 @@ Lvalue: id {
                                 
                                 
         }
-        | Member {;}
+        | Member {callFlag =1;};
         ;
 
 
 Member: Lvalue dot id {;}
         | Lvalue left_bracket Expression right_bracket {;}
-        | Call dot id {;}
-        | Call left_bracket Expression right_bracket {;}
+        | Call {callFlag =1;} dot id {callFlag =0;}
+        | Call {callFlag =1;} left_bracket Expression right_bracket {callFlag =0;}
         ;
 
 
-Call: Call left_parenthesis Elist right_parenthesis {;}
-        | Lvalue Callsuffix {;}
-        | left_parenthesis Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {;}
+Call: Call {callFlag =1;}left_parenthesis Elist right_parenthesis {callFlag =0;}
+        |  Lvalue{callFlag =1;} Callsuffix {callFlag =0;}
+        | left_parenthesis{callFlag =1;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {callFlag =0;}
         ;
 
 
 
-Callsuffix: Normalcall {;}
-            | Methodcall {;}
+Callsuffix: Normalcall {callFlag =1;}
+            | Methodcall {callFlag =1;}
             ;
 
-Normalcall: left_parenthesis Elist right_parenthesis {;}
+Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {;}
             ;
 
 
 
-Methodcall: double_dots id left_parenthesis Elist right_parenthesis {;}
+Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthesis {;}
             ;
 
 
@@ -331,7 +334,7 @@ Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_p
 
 
 Returnstmt: Return semicolon
-        | Return{returnFlag =1;} Expression semicolon {returnFlag =0;}
+        | Return{returnFlag = 1; } Expression semicolon {returnFlag =0; }
             ;
 
 

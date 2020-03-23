@@ -6,6 +6,9 @@ extern int functionFlag;
 extern int yylineno;
 extern int returnFlag;
 extern char* functionName;
+extern int callFlag;
+
+
 
 int isLibraryFunction(char *name)
 {
@@ -142,11 +145,14 @@ void new_check(item *new){
                      red();
                      printf( "Redeclaration Function : %s\n", new->name);
                      wht();
+                     if(returnFlag ==1)return;
                      sprintf(str, "Function name exist : %s", new->name);
                      error(str, yylineno);
                     return;
                    //den kanei insert gt iparxei idi
               }else if(functionFlag > 0){
+                if(returnFlag ==1)return;
+                if(callFlag ==1)return;
               //  printf("se gamaw apo kolo %d k onoma %s\n",functionFlag,new->name );
                 item* proigoumeno;
                 proigoumeno = lookupScopeAbove(new->name,new->scope-1);
@@ -208,7 +214,7 @@ void new_check(item *new){
                       red();
                       printf( "Library Funtion : %s\n", new->name);
                       wht();
-                      error(str, yylineno);
+                     // error(str, yylineno);
                       return;
 
               //den borei na exei idio onoma me function
@@ -219,7 +225,7 @@ void new_check(item *new){
               printf(str, "Redeclaration Function : %s", new->name);
               wht();
               sprintf(str, "Function name exist : %s", new->name);
-              error(str, yylineno);
+             // if(callFlag == 1)error(str, yylineno);
               return;
             }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && new->scope !=tmp->scope){
                 red();
