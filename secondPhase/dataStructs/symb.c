@@ -1,6 +1,6 @@
-#include "symb.h"
 
-#include "../dataStructs/linkedList.h"
+#include "scopeList.h"
+#include "linkedList.h"
 
 extern int yylineno;
 char *libFun[12] = {
@@ -16,10 +16,11 @@ char *libFun[12] = {
     "sqrt",
     "cos",
     "sin"};
-    
+
 void init_symTable()
 {
     int index;
+    initList();
     for (index = 0; index < HASH_SIZE; index++)
     {
         symtable[index] = NULL;
@@ -29,6 +30,7 @@ void init_symTable()
         item *tmp = newItem(libFun[index], "library function", 0, 0);
         insert_symTable(tmp);
     }
+
 }
 
 int hash(int val)
@@ -51,41 +53,51 @@ void insert_list(item *i, int index)
         while (tmp->next != NULL)
         {
             tmp = tmp->next;
-    
-        }  
+
+        }
         tmp->next = i;
-       
+
     }
 }
 
 void insert_symTable(item *i)
 {
-    int index = hash(strlen(i->name));
-    insert_list(i, index);
-    
+   int index = hash(strlen(i->name));
+   insert_list(i, index);
+    linkItemToScope(i);
 }
+
+item* lookupScopeAbove(char* name , int scope)
+{
+    int index = scope;
+    item *tmp = lookupScope(name, scope);
+    while(scope != 0 && tmp !=NULL){
+        scope--;
+        tmp = lookupScope(name , scope);
+    }
+    return tmp;
+}
+
 
 /*lookup in selected scope*/
 item *lookupScope(char *name, int scope)
 {
     int index = hash(strlen(name));
     item *tmp = symtable[index];
-    while (tmp != NULL)
+    
+    scopeItem* headScope = search(scope);
+
+    if(headScope == NULL)return NULL;
+
+    item *indexScope = headScope->sameScope;
+
+    while (indexScope != NULL)
     {
-        if (!strcmp(tmp->name, name))
-        {
-            if (tmp->scope == scope){
-                grn();
-                 /* printf("lookupscope brika id %s sto scope %d \n",name,scope); */
-                 wht();
-                return tmp;
-            }
-        }
-      //  printf("mesa lookupscope");
-        tmp = tmp->next;
+        if(!strcmp(name , indexScope->name)) break;
+        indexScope = indexScope->sameScope;
     }
-    /* printf("lookupscope den brika \n"); */
-    return NULL;
+    
+    return indexScope;
 }
 
 
@@ -120,6 +132,8 @@ item *newItem(char *name, char *type, int scope, double lineno)
     tmp->lineno = lineno;
     tmp->isActive = 1;
     tmp->next = NULL;
+    tmp->sameScope = NULL;
+    tmp->formalArg = NULL;
     return tmp;
 }
 
@@ -160,10 +174,11 @@ void printSymTable()
                     if(tmp->isActive == 0){
                         red();
                     }else {
-                        cyn();
+                       if(isLibraryFunction(tmp->name))cyn();
+                       /* else red(); */
                     }
                     fprintf(stderr, "\"%s\" [%s] (line %d) (scope %d) \n", tmp->name, tmp->type, tmp->lineno, tmp->scope);
-                    
+
                 }
                 tmp = tmp->next;
              //   printf("sti sprint\n");

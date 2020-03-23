@@ -1,7 +1,4 @@
+x = 2;
 function f(){
-    local f = 10 ;
-    function h(){
-        return f ;
-    }
-
-}   
+    ::x = 1;
+}
