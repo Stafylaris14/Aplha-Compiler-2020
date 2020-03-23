@@ -193,10 +193,8 @@ Lvalue: id {
         | local id {
                                 if(isLibraryFunction($2))libcheck =1;
                                 item* new = NULL;
-                                if(scopeCounter == 0){error("You cant declare a local veriable in global scope" , yylineno);}
-                                else {new = newItem($2,"local variable", scopeCounter , yylineno );}
-                                
-                                insert_symTable(new);
+                                new = newItem($2,"local variable", scopeCounter , yylineno );
+                                new_check(new);
         }
         | double_colons id {
                                 item* tmp = lookupScope($2 , 0);
@@ -244,8 +242,8 @@ Multy_exp: comma Expression Multy_exp {;}
         | {;}
         ;
 
-Objectdef: left_bracket Elist right_bracket {;}
-        | left_bracket Indexed right_bracket {;}
+Objectdef: left_bracket{scopeCounter--;}Elist right_bracket {scopeCounter++;}
+        | left_bracket{scopeCounter--;} Indexed right_bracket {scopeCounter++;}
         ;
 
 
