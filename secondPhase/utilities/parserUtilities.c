@@ -147,16 +147,16 @@ void new_check(item *new){
                     return;
                    //den kanei insert gt iparxei idi
               }else if(functionFlag > 0){
-                printf("se gamaw apo kolo %d k onoma %s\n",functionFlag,new->name );
+              //  printf("se gamaw apo kolo %d k onoma %s\n",functionFlag,new->name );
                 item* proigoumeno;
                 proigoumeno = lookupScopeAbove(new->name,new->scope-1);
-               if(proigoumeno != NULL) printf("above  %s\n",proigoumeno->name);
+              // if(proigoumeno != NULL) printf("above  %s\n",proigoumeno->name);
                 item* twra;
                 twra = lookupScope(new->name,new->scope);
-                 if(twra != NULL) printf("abovtwra  %s\n",twra->name);
+               //  if(twra != NULL) printf("abovtwra  %s\n",twra->name);
                 item* glob;
                 glob = lookupScope(new->name,0);
-                if(glob != NULL) printf("global  %s\n",glob->name);
+                //if(glob != NULL) printf("global  %s\n",glob->name);
                 if(glob != NULL){
                   if(!strcmp(glob->type, "User Function")){
                      char *str = malloc(35 + sizeof(new->name));
