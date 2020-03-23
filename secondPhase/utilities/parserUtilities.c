@@ -157,18 +157,18 @@ void new_check(item *new){
                 item* glob;
                 glob = lookupScope(new->name,0);
                 //if(glob != NULL) printf("global  %s\n",glob->name);
-                if(glob != NULL){
-                  if(!strcmp(glob->type, "User Function")){
+                if(proigoumeno != NULL){
                      char *str = malloc(35 + sizeof(new->name));
+                     wht();
+                     sprintf(str, "Not access : %s", new->name);
+                     error(str, yylineno);
+                }else if(glob != NULL){
+                  if(!strcmp(glob->type, "User Function")){
+                    char *str = malloc(35 + sizeof(new->name));
                      wht();
                      sprintf(str, "Not access : %s", new->name);
                      error(str, yylineno);
                   }else return;
-                }else if(proigoumeno !=NULL && twra == NULL){
-                     char *str = malloc(35 + sizeof(new->name));
-                     wht();
-                     sprintf(str, "Not access : %s", new->name);
-                     error(str, yylineno);
                 }else if (twra != NULL)return;
                 else{
                   insert_symTable(new);
