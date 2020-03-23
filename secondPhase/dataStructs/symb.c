@@ -71,12 +71,14 @@ void insert_symTable(item *i)
 item* lookupScopeAbove(char* name , int scope)
 {
     int index = scope;
-    item *tmp = lookupScope(name, scope);
-    while(scope != 0 && tmp !=NULL){
+    item *tmp = NULL;
+    tmp = lookupScope(name, scope);
+    while(scope != 0 ){
         scope--;
+        if(tmp != NULL) return tmp;
         tmp = lookupScope(name , scope);
     }
-    return tmp;
+    return NULL;
 }
 
 
@@ -94,11 +96,11 @@ item *lookupScope(char *name, int scope)
 
     while (indexScope != NULL)
     {
-        if(!strcmp(name , indexScope->name)) break;
+        if(!strcmp(name , indexScope->name)) {return indexScope;}
         indexScope = indexScope->sameScope;
     }
     
-    return indexScope;
+    return NULL;
 }
 
 

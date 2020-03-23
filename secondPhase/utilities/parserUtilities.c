@@ -6,6 +6,7 @@ extern int functionFlag;
 extern int yylineno;
 extern int returnFlag;
 extern char* functionName;
+
 int isLibraryFunction(char *name)
 {
     int i = 0;
@@ -136,17 +137,46 @@ void new_check(item *new){
               //error(str, yylineno);
               return;
               //den borei na exei idio onoma me function
-            }else if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
-                char *str = malloc(35 + sizeof(new->name));
-                red();
-                printf( "Redeclaration Function : %s\n", new->name);
-                wht();
-                //error(str, yylineno);
-                return;
-                //den kanei insert gt iparxei idi
+                } else if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
+                     char *str = malloc(35 + sizeof(new->name));
+                     red();
+                     printf( "Redeclaration Function : %s\n", new->name);
+                     wht();
+                     sprintf(str, "Function name exist : %s", new->name);
+                     error(str, yylineno);
+                    return;
+                   //den kanei insert gt iparxei idi
+              }else if(functionFlag > 0){
+                printf("se gamaw apo kolo %d k onoma %s\n",functionFlag,new->name );
+                item* proigoumeno;
+                proigoumeno = lookupScopeAbove(new->name,new->scope-1);
+               if(proigoumeno != NULL) printf("above  %s\n",proigoumeno->name);
+                item* twra;
+                twra = lookupScope(new->name,new->scope);
+                 if(twra != NULL) printf("abovtwra  %s\n",twra->name);
+                item* glob;
+                glob = lookupScope(new->name,0);
+                if(glob != NULL) printf("global  %s\n",glob->name);
+                if(glob != NULL){
+                  if(!strcmp(glob->type, "User Function")){
+                     char *str = malloc(35 + sizeof(new->name));
+                     wht();
+                     sprintf(str, "Not access : %s", new->name);
+                     error(str, yylineno);
+                  }else return;
+                }else if(proigoumeno !=NULL && twra == NULL){
+                     char *str = malloc(35 + sizeof(new->name));
+                     wht();
+                     sprintf(str, "Not access : %s", new->name);
+                     error(str, yylineno);
+                }else if (twra != NULL)return;
+                else{
+                  insert_symTable(new);
+                  return;
+                }
               }else return;
-
           //tsekarw an einai global
+              
           }else if(!strcmp(new->type, "local")){
             new->type = strdup("local variable");
 
@@ -164,7 +194,8 @@ void new_check(item *new){
                 red();
                 printf( "Redeclaration Function : %s\n", new->name);
                 wht();
-                //error(str, yylineno);
+                sprintf(str, "Function name exist : %s", new->name);
+                error(str, yylineno);
                 return;
                 //den kanei insert gt iparxei idi
               }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && tmp->scope == new->scope){
@@ -177,7 +208,7 @@ void new_check(item *new){
                       red();
                       printf( "Library Funtion : %s\n", new->name);
                       wht();
-                      //error(str, yylineno);
+                      error(str, yylineno);
                       return;
 
               //den borei na exei idio onoma me function
@@ -187,7 +218,8 @@ void new_check(item *new){
 
               printf(str, "Redeclaration Function : %s", new->name);
               wht();
-            //  error(str, yylineno);
+              sprintf(str, "Function name exist : %s", new->name);
+              error(str, yylineno);
               return;
             }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && new->scope !=tmp->scope){
                 red();
