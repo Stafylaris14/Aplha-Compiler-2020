@@ -136,4 +136,5 @@ void printScopeList()
         printf("\n");
         tmp = tmp->next;
     }
+    wht();
 }

@@ -17,6 +17,9 @@ extern char* yytext;
 extern FILE* yyin;
 int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
+int callFlag =0; // an exw call
+
+
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
 int libcheck = 0;
 char* functionName ; /* used to add formal arguments to linked list */
@@ -123,16 +126,16 @@ States: States Stmt {;}
     |
     ;
 
-Stmt: Expression semicolon {;}
+Stmt: Expression semicolon {libcheck =0;}
     | Ifstmt {;}
     | Whilestmt {;}
     | Forstmt {;}
     | Returnstmt {if(functionFlag == 0)error("no function to return" , yylineno);}
-    | Break semicolon {if(loopFlag == 0)error("no loop to break" , yylineno);}
-    | Continue semicolon {if(loopFlag == 0)error("no loop to Continue" , yylineno);}
+    | Break semicolon {libcheck =0;if(loopFlag == 0)error("no loop to break" , yylineno);}
+    | Continue semicolon {libcheck =0;if(loopFlag == 0)error("no loop to Continue" , yylineno);}
     | Block {;}
     | Funcdef {;}
-    | semicolon   {;}
+    | semicolon {libcheck =0;}
     ;
 
 
@@ -157,14 +160,14 @@ Expression: Assignexpression {;}
 Term:   left_parenthesis Expression right_parenthesis {;}
         | minus Expression %prec Uminus {;}
         | not Expression {;}
-        | plus_plus Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n"); libcheck=0;}}
-        | Lvalue plus_plus {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
-        | minus_minus Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
-        | Lvalue minus_minus {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
+        | plus_plus Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
+        | Lvalue plus_plus {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
+        | minus_minus Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
+        | Lvalue minus_minus {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
         | Primary {;}
         ;
 
-Assignexpression: Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}} assign Expression {
+Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
 
 
                 }
@@ -174,7 +177,7 @@ Assignexpression: Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai li
 
 
 Primary: Lvalue {;}
-        | Call {;}
+        | Call {callFlag =1;}
         | Objectdef {;}
         | left_parenthesis Funcdef right_parenthesis {;}
         | Const {;}
@@ -184,52 +187,51 @@ Primary: Lvalue {;}
 
 
 Lvalue: id {
-                                if(isLibraryFunction($1))libcheck =1;
+                                if(isLibraryFunction($1)){libcheck =1;}
+                                if(isFA($1))libcheck =1;
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno );new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
-
         }
         | local id {
                                 if(isLibraryFunction($2))libcheck =1;
+                                if(isFA($2))libcheck =1;
                                 item* new = NULL;
                                 new = newItem($2,"local variable", scopeCounter , yylineno );
                                 new_check(new);
         }
         | double_colons id {
                                 item* tmp = lookupScope($2 , 0);
-                                if(tmp == NULL){error("Cant find Global " , yylineno);}
-                                
-                                
+                                if(tmp == NULL){error("Cant find Global " , yylineno);}                
         }
-        | Member {;}
+        | Member {;};
         ;
 
 
-Member: Lvalue dot id {;}
-        | Lvalue left_bracket Expression right_bracket {;}
-        | Call dot id {;}
-        | Call left_bracket Expression right_bracket {;}
+Member: Lvalue dot id {libcheck = 0;}
+        | Lvalue left_bracket Expression right_bracket {libcheck = 0;}
+        | Call {callFlag =1;libcheck =0;} dot id {callFlag =0;libcheck = 0;}
+        | Call {callFlag =1;libcheck=0;} left_bracket Expression right_bracket {callFlag =0;libcheck = 0;}
         ;
 
 
-Call: Call left_parenthesis Elist right_parenthesis {;}
-        | Lvalue Callsuffix {;}
-        | left_parenthesis Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {;}
+Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {callFlag =0;}
+        |  Lvalue{callFlag =1;libcheck = 0;} Callsuffix {callFlag =0;}
+        | left_parenthesis{callFlag =1;libcheck = 0;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {callFlag =0;}
         ;
 
 
 
-Callsuffix: Normalcall {;}
-            | Methodcall {;}
+Callsuffix: Normalcall {callFlag =1;}
+            | Methodcall {callFlag =1;}
             ;
 
-Normalcall: left_parenthesis Elist right_parenthesis {;}
+Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {;}
             ;
 
 
 
-Methodcall: double_dots id left_parenthesis Elist right_parenthesis {;}
+Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthesis {;}
             ;
 
 
@@ -330,8 +332,8 @@ Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_p
         ;
 
 
-Returnstmt: Return semicolon
-        | Return{returnFlag =1;} Expression semicolon {returnFlag =0;}
+Returnstmt: Return semicolon{libcheck =0;}
+        | Return{returnFlag = 1; } Expression semicolon {libcheck =0;returnFlag =0; }
             ;
 
 

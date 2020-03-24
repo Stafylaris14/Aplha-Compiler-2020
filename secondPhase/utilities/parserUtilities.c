@@ -6,6 +6,10 @@ extern int functionFlag;
 extern int yylineno;
 extern int returnFlag;
 extern char* functionName;
+extern int callFlag;
+
+
+
 int isLibraryFunction(char *name)
 {
     int i = 0;
@@ -136,17 +140,49 @@ void new_check(item *new){
               //error(str, yylineno);
               return;
               //den borei na exei idio onoma me function
-            }else if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
-                char *str = malloc(35 + sizeof(new->name));
-                red();
-                printf( "Redeclaration Function : %s\n", new->name);
-                wht();
-                //error(str, yylineno);
-                return;
-                //den kanei insert gt iparxei idi
+                } else if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
+                     char *str = malloc(35 + sizeof(new->name));
+                     red();
+                     printf( "Redeclaration Function : %s\n", new->name);
+                     wht();
+                     if(returnFlag ==1)return;
+                     sprintf(str, "Function name exist : %s", new->name);
+                     error(str, yylineno);
+                    return;
+                   //den kanei insert gt iparxei idi
+              }else if(functionFlag > 0){
+                if(returnFlag ==1)return;
+                if(callFlag ==1)return;
+              //  printf("se gamaw apo kolo %d k onoma %s\n",functionFlag,new->name );
+                item* proigoumeno;
+                proigoumeno = lookupScopeAbove(new->name,new->scope-1);
+              // if(proigoumeno != NULL) printf("above  %s\n",proigoumeno->name);
+                item* twra;
+                twra = lookupScope(new->name,new->scope);
+               //  if(twra != NULL) printf("abovtwra  %s\n",twra->name);
+                item* glob;
+                glob = lookupScope(new->name,0);
+                //if(glob != NULL) printf("global  %s\n",glob->name);
+                if(proigoumeno != NULL){
+                     char *str = malloc(35 + sizeof(new->name));
+                     wht();
+                     sprintf(str, "Not access : %s", new->name);
+                     error(str, yylineno);
+                }else if(glob != NULL){
+                  if(!strcmp(glob->type, "User Function")){
+                    char *str = malloc(35 + sizeof(new->name));
+                     wht();
+                     sprintf(str, "Not access : %s", new->name);
+                     error(str, yylineno);
+                  }else return;
+                }else if (twra != NULL)return;
+                else{
+                  insert_symTable(new);
+                  return;
+                }
               }else return;
-
           //tsekarw an einai global
+              
           }else if(!strcmp(new->type, "local")){
             new->type = strdup("local variable");
 
@@ -164,7 +200,8 @@ void new_check(item *new){
                 red();
                 printf( "Redeclaration Function : %s\n", new->name);
                 wht();
-                //error(str, yylineno);
+                sprintf(str, "Function name exist : %s", new->name);
+                error(str, yylineno);
                 return;
                 //den kanei insert gt iparxei idi
               }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && tmp->scope == new->scope){
@@ -177,7 +214,7 @@ void new_check(item *new){
                       red();
                       printf( "Library Funtion : %s\n", new->name);
                       wht();
-                      //error(str, yylineno);
+                     // error(str, yylineno);
                       return;
 
               //den borei na exei idio onoma me function
@@ -187,7 +224,8 @@ void new_check(item *new){
 
               printf(str, "Redeclaration Function : %s", new->name);
               wht();
-            //  error(str, yylineno);
+              sprintf(str, "Function name exist : %s", new->name);
+             // if(callFlag == 1)error(str, yylineno);
               return;
             }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && new->scope !=tmp->scope){
                 red();
@@ -268,39 +306,19 @@ int isFA(char *name)
 {
     item *tmp = NULL;
     int i;
-    int flag = 0;
     for (i = 0; i < HASH_SIZE; i++)
     {
         tmp = symtable[i];
         while (tmp != NULL)
         {
-
-            if (!strcmp(tmp->name, name))
-            {
-                printf("type %s kai scope %d kai scopecounter %d\n", tmp->type, tmp->scope, scopeCounter);
-            }
-            /* if (!strcmp(tmp->type, "local variable") && !strcmp(tmp->name, name))
-            {
-                printf("komple gia local\n");
-                return 0;
-            } */
-
-            if(!strcmp(tmp->type, "local variable") && !strcmp(tmp->name, name) && tmp->scope == scopeCounter && tmp->isActive){
-                flag =1;
-            }
-
-
-            if (tmp->isActive && strcmp(tmp->name, name) == 0 && (strcmp(tmp->type, "formal argument") == 0 ||strcmp(tmp->type, "local variable") == 0)  && tmp->scope < functionFlag)
-            {
-                if(flag == 0) flag = 2;
-            }
-
+            if (!strcmp(tmp->name, name) && !strcmp(tmp->type, "User Function")){
+              printf("function %s k type %s k line %d\n",tmp->name,tmp->type,tmp->lineno);
+              return 1;}
             tmp = tmp->next;
         }
     }
-    if(flag == 0) return 0; //den brike tpt
-    else if(flag ==1)return 0;//brike local se idio scope
-    else{error("RIPAPAS", yylineno); return 1;} //einai formal varaible
+    return 0;
+
 }
 
 
