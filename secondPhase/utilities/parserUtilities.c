@@ -312,33 +312,14 @@ int isFA(char *name)
         tmp = symtable[i];
         while (tmp != NULL)
         {
-
-            if (!strcmp(tmp->name, name))
-            {
-                printf("type %s kai scope %d kai scopecounter %d\n", tmp->type, tmp->scope, scopeCounter);
-            }
-            /* if (!strcmp(tmp->type, "local variable") && !strcmp(tmp->name, name))
-            {
-                printf("komple gia local\n");
-                return 0;
-            } */
-
-            if(!strcmp(tmp->type, "local variable") && !strcmp(tmp->name, name) && tmp->scope == scopeCounter && tmp->isActive){
-                flag =1;
-            }
-
-
-            if (tmp->isActive && strcmp(tmp->name, name) == 0 && (strcmp(tmp->type, "formal argument") == 0 ||strcmp(tmp->type, "local variable") == 0)  && tmp->scope < functionFlag)
-            {
-                if(flag == 0) flag = 2;
-            }
-
+            if (!strcmp(tmp->name, name) && !strcmp(tmp->type, "User Function"))flag = 1;
             tmp = tmp->next;
         }
     }
-    if(flag == 0) return 0; //den brike tpt
-    else if(flag ==1)return 0;//brike local se idio scope
-    else{error("RIPAPAS", yylineno); return 1;} //einai formal varaible
+
+    if(flag ==1){return 1;}//brike User Function me idio onoma
+    return 0;
+
 }
 
 

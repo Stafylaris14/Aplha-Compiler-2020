@@ -126,7 +126,7 @@ States: States Stmt {;}
     |
     ;
 
-Stmt: Expression semicolon {;}
+Stmt: Expression semicolon {libcheck =0;}
     | Ifstmt {;}
     | Whilestmt {;}
     | Forstmt {;}
@@ -135,7 +135,7 @@ Stmt: Expression semicolon {;}
     | Continue semicolon {if(loopFlag == 0)error("no loop to Continue" , yylineno);}
     | Block {;}
     | Funcdef {;}
-    | semicolon   {;}
+    | semicolon {libcheck =0;}
     ;
 
 
@@ -160,14 +160,14 @@ Expression: Assignexpression {;}
 Term:   left_parenthesis Expression right_parenthesis {;}
         | minus Expression %prec Uminus {;}
         | not Expression {;}
-        | plus_plus Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n"); libcheck=0;}}
-        | Lvalue plus_plus {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
-        | minus_minus Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
-        | Lvalue minus_minus {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}}
+        | plus_plus Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
+        | Lvalue plus_plus {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
+        | minus_minus Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
+        | Lvalue minus_minus {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
         | Primary {;}
         ;
 
-Assignexpression: Lvalue {if(libcheck == 1){fprintf(stderr,"Den allazei einai lib\n");libcheck=0;}} assign Expression {
+Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
 
 
                 }
@@ -188,31 +188,30 @@ Primary: Lvalue {;}
 
 Lvalue: id {
                                 if(isLibraryFunction($1))libcheck =1;
+                                if(isFA($1))libcheck =1;
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno );new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
-
         }
         | local id {
                                 if(isLibraryFunction($2))libcheck =1;
+                                if(isFA($2))libcheck =1;
                                 item* new = NULL;
                                 new = newItem($2,"local variable", scopeCounter , yylineno );
                                 new_check(new);
         }
         | double_colons id {
                                 item* tmp = lookupScope($2 , 0);
-                                if(tmp == NULL){error("Cant find Global " , yylineno);}
-                                
-                                
+                                if(tmp == NULL){error("Cant find Global " , yylineno);}                
         }
-        | Member {callFlag =1;};
+        | Member {;};
         ;
 
 
-Member: Lvalue dot id {;}
+Member: Lvalue dot id {item* newItem;}
         | Lvalue left_bracket Expression right_bracket {;}
-        | Call {callFlag =1;} dot id {callFlag =0;}
-        | Call {callFlag =1;} left_bracket Expression right_bracket {callFlag =0;}
+        | Call {callFlag =1;libcheck =0;} dot id {callFlag =0;}
+        | Call {callFlag =1;libcheck=0;} left_bracket Expression right_bracket {callFlag =0;}
         ;
 
 
