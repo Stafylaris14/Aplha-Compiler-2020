@@ -131,8 +131,8 @@ Stmt: Expression semicolon {libcheck =0;}
     | Whilestmt {;}
     | Forstmt {;}
     | Returnstmt {if(functionFlag == 0)error("no function to return" , yylineno);}
-    | Break semicolon {if(loopFlag == 0)error("no loop to break" , yylineno);}
-    | Continue semicolon {if(loopFlag == 0)error("no loop to Continue" , yylineno);}
+    | Break semicolon {libcheck =0;if(loopFlag == 0)error("no loop to break" , yylineno);}
+    | Continue semicolon {libcheck =0;if(loopFlag == 0)error("no loop to Continue" , yylineno);}
     | Block {;}
     | Funcdef {;}
     | semicolon {libcheck =0;}
@@ -187,7 +187,7 @@ Primary: Lvalue {;}
 
 
 Lvalue: id {
-                                if(isLibraryFunction($1))libcheck =1;
+                                if(isLibraryFunction($1)){libcheck =1;}
                                 if(isFA($1))libcheck =1;
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno );new_check(new); }
@@ -208,16 +208,16 @@ Lvalue: id {
         ;
 
 
-Member: Lvalue dot id {item* newItem;}
-        | Lvalue left_bracket Expression right_bracket {;}
-        | Call {callFlag =1;libcheck =0;} dot id {callFlag =0;}
-        | Call {callFlag =1;libcheck=0;} left_bracket Expression right_bracket {callFlag =0;}
+Member: Lvalue dot id {libcheck = 0;}
+        | Lvalue left_bracket Expression right_bracket {libcheck = 0;}
+        | Call {callFlag =1;libcheck =0;} dot id {callFlag =0;libcheck = 0;}
+        | Call {callFlag =1;libcheck=0;} left_bracket Expression right_bracket {callFlag =0;libcheck = 0;}
         ;
 
 
-Call: Call {callFlag =1;}left_parenthesis Elist right_parenthesis {callFlag =0;}
-        |  Lvalue{callFlag =1;} Callsuffix {callFlag =0;}
-        | left_parenthesis{callFlag =1;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {callFlag =0;}
+Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {callFlag =0;}
+        |  Lvalue{callFlag =1;libcheck = 0;} Callsuffix {callFlag =0;}
+        | left_parenthesis{callFlag =1;libcheck = 0;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {callFlag =0;}
         ;
 
 
@@ -332,8 +332,8 @@ Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_p
         ;
 
 
-Returnstmt: Return semicolon
-        | Return{returnFlag = 1; } Expression semicolon {returnFlag =0; }
+Returnstmt: Return semicolon{libcheck =0;}
+        | Return{returnFlag = 1; } Expression semicolon {libcheck =0;returnFlag =0; }
             ;
 
 

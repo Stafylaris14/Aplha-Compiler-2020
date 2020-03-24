@@ -306,18 +306,17 @@ int isFA(char *name)
 {
     item *tmp = NULL;
     int i;
-    int flag = 0;
     for (i = 0; i < HASH_SIZE; i++)
     {
         tmp = symtable[i];
         while (tmp != NULL)
         {
-            if (!strcmp(tmp->name, name) && !strcmp(tmp->type, "User Function"))flag = 1;
+            if (!strcmp(tmp->name, name) && !strcmp(tmp->type, "User Function")){
+              printf("function %s k type %s k line %d\n",tmp->name,tmp->type,tmp->lineno);
+              return 1;}
             tmp = tmp->next;
         }
     }
-
-    if(flag ==1){return 1;}//brike User Function me idio onoma
     return 0;
 
 }
