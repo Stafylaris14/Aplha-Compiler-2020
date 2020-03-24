@@ -196,7 +196,7 @@ Lvalue: id {
         }
         | local id {
                                 if(isLibraryFunction($2))libcheck =1;
-                                if(isFA($2))libcheck =1;
+                              //  if(isFA($2))libcheck =1;
                                 item* new = NULL;
                                 new = newItem($2,"local", scopeCounter , yylineno );
                                 new_check(new);
