@@ -123,14 +123,14 @@ void check(item *new)
 void new_check(item *new){
   int i=0;
   item *tmp = NULL;
-
   for (i = 0; i < HASH_SIZE; i++) {
       tmp = symtable[i];
       while (tmp != NULL){
         if (!strcmp(tmp->name, new->name) && tmp->isActive){      //an einai idio onoma meta 3ekinaw elenxoys
-        //  printf("idio onoma %s ka newitype %s kai tmptypw %s kai scope %d k scope idio %d\n",tmp->name,new->type,tmp->type,new->scope,tmp->scope);
+          // printf("idio onoma %s ka newitype %s kai tmptypw %s kai scope %d k scope idio %d k diko m line %d\n",tmp->name,new->type,tmp->type,new->scope,tmp->scope,new->lineno);
           //tsekarw an einai local to type pou 8elw na balw
           if(!strcmp(new->type, "local variable")){
+            
             //den borei na einai library
             if (isLibraryFunction(new->name)){
               char *str = malloc(35 + sizeof(new->name));
@@ -185,7 +185,6 @@ void new_check(item *new){
               
           }else if(!strcmp(new->type, "local")){
             new->type = strdup("local variable");
-
             //den borei na einai library
             if (isLibraryFunction(new->name)){
               char *str = malloc(35 + sizeof(new->name));
@@ -205,6 +204,7 @@ void new_check(item *new){
                 return;
                 //den kanei insert gt iparxei idi
               }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && tmp->scope == new->scope){
+                
                 return;
               }
           //tsekarw an einai global

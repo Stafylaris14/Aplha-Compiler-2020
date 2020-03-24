@@ -18,6 +18,7 @@ extern FILE* yyin;
 int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
+int objectHide = 1;//na min kanei hide an einai se object
 
 
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
@@ -197,7 +198,7 @@ Lvalue: id {
                                 if(isLibraryFunction($2))libcheck =1;
                                 if(isFA($2))libcheck =1;
                                 item* new = NULL;
-                                new = newItem($2,"local variable", scopeCounter , yylineno );
+                                new = newItem($2,"local", scopeCounter , yylineno );
                                 new_check(new);
         }
         | double_colons id {
@@ -244,8 +245,8 @@ Multy_exp: comma Expression Multy_exp {;}
         | {;}
         ;
 
-Objectdef: left_bracket{scopeCounter--;}Elist right_bracket {scopeCounter++;}
-        | left_bracket{scopeCounter--;} Indexed right_bracket {scopeCounter++;}
+Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {scopeCounter++;objectHide=1;}
+        | left_bracket{scopeCounter--;objectHide =0;} Indexed right_bracket {scopeCounter++;objectHide=1;}
         ;
 
 
@@ -259,7 +260,7 @@ Multy_ind: Multy_ind comma Indexedelement {;}
 Indexedelement: left_curle_bracket{scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
                 Expression colon Expression right_curle_bracket {
-                        hide(scopeCounter);
+                        if(objectHide)hide(scopeCounter);
                         scopeCounter--;
 
                  }
@@ -269,7 +270,7 @@ Indexedelement: left_curle_bracket{scopeCounter++;
 Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         States right_curle_bracket {
-                hide(scopeCounter);
+                if(objectHide)hide(scopeCounter);
                 scopeCounter--;}
         ;
 
