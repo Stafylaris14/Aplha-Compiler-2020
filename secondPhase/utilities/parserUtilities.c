@@ -312,7 +312,7 @@ int isFA(char *name)
         while (tmp != NULL)
         {
             if (!strcmp(tmp->name, name) && !strcmp(tmp->type, "User Function")){
-              printf("function %s k type %s k line %d\n",tmp->name,tmp->type,tmp->lineno);
+              //printf("function %s k type %s k line %d\n",tmp->name,tmp->type,tmp->lineno);
               return 1;}
             tmp = tmp->next;
         }
