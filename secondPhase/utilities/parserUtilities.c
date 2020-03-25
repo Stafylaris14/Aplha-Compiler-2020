@@ -138,11 +138,8 @@ void new_check(item *new){
             new->type = strdup("local variable");
             //den borei na einai library
             if (isLibraryFunction(new->name)){
-              
-              red();
-              printf( "Library Funtion : %s\n", new->name);
-              wht();
-              //error(str, yylineno);
+               char *str = returnErrorString("Library same Function", new->name);
+               error(str, yylineno);
               return;
               //den borei na exei idio onoma me function
             }else if(!strcmp(tmp->type, "User Function") && tmp->scope == new->scope){
@@ -157,9 +154,9 @@ void new_check(item *new){
           }  else if(!strcmp(new->type, "global variable")){
             if (isLibraryFunction(new->name)){
                       
-                      red();
-                      printf( "Library Funtion : %s\n", new->name);
-                      wht();
+                     // red();
+                    //  printf( "Library Funtion : %s\n", new->name);
+                    //  wht();
                      // error(str, yylineno);
                       return;
 
@@ -170,7 +167,7 @@ void new_check(item *new){
               return;
             }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument")) && new->scope !=tmp->scope){
                 red();
-              printf("preeeeeepeeeiieie na to doymeeeeeeeee\n" );
+             // printf("preeeeeepeeeiieie na to doymeeeeeeeeeeeeeeeeeee\n" );
               return;
               //yparxei swsta
             }else if((!strcmp(tmp->type, "local variable") || !strcmp(tmp->type, "formal argument"))&& new->scope == tmp->scope){

@@ -288,7 +288,7 @@ Funcdef: Function id {
                         item* new = newItem(noname,"User Function", scopeCounter , yylineno );
                         new_check(new);
         }
-         left_parenthesis{scopeCounter++;grn(); fprintf(stderr , "%d\n" , scopeCounter);wht();} Idlist right_parenthesis {scopeCounter--;functionFlag++;} Block{functionFlag --;}
+         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {scopeCounter--;functionFlag++;} Block{functionFlag --;}
         ;
 
 
