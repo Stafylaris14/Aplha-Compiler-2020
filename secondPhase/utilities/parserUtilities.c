@@ -61,63 +61,6 @@ int isFunction(char *name)
     return 0;
 }
 
-/* sprintf(str, "Value of Pi = %f", M_PI); */
-void check(item *new)
-{
-
-        //tsekaroume gia library
-        if (isLibraryFunction(new->name))
-        {
-            char *str = malloc(35 + sizeof(new->name));
-            sprintf(str, "Library Funtion : %s", new->name);
-            error(str, yylineno);
-            return;
-        }
-
-        if (!strcmp(new->type, "local variable"))
-        {
-            item *tmp = lookupScope(new->name, scopeCounter);
-            if (tmp == NULL)
-            {
-                printf("komple gia local \n");
-                red();
-                insert_symTable(new);
-                wht();
-                return;
-            }
-            else
-            {
-                error("you cant access local veriable", yylineno);
-            }
-        }
-
-        //tseck gia function
-        if (isFunction(new->name))
-        {
-            char *str = malloc(35 + sizeof(new->name));
-            sprintf(str, "User Function exist : %s", new->name);
-            error(str, yylineno);
-            return;
-        }
-
-        //tsekaroume an einai function scope
-        if (isFA(new->name))
-            return;
-
-    item *tmp = lookup(new->name);
-    if (tmp != NULL)
-    {
-        if (tmp->isActive == 1)
-        {
-            char *str = malloc(35 + sizeof(new->name));
-            sprintf(str, "Already Exists: %s", new->name);
-            error(str, yylineno);
-            return;
-        }
-    }
-
-    insert_symTable(new);
-}
 
 
 void new_check(item *new){
@@ -337,7 +280,7 @@ void insert_formal_arg(char* functionName , char* name)
 
     if(formals == NULL)
     {
-        DEBUG("EINAI ADEIA");
+        
         formals = malloc(sizeof(formal));
         formals->arg = lookupScope(name , tmp->scope+1);
         formals->next = NULL;
@@ -345,7 +288,7 @@ void insert_formal_arg(char* functionName , char* name)
     }
     else
     {
-        DEBUG("DEN EINAI ADEIA");
+        
         formal* tmp_f = formals;
         while(tmp_f->next!=NULL)
         {
@@ -365,11 +308,8 @@ void print_formal_arguments()
 {
     item* funciton = lookup(functionName);
     formal* args = funciton->formalArg;
-    cyn();
-    printf("---%s---\n" , functionName);
-    grn();
-    if(args == NULL) DEBUG("EINAI NULL");
-    else
+    
+    if(args != NULL) 
     {
         while (args != NULL)
         {
