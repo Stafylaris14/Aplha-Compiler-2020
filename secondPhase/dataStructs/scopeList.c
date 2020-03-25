@@ -120,21 +120,24 @@ void linkItemToScope(item *new)
 
 void printScopeList()
 {
-    scopeItem *tmp = scopeHead;
-
-    while (tmp != NULL)
+    scopeItem *tmpScope = scopeHead;
+    int scopeIndex;
+    while (tmpScope != NULL)
     {
-        item *tmpItem = tmp->sameScope;
+        item *tmpItem = tmpScope->sameScope;
+        scopeIndex = tmpScope->scope;
         cyn();
-        printf("|%d|---> ", tmp->scope);
+        fprintf(stderr, "-------Scope #%d------\n", scopeIndex);
         while (tmpItem != NULL)
         {
-            mag();
-            printf("(%s) ", tmpItem->name);
+            fprintf(stderr, "\"%s\" [%s] (line %d) (scope %d) \n", tmpItem->name, tmpItem->type, tmpItem->lineno, tmpItem->scope);
+            /* mag();
+            printf("(%s) ", tmpItem->name); */
             tmpItem = tmpItem->sameScope;
         }
         printf("\n");
-        tmp = tmp->next;
+        tmpScope = tmpScope->next;
     }
     wht();
 }
+

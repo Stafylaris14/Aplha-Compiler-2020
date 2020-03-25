@@ -342,7 +342,7 @@ Returnstmt: Return semicolon{libcheck =0;}
 %%
 
 
-//tin ftiaxoyme
+
 
 int yyerror (char * YaccProvidedMessage){
         red();
@@ -365,9 +365,9 @@ int main(int argc, char** argv)
   }
 
     yyparse();
-    printSymTable();
+    //printSymTable();
     
-    printHash();
+    //printHash();
     printScopeList();
-   // error("print hash" , yylineno);
+   
 }
