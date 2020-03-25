@@ -279,7 +279,7 @@ Funcdef: Function id {
                                 item* new = newItem($2,"User Function", scopeCounter , yylineno );
                                 new_check(new);
                                 functionName = strdup($2);
-        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag++;} Block{functionFlag --;print_formal_arguments();}
+        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag++;} Block{functionFlag --;}
         | Function{
                         char noname[20];
                         sprintf(noname,"function$%d",functionCounter);
@@ -342,7 +342,7 @@ Returnstmt: Return semicolon{libcheck =0;}
 %%
 
 
-//tin ftiaxoyme
+
 
 int yyerror (char * YaccProvidedMessage){
         red();
@@ -365,9 +365,9 @@ int main(int argc, char** argv)
   }
 
     yyparse();
-    printSymTable();
+    //printSymTable();
     
-    printHash();
+    //printHash();
     printScopeList();
-   // error("print hash" , yylineno);
+   
 }
