@@ -1,8 +1,8 @@
 function f(){
        local a  =1;
        function g(){
-        local a;
-		a =0;
+         b;
+		b =0;
            //    return f();     
        }
 }

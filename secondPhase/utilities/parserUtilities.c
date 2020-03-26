@@ -222,7 +222,7 @@ void new_check(item *new){
       }
   }
   if(!strcmp(new->type, "local"))new->type = strdup("local variable");
-  printf("bazw %s se scope %d k type\n",new->name,new->scope,new->type);
+ // printf("bazw %s se scope %d k type\n",new->name,new->scope,new->type);
   insert_symTable(new);
 }
 
