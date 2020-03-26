@@ -326,10 +326,10 @@ Ifstmt: If left_parenthesis Expression right_parenthesis Stmt {;}
         | If left_parenthesis Expression right_parenthesis Stmt Else Stmt {;}
         ;
 
-Whilestmt: While left_parenthesis Expression right_parenthesis {loopFlag = 1;} Stmt {loopFlag=0;}
+Whilestmt: While left_parenthesis Expression right_parenthesis {loopFlag ++;} Stmt {loopFlag--;}
     ;
 
-Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis {loopFlag = 1;} Stmt {loopFlag = 0;}
+Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis {loopFlag ++;} Stmt {loopFlag --;}
         ;
 
 
