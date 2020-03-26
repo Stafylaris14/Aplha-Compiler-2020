@@ -83,7 +83,6 @@ int accessToFunction(item* new){
   if (proigoumeno != NULL)
   {
     if(twra != NULL){
-       printf("elaa \n");
      if(!strcmp(twra->type, "local variable")) return 1;
     }
    
@@ -94,9 +93,14 @@ int accessToFunction(item* new){
   {
     if (!strcmp(glob->type, "User Function"))
     {
+      
+      if(!strcmp(twra->type, "formal argument")) return 1;
+
       char *str = returnErrorString("Not access", new->name);
       
       error(str, yylineno);
+      
+     
     }
     else
       return 1;
@@ -234,17 +238,23 @@ int isFA(char *name)
 {
     item *tmp = NULL;
     int i;
+    int function = 0;
     for (i = 0; i < HASH_SIZE; i++)
     {
         tmp = symtable[i];
         while (tmp != NULL)
         {
             if (!strcmp(tmp->name, name) && !strcmp(tmp->type, "User Function")){
-              //printf("function %s k type %s k line %d\n",tmp->name,tmp->type,tmp->lineno);
-              return 1;}
+             if (function == 0)function= 1;
+              }else  if (!strcmp(tmp->name, name) && !strcmp(tmp->type, "formal argument") && tmp->isActive){
+                function= 2;
+              }
+
             tmp = tmp->next;
         }
     }
+
+    if(function == 1) return 1;
     return 0;
 
 }
