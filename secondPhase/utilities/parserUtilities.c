@@ -82,6 +82,11 @@ int accessToFunction(item* new){
   //if(glob != NULL) printf("global  %s\n",glob->name);
   if (proigoumeno != NULL)
   {
+    if(twra != NULL){
+       printf("elaa \n");
+     if(!strcmp(twra->type, "local variable")) return 1;
+    }
+   
     char *str = returnErrorString("Not access",new->name);
     error(str, yylineno);
   }
@@ -118,7 +123,7 @@ void new_check(item *new){
           // printf("idio onoma %s ka newitype %s kai tmptypw %s kai scope %d k scope idio %d k diko m line %d\n",tmp->name,new->type,tmp->type,new->scope,tmp->scope,new->lineno);
           //tsekarw an einai local to type pou 8elw na balw
           if(!strcmp(new->type, "local variable")){
-            
+          //  printf("ti fasss %s k socpe %d\n",new->name,new->scope);
             //den borei na einai library
             if (isLibraryFunction(new->name)){
               return;
@@ -151,6 +156,7 @@ void new_check(item *new){
                 return;
               }
           //tsekarw an einai global
+         // printf("telos apo Sketo Local %s k scope %d\n",new->name,new->scope);
           }  else if(!strcmp(new->type, "global variable")){
             if (isLibraryFunction(new->name)){
                       
@@ -216,6 +222,7 @@ void new_check(item *new){
       }
   }
   if(!strcmp(new->type, "local"))new->type = strdup("local variable");
+  printf("bazw %s se scope %d k type\n",new->name,new->scope,new->type);
   insert_symTable(new);
 }
 
