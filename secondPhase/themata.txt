@@ -1,15 +1,10 @@
-
-
-
-
-
-
-
 /*****************APO TIN TRITH FASH *************/
 
 //edw petaei syntax
 x = x and (function (){ return false;})(2) or (function(){return true;});
 
+
+edwww toy ftaiei to (2) den 3erw gt 8a to doume
 
 
 
@@ -18,21 +13,19 @@ x = x and (function (){ return false;})(2) or (function(){return true;});
 //kai edw petaei syntax
 (function(a,b){a;b();})(a(), b()());
 
+edww to trwi edwww   (a(), b()())  
 
 
 
-
-//edw petaei oti no Loop to continue
-for (20-0; 21; 22-0) {
-	while (23)
-		break;
-	continue;
-}
+//exoume sto flow_control error 8ema 
 
 
 
 //not access iamafunction
 function iamnothing() { iamafunction; }
+//edw den katalabainw ti ginetai 
+
+
 
 //not access
 function(){ function() { iamafunction(3,4); } }
@@ -42,17 +35,6 @@ function(){ function() { iamafunction(3,4); } }
 
 
 
-[];
-
-[1, 2, 3];
-
-[false, true, [], 5, [ "hello", "lol" ], []];
-
-[ {4: 5}, {2:18}, {"lulz": (function(){[];})},
-  {"wot": [1,2,3]}, {"wut": [{1: 2},{"bool": false},{5: print}]}
-];
-//edw not access
-[{4: [{4: [{4: [{4: (function four(four){four=4;})}] }] }] }];
 
 
 
