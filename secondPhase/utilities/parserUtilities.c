@@ -80,20 +80,23 @@ int accessToFunction(item* new){
   item *glob;
   glob = lookupScope(new->name, 0);
   //if(glob != NULL) printf("global  %s\n",glob->name);
+  
   if (proigoumeno != NULL)
   {
+    
     if(twra != NULL){
      if(!strcmp(twra->type, "local variable")) return 1;
     }
-   
+   //printf(" proi %s k type %s k scope %d\n",proigoumeno->name,proigoumeno->type,proigoumeno->scope);
     char *str = returnErrorString("Not access",new->name);
     error(str, yylineno);
   }
   else if (glob != NULL)
   {
+    
     if (!strcmp(glob->type, "User Function"))
     {
-      
+      if(twra != NULL)
       if(!strcmp(twra->type, "formal argument")) return 1;
 
       char *str = returnErrorString("Not access", new->name);
@@ -226,7 +229,7 @@ void new_check(item *new){
       }
   }
   if(!strcmp(new->type, "local"))new->type = strdup("local variable");
- // printf("bazw %s se scope %d k type\n",new->name,new->scope,new->type);
+  //printf("bazw %s se scope %d k type\n",new->name,new->scope,new->type);
   insert_symTable(new);
 }
 
