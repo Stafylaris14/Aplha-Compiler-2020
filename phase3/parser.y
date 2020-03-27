@@ -111,16 +111,17 @@ char* functionName ; /* used to add formal arguments to linked list */
 %nonassoc greater g_equal less l_equal
 %left plus minus
 %left multiply division mod
-%left not plus_plus minus_minus Uminus
+%left not plus_plus minus_minus uminus
 %left dot
 %left double_dots
 %left left_bracket right_bracket
 %left left_parenthesis right_parenthesis
 
-
+%type<expr> Expression
+%type <expr> Assignexpression
 %%
 
-program: States {;}
+program: States 
     ;
 
 States: States Stmt {;}
@@ -140,7 +141,7 @@ Stmt: Expression semicolon {libcheck =0;}
     ;
 
 
-Expression: Assignexpression {;}
+Expression: Assignexpression {
             | Expression plus Expression {;}
             | Expression minus Expression {;}
             | Expression multiply Expression {;}
@@ -159,7 +160,7 @@ Expression: Assignexpression {;}
 
 
 Term:   left_parenthesis Expression right_parenthesis {;}
-        | minus Expression %prec Uminus {;}
+        | minus Expression %prec uminus {;}
         | not Expression {;}
         | plus_plus Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
         | Lvalue plus_plus {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
@@ -293,7 +294,7 @@ Funcdef: Function id {
 
 
 
-Const:  integer {;}
+Const:  integer 
         | real {;}
         | string {;}
         | nil {;}
