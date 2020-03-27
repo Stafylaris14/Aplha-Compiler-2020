@@ -24,3 +24,11 @@ secondPhase/parser.c
 secondPhase/parser.h
 
 secondPhase/scanner.c
+
+phase3/calc
+
+phase3/parser.c
+
+phase3/parser.h
+
+phase3/scanner.c
