@@ -4,6 +4,7 @@
 
 /* #include "../dataStructs/symb.h" */
 #include "../dataStructs/scopeList.h"
+
 extern int yylineno;
 
 /* extern char*libFun[]; */

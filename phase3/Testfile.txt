@@ -1,8 +1,1 @@
-function f(){
-       local a  =1;
-       function g(){
-         b;
-		b =0;
-           //    return f();     
-       }
-}
+a =1-2;

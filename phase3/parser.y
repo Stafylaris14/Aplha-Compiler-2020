@@ -4,7 +4,8 @@
 #include "dataStructs/commentStack.h"
 
 
-#include "./utilities/parserUtilities.h"
+
+#include "./utilities/quad.h"
 
 
 int yyerror(char *yaccProvideMessage);
@@ -19,6 +20,9 @@ int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
+iopcode op;
+
+expr *result;
 
 
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
@@ -29,6 +33,7 @@ char* functionName ; /* used to add formal arguments to linked list */
 
 
 %union{
+    struct expression* EXPR;
     int intVal;
     char* strVal;
     double doubleVal;
@@ -117,8 +122,9 @@ char* functionName ; /* used to add formal arguments to linked list */
 %left left_bracket right_bracket
 %left left_parenthesis right_parenthesis
 
-%type<expr> Expression
-%type <expr> Assignexpression
+%type <EXPR> Expression
+%type <EXPR> Assignexpression
+
 %%
 
 program: States 
@@ -141,20 +147,73 @@ Stmt: Expression semicolon {libcheck =0;}
     ;
 
 
-Expression: Assignexpression {
-            | Expression plus Expression {;}
-            | Expression minus Expression {;}
-            | Expression multiply Expression {;}
-            | Expression division Expression {;}
-            | Expression and Expression {;}
-            | Expression or Expression {;}
-            | Expression mod Expression {;}
-            | Expression equal Expression {;}
-            | Expression n_equal Expression {;}
-            | Expression greater Expression {;}
-            | Expression less Expression {;}
-            | Expression g_equal Expression {;}
-            | Expression l_equal Expression {;}
+Expression: Assignexpression {$$ = $1;}
+            | Expression plus Expression {
+                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
+                        emit(ADD,$1,$3, result);
+                        $$ = result;
+                    }
+            | Expression minus Expression {
+                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
+                        emit(SUB,$1,$3, result);
+                        $$ = result;
+                    }
+            | Expression multiply Expression {
+                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
+                        emit(MUL,$1,$3, result);
+                        $$ = result;
+                    }
+            | Expression division Expression {
+                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);
+                        emit(DIV,$1,$3, result);
+                        $$ = result;
+                  }
+            | Expression and Expression {
+                       result  =  new_expression(constbool_ , tmp_item(),NULL);
+                       emit(AND,$1,$3, result);
+                       $$ = result;
+            }
+            | Expression or Expression {
+                       result  =  new_expression(constbool_ , tmp_item(),NULL);
+                       emit(OR,$1,$3, result);
+                       $$ = result;
+            }
+            | Expression mod Expression {
+                       result  =  new_expression(arthmexp_ , tmp_item(),NULL);
+                       emit(MOD,$1,$3, result);
+                       $$ = result;
+            }
+            | Expression equal Expression{
+                       result  =  new_expression(constbool_ , tmp_item(),NULL);
+                       emit(IF_EQ,$1,$3, result);
+                       $$ = result;
+            }
+            | Expression n_equal Expression {
+                       result  =  new_expression(constbool_ , tmp_item(),NULL);
+                       emit(IF_NOTEQ,$1,$3, result);
+                       $$ = result;
+            }
+            | Expression greater Expression {
+                       result  =  new_expression(constbool_ , tmp_item(),NULL);
+                       emit(IF_GREATER,$1,$3, result);
+                       $$ = result;
+            }
+            | Expression less Expression {
+                       result  =  new_expression(constbool_ , tmp_item(),NULL);
+                       emit(IF_LESS,$1,$3, result);
+                       $$ = result;
+            }
+            | Expression g_equal Expression {
+                       result  =  new_expression(constbool_ , tmp_item(),NULL);
+                       emit(IF_GREATEREQ,$1,$3, result);
+                       $$ = result;
+
+            }
+            | Expression l_equal Expression {
+                       result  =  new_expression(constbool_ , tmp_item(),NULL);
+                       emit(IF_LESSEQ,$1,$3, result);
+                       $$ = result;
+            }
             | Term {;}
              ;
 
@@ -369,6 +428,6 @@ int main(int argc, char** argv)
     //printSymTable();
     
     //printHash();
-    printScopeList();
+    //printScopeList();
    
 }
