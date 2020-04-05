@@ -262,6 +262,7 @@ Lvalue: id {
                                 new_check(new);
         }
         | double_colons id {
+                                if(isFA($2))libcheck =1;
                                 item* tmp = lookupScope($2 , 0);
                                 if(tmp == NULL){error("Cant find Global " , yylineno);}                
         }
