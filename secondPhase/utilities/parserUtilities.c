@@ -69,8 +69,7 @@ char* returnErrorString(char* text,char* name)
 }
 
 int accessToFunction(item* new){
-  if (returnFlag == 1)
-    return 1;
+
   if (callFlag == 1)
     return 1;
   item *proigoumeno;
@@ -80,6 +79,13 @@ int accessToFunction(item* new){
   item *glob;
   glob = lookupScope(new->name, 0);
   //if(glob != NULL) printf("global  %s\n",glob->name);
+
+
+    // if (returnFlag == 1 && proigoumeno != NULL){
+    //    char *str = returnErrorString("Not access",new->name);
+    //     error(str, yylineno);
+    // }else return 1;
+   
   
   if (proigoumeno != NULL)
   {
@@ -99,10 +105,11 @@ int accessToFunction(item* new){
       if(twra != NULL)
       if(!strcmp(twra->type, "formal argument")) return 1;
 
+      if(returnFlag != 1){
       char *str = returnErrorString("Not access", new->name);
       
       error(str, yylineno);
-      
+      }else return 1;
      
     }
     else
