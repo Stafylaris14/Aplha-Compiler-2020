@@ -1,17 +1,18 @@
 %{
 
+#include "./utilities/quad.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 
 
 
-#include "./utilities/quad.h"
 
 
 int yyerror(char *yaccProvideMessage);
 int yylex(void);
-
+int offset = 0;
 int scopeCounter = 0;
+int formal_flag  =0 ;
 extern int yylineno;
 int returnFlag = 0;
 extern char* yytext;
@@ -21,6 +22,8 @@ int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
 iopcode op;
+
+
 
 expr *result;
 
@@ -251,7 +254,7 @@ Lvalue: id {
                                 if(isLibraryFunction($1)){libcheck =1;}
                                 if(isFA($1))libcheck =1;
                                 item* new;
-                                if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno );new_check(new); }
+                                if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
         }
         | local id {
@@ -340,16 +343,18 @@ Funcdef: Function id {
                                 item* new = newItem($2,"User Function", scopeCounter , yylineno );
                                 new_check(new);
                                 functionName = strdup($2);
-        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{scopeCounter--;functionFlag++;} Block{functionFlag --;}
+                                offset =0;
+        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;} Block{functionFlag --; getoffset();}
         | Function{
                         char noname[20];
+                        offset = 0;
                         sprintf(noname,"function$%d",functionCounter);
                         functionCounter++;
                         functionName = strdup(noname);
                         item* new = newItem(noname,"User Function", scopeCounter , yylineno );
                         new_check(new);
         }
-         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {scopeCounter--;functionFlag++;} Block{functionFlag --;}
+         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {offset = 0;scopeCounter--;functionFlag++;} Block{functionFlag --;getoffset();}
         ;
 
 
@@ -366,14 +371,16 @@ Const:  integer
 
 Idlist: id Multy_id {
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
+                    formal_flag = 1;
                     new_check(new);
                     insert_formal_arg(functionName , $1);
+                    formal_flag = 0;
         }
         | {;}
         ;
 
 Multy_id: Multy_id comma id {
-                item* new = newItem($3,"formal argument", scopeCounter , yylineno );
+                  item* new = newItem($3,"formal argument", scopeCounter , yylineno );
                   new_check(new);
                   insert_formal_arg(functionName , $3);
         }
@@ -429,6 +436,6 @@ int main(int argc, char** argv)
     //printSymTable();
     
     //printHash();
-    //printScopeList();
+    printScopeList();
    
 }
