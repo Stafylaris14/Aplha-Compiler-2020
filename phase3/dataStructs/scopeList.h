@@ -11,6 +11,7 @@ typedef struct scopeListElement
 
 } scopeItem;
 
+extern int scopeCounter;
 
 void initList();
 
@@ -23,3 +24,5 @@ scopeItem *addNewScope( int scope);
 void linkItemToScope(item *new);
 
 void printScopeList();
+
+item *get_last();

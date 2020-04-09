@@ -1,8 +1,11 @@
-function f(){
-       local a  =1;
-       function g(){
-         b;
-		b =0;
-           //    return f();     
-       }
+
+
+function g(h,j,y){}
+
+function f(a,b,c)
+{
+
 }
+
+
+x =1;

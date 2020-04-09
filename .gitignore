@@ -33,4 +33,6 @@ phase3/parser.h
 
 phase3/scanner.c
 
+phase3/a.out.dSYM/
+
 phase3/.vscode/
