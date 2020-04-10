@@ -98,3 +98,6 @@ expr *switch_expression_type(expr *tmp_expression, void *value);
 char *get_opcode_string(iopcode op);
 
 char *get_opcode_expr_string(expr_t str);
+
+/* katse na doume */
+expr *new_expr(expr_t e);

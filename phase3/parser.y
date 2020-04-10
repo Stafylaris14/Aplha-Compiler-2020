@@ -125,8 +125,11 @@ char* functionName ; /* used to add formal arguments to linked list */
 %left left_bracket right_bracket
 %left left_parenthesis right_parenthesis
 
-%type <EXPR> Expression
 %type <EXPR> Assignexpression
+%type <EXPR> Expression
+%type <EXPR> Lvalue
+%type <EXPR> Const
+
 
 %%
 
@@ -150,11 +153,16 @@ Stmt: Expression semicolon {libcheck =0;}
     ;
 
 
-Expression: Assignexpression {$$ = $1;}
+Expression: Assignexpression {
+      
+        }
             | Expression plus Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
+                    $$ = new_expr(arthmexp_);
+                    $$->sym =  tmp_item();
+                    emit(ADD , $1 , $3 , $$);
+                    /*     result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
                         emit(ADD,$1,$3, result);
-                        $$ = result;
+                        $$ = result; */
                     }
             | Expression minus Expression {
                         result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
@@ -231,9 +239,14 @@ Term:   left_parenthesis Expression right_parenthesis {;}
         | Primary {;}
         ;
 
-Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
-
-
+Assignexpression: Lvalue {
+                if(libcheck == 1){
+                        error("Den boreis na kaneis pra3eis me synartiseis", yylineno);
+                        libcheck=0;
+                }} assign Expression {
+                        $$ = new_expr(assignexp_);
+                        
+                        emit(ASSIGN ,$3, NULL , $1)
                 }
                 ;
 
@@ -251,11 +264,16 @@ Primary: Lvalue {;}
 
 
 Lvalue: id {
+
+
                                 if(isLibraryFunction($1)){libcheck =1;}
                                 if(isFA($1))libcheck =1;
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
+                                $$ = new_expr(var_);
+                                $$->sym = new;
+
         }
         | local id {
                                 if(isLibraryFunction($2))libcheck =1;
@@ -360,11 +378,25 @@ Funcdef: Function id {
 
 
 Const:  integer 
-        | real {;}
-        | string {;}
-        | nil {;}
-        | True {;}
-        | False {;}
+        | real {
+                $$ = new_expr(constnum_);
+                $$->numConst = $1;
+        }
+        | string {$$ = new_expr(conststring_);
+                $$->stringConst = strdup($1);
+                }
+        | nil {
+                $$ = new_expr(nill_);
+                $$->stringConst = "NILL";                                   /* to 3erw oti den einai kala alla den vriskw allo tropo na to valw */
+                }
+        | True {
+                $$ = new_expr(constbool_);
+                $$->boolConst = 1;
+                }
+        | False {
+                $$ = new_expr(constbool_);
+                $$->boolConst = 0;
+                }
         ;
 
 
@@ -433,9 +465,12 @@ int main(int argc, char** argv)
   }
 
     yyparse();
+    printf("twra tha mpw sto print\n");
     //printSymTable();
     
     //printHash();
-    printScopeList();
+    //printScopeList();
+    red();
+    print_quads();
    
 }

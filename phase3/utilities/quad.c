@@ -44,6 +44,14 @@ void extend_quads()
     }
     quads = p;
     total += EXTEND;
+    for(int i = currQuad ; i < total; i++)
+    {
+        quads[i].arg1 = NULL;
+        quads[i].arg2 = NULL;
+        quads[i].label = -1;
+        quads[i].op = -1;
+        quads[i].result = NULL;
+    }
 }
 
 void print_quads()
@@ -53,10 +61,30 @@ void print_quads()
     printf("-------------------------------------------------------------------------\n");
 
     int i;
-    for (i = 0; i < total; i++)
+    for (i = 0; i < currQuad; i++)
     {
-
-        /* printf("%d:\t %s\t %s\t %s\t %s\t %d  \n", i, quads[i].op, quads[i].result->); */
+        if (quads + i != NULL)
+        {
+            if (quads[i].label < 0)
+            {
+                printf("%d:\t %s\t %s\t %s\t %s\t \n",
+                       i,
+                       get_opcode_string( quads[i].op),
+                       quads[i].result->sym->name,
+                       quads[i].arg1->sym->name,
+                       quads[i].arg1->sym->name);
+            }
+            else
+            {
+                printf("%d:\t %s\t %s\t %s\t %s\t %d  \n",
+                       i,
+                       get_opcode_string(quads[i].op),
+                       quads[i].result->sym->name,
+                       quads[i].arg1->sym->name,
+                       quads[i].arg1->sym->name,
+                       quads[i].label);
+            }
+        }
     }
 }
 
@@ -95,6 +123,7 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *res)
     currQuad = currQuad + 1;
 
     printf("op  %s\n", get_opcode_string(op));
+    
 }
 
 item *tmp_item()
@@ -224,6 +253,7 @@ char *get_opcode_expr_string(expr_t str)
 
 char *get_opcode_string(iopcode op)
 {
+    
     switch (op)
     {
     case ASSIGN:
@@ -305,12 +335,27 @@ char *get_opcode_string(iopcode op)
         return "TABLESETELEM";
         break;
     default:
-        exit(1);
+        //exit(1);
         break;
     }
+    printf("eimai stin emmit\n");
     return NULL;
 }
 
+
+expr* new_expr(expr_t e)
+{
+    expr *new = malloc(sizeof(expr));
+
+    new->boolConst = -1;
+    new->index = NULL;
+    new->stringConst = NULL;
+    new->type = e;
+    new->sym = NULL;
+    new->next = NULL;
+
+    return new;
+}
 /* 
 
 int main()
