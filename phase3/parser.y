@@ -40,6 +40,7 @@ char* functionName ; /* used to add formal arguments to linked list */
     int intVal;
     char* strVal;
     double doubleVal;
+    struct item *Item; 
 }
 
 
@@ -127,6 +128,13 @@ char* functionName ; /* used to add formal arguments to linked list */
 
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
+%type <Item> Funcdef
+%type <Item> Funcprefix
+%type <strVal> Funcname
+%type <ntVal> Funcbody
+
+
+
 
 %%
 
@@ -339,24 +347,37 @@ Block: left_curle_bracket{scopeCounter++;
         ;
 
 
-Funcdef: Function id {
-                                item* new = newItem($2,"User Function", scopeCounter , yylineno );
-                                new_check(new);
-                                functionName = strdup($2);
-                                offset =0;
-        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;} Block{functionFlag --; getoffset();}
-        | Function{
-                        char noname[20];
-                        offset = 0;
-                        sprintf(noname,"function$%d",functionCounter);
-                        functionCounter++;
-                        functionName = strdup(noname);
-                        item* new = newItem(noname,"User Function", scopeCounter , yylineno );
-                        new_check(new);
+Funcdef: Funcprefix Funcargs Funcbody{
+        //prepei na ftia3w quad
         }
-         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {offset = 0;scopeCounter--;functionFlag++;} Block{functionFlag --;getoffset();}
         ;
 
+Funcprefix: Function Funcname{
+         item* new = newItem($2,"User Function", scopeCounter , yylineno );
+         new_check(new);
+        functionName = strdup($2);
+        offset =0;
+        $$ = new;
+        //prepei na ftia3w quad
+}
+;
+
+Funcname: id{
+                $$ = $1;
+        }
+        |{
+                char noname[20];
+                sprintf(noname,"function$%d",functionCounter);
+                functionCounter++;
+                $$ = functionName;
+        }
+;
+
+Funcargs:  left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;}
+        ;
+
+Funcbody: Block{functionFlag --; getoffset();}
+        ;
 
 
 Const:  integer 

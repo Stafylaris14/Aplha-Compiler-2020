@@ -1,5 +1,6 @@
 #include "quad.h"
 #include "../dataStructs/linkedList.h"
+#include <assert.h>
 #define STARTING_SIZE 1024
 
 #define EXTEND 1024
@@ -23,7 +24,8 @@ void init_quads()
     currQuad = 0;
     quads = malloc(sizeof(quad) * STARTING_SIZE);
     total = STARTING_SIZE;
-    for (int i = 0; i < STARTING_SIZE; i++)
+    int i;
+    for (i = 0; i < STARTING_SIZE; i++)
     {
         /* quads[i].label = 0; */
         quads[i].arg1 = NULL;
@@ -36,10 +38,11 @@ void init_quads()
 
 void extend_quads()
 {
+    assert(total == currQuad);
     quad *p = malloc(NEW_SIZE);
     if (quads)
     {
-        memcpy(p, quads, total);
+        memcpy(p, quads, CURR_SIZE);
         free(quads);
     }
     quads = p;
