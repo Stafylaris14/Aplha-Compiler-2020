@@ -21,6 +21,10 @@ int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
+
+
+expr* lval;
+
 iopcode op;
 
 
@@ -154,7 +158,7 @@ Stmt: Expression semicolon {libcheck =0;}
 
 
 Expression: Assignexpression {
-      
+                emit(ASSIGN , $1 , NULL, lval);
         }
             | Expression plus Expression {
                     $$ = new_expr(arthmexp_);
@@ -244,9 +248,10 @@ Assignexpression: Lvalue {
                         error("Den boreis na kaneis pra3eis me synartiseis", yylineno);
                         libcheck=0;
                 }} assign Expression {
-                        $$ = new_expr(assignexp_);
-                        
-                        emit(ASSIGN ,$3, NULL , $1)
+                       lval = $1;
+                       
+                       
+                       
                 }
                 ;
 
@@ -377,23 +382,32 @@ Funcdef: Function id {
 
 
 
-Const:  integer 
+Const:  integer {
+                printf("eimai sto int %d\n" , $1 );
+                $$ = new_expr(constnum_);
+                $$->numConst = $1;
+        }
         | real {
+                printf("eimai sto real %s\n" , $1 );
                 $$ = new_expr(constnum_);
                 $$->numConst = $1;
         }
         | string {$$ = new_expr(conststring_);
+                printf("eimai stostring %s" , $1 );
                 $$->stringConst = strdup($1);
                 }
         | nil {
+                printf("eimai sto NULL \n" );
                 $$ = new_expr(nill_);
                 $$->stringConst = "NILL";                                   /* to 3erw oti den einai kala alla den vriskw allo tropo na to valw */
                 }
         | True {
+                
                 $$ = new_expr(constbool_);
                 $$->boolConst = 1;
                 }
         | False {
+                
                 $$ = new_expr(constbool_);
                 $$->boolConst = 0;
                 }
@@ -470,7 +484,8 @@ int main(int argc, char** argv)
     
     //printHash();
     //printScopeList();
-    red();
+    
     print_quads();
+    
    
 }

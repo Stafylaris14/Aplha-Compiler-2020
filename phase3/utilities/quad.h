@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 /* #include "../dataStructs/sym.h" */
+#include <string.h>
 #include "parserUtilities.h"
 
 /* tha ta valw me tin seira */
@@ -73,7 +74,7 @@ typedef struct Quad
     expr *result;
     expr *arg1;
     expr *arg2;
-    int label; /* ???????? */
+    int label; /* mono gia ta jumps */
     int lineno;
 } quad;
 

@@ -44,7 +44,7 @@ void extend_quads()
     }
     quads = p;
     total += EXTEND;
-    for(int i = currQuad ; i < total; i++)
+    for (int i = currQuad; i < total; i++)
     {
         quads[i].arg1 = NULL;
         quads[i].arg2 = NULL;
@@ -59,20 +59,109 @@ void print_quads()
     cyn();
     printf("quad#\t opcode\t result \t arg1 \t arg2 \t label \n");
     printf("-------------------------------------------------------------------------\n");
-
+    /* 0-> normal arg | 1-> boolConst 2-> NumConst | 3-> StringConst */
+    int flag = 0;
     int i;
+    char *a1 = malloc(sizeof(expr));
+    char *a2 = malloc(sizeof(expr));
     for (i = 0; i < currQuad; i++)
     {
         if (quads + i != NULL)
         {
+
+            switch (quads[i].arg1->type)
+            {
+            case nill_:
+                a1 = "nill";
+                break;
+            case newtable_:
+                a1 = "newTable";
+                break; /* den exw idea */
+            case assignexp_:
+                a1 = "assign expression";
+                break;
+            case arthmexp_:
+                //itoa(quads[i].arg1->numConst, a1 ,10 );
+                a1 = quads[i].arg1->sym->name;
+                break;
+            case var_:
+                a1 = quads[i].arg1->sym->name;
+                break;
+            case conststring_:
+                a1 = quads[i].arg1->stringConst;
+                break;
+            case constbool_:
+                if (quads[i].arg1->boolConst == 1)
+                    a1 = "TRUE";
+                else if (quads[i].arg1->boolConst == 0)
+                    a1 = "FALSE";
+                else
+                {
+                    red();
+                    printf("den exei oristei to boolean\n");
+                    wht();
+                }
+                break;
+            case constnum_:
+                sprintf(a1, "%d", quads[i].arg1->numConst);
+                break;
+            default:
+                a1 = get_opcode_expr_string(quads[i].arg1->type);
+                break;
+            }
+
+            switch (quads[i].arg2->type)
+            {
+            case nill_:
+                a2 = "nill";
+                break;
+            case newtable_:
+                a2 = "newTable";
+                break; /* den exw idea */
+            case assignexp_:
+                a2 = "assign expression";
+                break;
+            case arthmexp_:
+                //itoa(quads[i].arg2->numConst, a2 ,10 );
+                a2 = quads[i].arg2->sym->name;
+                break;
+            case var_:
+                a2 = quads[i].arg2->sym->name;
+                break;
+            case conststring_:
+                a2 = quads[i].arg2->stringConst;
+                break;
+            case constbool_:
+                if (quads[i].arg2->boolConst == 1)
+                    a2 = "TRUE";
+                else if (quads[i].arg2->boolConst == 0)
+                    a2 = "FALSE";
+                else
+                {
+                    red();
+                    printf("den exei oristei to boolean\n");
+                    wht();
+                }
+                break;
+            case constnum_:
+                sprintf(a2, "%d", quads[i].arg2->numConst);
+                break;
+            default:
+                a2 = get_opcode_expr_string(quads[i].arg2->type);
+                break;
+            }
+            
+
+            
+            
             if (quads[i].label < 0)
             {
                 printf("%d:\t %s\t %s\t %s\t %s\t \n",
                        i,
-                       get_opcode_string( quads[i].op),
+                       get_opcode_string(quads[i].op),
                        quads[i].result->sym->name,
-                       quads[i].arg1->sym->name,
-                       quads[i].arg1->sym->name);
+                       a1,
+                       a2);
             }
             else
             {
@@ -80,8 +169,8 @@ void print_quads()
                        i,
                        get_opcode_string(quads[i].op),
                        quads[i].result->sym->name,
-                       quads[i].arg1->sym->name,
-                       quads[i].arg1->sym->name,
+                       a1,
+                       a2,
                        quads[i].label);
             }
         }
@@ -107,23 +196,38 @@ quad newQuad(iopcode op, expr *arg1, expr *arg2, expr *res)
     tmp.result = res;
     tmp.lineno = yylineno;
     /* kati gia to label */
+    tmp.label = -1;
     return tmp;
 }
 
 void emit(iopcode op, expr *arg1, expr *arg2, expr *res)
 {
+    expr *a1 = malloc(sizeof(exit)), *a2 = malloc(sizeof(expr));
+    if (arg1 == NULL)
+    {
+        a1 = malloc(sizeof(expr));
+        a1->type = nill_;
+    }
+    else
+        a1 = arg1;
+    if (arg2 == NULL)
+    {
+        a1 = malloc(sizeof(expr));
+        a1->type = nill_;
+    }
+    else
+        a2 = arg2;
     /* ean den ftanei o xwros kanei extend */
     if (currQuad >= total)
         extend_quads();
     /* create a new Quad */
-    quad tmp = newQuad(op, arg1, arg2, res);
+    quad tmp = newQuad(op, a1, a2, res);
     /* add it to array */
     quads[currQuad] = tmp;
     /* increse currQuad with 1 */
     currQuad = currQuad + 1;
 
     printf("op  %s\n", get_opcode_string(op));
-    
 }
 
 item *tmp_item()
@@ -253,7 +357,7 @@ char *get_opcode_expr_string(expr_t str)
 
 char *get_opcode_string(iopcode op)
 {
-    
+
     switch (op)
     {
     case ASSIGN:
@@ -342,8 +446,7 @@ char *get_opcode_string(iopcode op)
     return NULL;
 }
 
-
-expr* new_expr(expr_t e)
+expr *new_expr(expr_t e)
 {
     expr *new = malloc(sizeof(expr));
 
