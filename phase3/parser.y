@@ -21,7 +21,7 @@ int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
-iopcode op;
+/* iopcode op; */
 
 
 
@@ -40,7 +40,10 @@ char* functionName ; /* used to add formal arguments to linked list */
     int intVal;
     char* strVal;
     double doubleVal;
-    struct item *Item; 
+    struct Item *item; 
+    int opcode;                         /* gia ta arithimika  STAF */
+    int ifs;                            /* gia ta sigritika einai ayto STAF */
+    int boolop ;                         /* gia ta boolean STAF */
 }
 
 
@@ -128,12 +131,13 @@ char* functionName ; /* used to add formal arguments to linked list */
 
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
-%type <Item> Funcdef
-%type <Item> Funcprefix
+%type <item> Funcdef
+%type <item> Funcprefix
 %type <strVal> Funcname
 %type <ntVal> Funcbody
-
-
+%type <opcode> arithm           /* STAF */
+%type <ifs> particular                 /* STAF */
+%type <boolop> boolop                   /* STAF */
 
 
 %%
@@ -159,74 +163,44 @@ Stmt: Expression semicolon {libcheck =0;}
 
 
 Expression: Assignexpression {$$ = $1;}
-            | Expression plus Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
-                        emit(ADD,$1,$3, result);
-                        $$ = result;
-                    }
-            | Expression minus Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
-                        emit(SUB,$1,$3, result);
-                        $$ = result;
-                    }
-            | Expression multiply Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
-                        emit(MUL,$1,$3, result);
-                        $$ = result;
-                    }
-            | Expression division Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);
-                        emit(DIV,$1,$3, result);
-                        $$ = result;
-                  }
-            | Expression and Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(AND,$1,$3, result);
-                       $$ = result;
+                        /* EDW TO EKANA OPWS STHN DIALE3I  */
+                |Expression arithm Expression{
+                      $$ = new_expression(arthmexp_ , tmp_item() , NULL);  
+                      emit($2 , $1 , $3 , $$);
+                }
+            | Expression boolop Expression {
+                       $$  =  new_expression(boolexpr_ , tmp_item(),NULL);
+                       emit($2,$1,$3,$$);
             }
-            | Expression or Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(OR,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression mod Expression {
-                       result  =  new_expression(arthmexp_ , tmp_item(),NULL);
-                       emit(MOD,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression equal Expression{
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_EQ,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression n_equal Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_NOTEQ,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression greater Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_GREATER,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression less Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_LESS,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression g_equal Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_GREATEREQ,$1,$3, result);
-                       $$ = result;
-
-            }
-            | Expression l_equal Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_LESSEQ,$1,$3, result);
-                       $$ = result;
+            | Expression particular Expression{
+                    $$ = new_expression(boolexpr_ , tmp_item() , NULL);
+                    emit($2 , $1 , $3 , $$);
             }
             | Term {;}
              ;
+
+
+boolop: and{$$ = AND;}
+        | or {$$ = OR;}
+
+
+particular : greater { $$ = IF_GREATER; }
+        | g_equal { $$ = IF_GREATEREQ; }
+        |less { $$ = IF_LESS; }
+        |l_equal { $$ = IF_LESSEQ; }
+        |equal { $$ = IF_EQ; }
+        |n_equal { $$ = IF_NOTEQ; }
+        ;
+
+arithm: plus{ $$ = ADD;}
+        | minus {$$ = SUB;}
+        | multiply {$$ = MUL;}
+        | division {$$ = DIV;}
+        | mod {$$ = MOD;}
+        ;
+
+
+
 
 
 Term:   left_parenthesis Expression right_parenthesis {;}

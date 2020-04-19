@@ -3,8 +3,7 @@
 /* #include "../dataStructs/sym.h" */
 #include "parserUtilities.h"
 
-/* tha ta valw me tin seira */
-/* kapoia einai me kefalaio kai alla oxi giati to exoyme lousei me tis deilwseis */
+
 typedef enum Iopcode
 {
     ASSIGN,
@@ -47,7 +46,7 @@ typedef enum expression_template
 
     pfunc_, /* program Function  */
     lfunc_, /* library Function */
-
+    boolexpr_,
     arthmexp_,  /* arithmetic expression */
     assignexp_, /* assign Expression */
     newtable_,  /* new Table expression */
