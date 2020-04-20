@@ -165,15 +165,18 @@ Stmt: Expression semicolon {libcheck =0;}
 Expression: Assignexpression {$$ = $1;}
                         /* EDW TO EKANA OPWS STHN DIALE3I  */
                 |Expression arithm Expression{
-                      $$ = new_expression(arthmexp_ , tmp_item() , NULL);  
+                      $$ = new_expression(arthmexp_ );  
+                      $$->sym = tmp_item();
                       emit($2 , $1 , $3 , $$);
                 }
             | Expression boolop Expression {
-                       $$  =  new_expression(boolexpr_ , tmp_item(),NULL);
+                       $$  =  new_expression(boolexpr_ );
+                       $$->sym = tmp_item();
                        emit($2,$1,$3,$$);
             }
             | Expression particular Expression{
-                    $$ = new_expression(boolexpr_ , tmp_item() , NULL);
+                    $$ = new_expression(boolexpr_);
+                    $$->sym = tmp_item();
                     emit($2 , $1 , $3 , $$);
             }
             | Term {;}

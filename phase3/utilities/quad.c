@@ -110,12 +110,11 @@ item *tmp_item()
     return tmp;
 }
 
-expr *new_expression(expr_t type, item *Item, void *value)
+expr *new_expression(expr_t type)
 {
     expr *tmp_expression = malloc(sizeof(expr));
     tmp_expression->type = type;
-    tmp_expression->sym = Item;
-    tmp_expression = switch_expression_type(tmp_expression, value);
+    
 
     return tmp_expression;
 }

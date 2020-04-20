@@ -90,7 +90,7 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *res);
 
 item *tmp_item();
 
-expr *new_expression(expr_t type, item *Item, void *value);
+expr *new_expression(expr_t type);
 
 expr *switch_expression_type(expr *tmp_expression, void *value);
 
