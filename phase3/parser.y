@@ -44,6 +44,7 @@ char* functionName ; /* used to add formal arguments to linked list */
     int opcode;                         /* gia ta arithimika  STAF */
     int ifs;                            /* gia ta sigritika einai ayto STAF */
     int boolop ;                         /* gia ta boolean STAF */
+    int label_jumps;                       /* gia ta jumps */
 }
 
 
@@ -135,9 +136,10 @@ char* functionName ; /* used to add formal arguments to linked list */
 %type <item> Funcprefix
 %type <strVal> Funcname
 %type <ntVal> Funcbody
-%type <opcode> arithm           /* STAF */
+%type <opcode> arithm                   /* STAF */
 %type <ifs> particular                 /* STAF */
-%type <boolop> boolop                   /* STAF */
+%type <boolop> boolop
+%type <label_jumps> Ifstmt
 
 
 %%
@@ -167,17 +169,17 @@ Expression: Assignexpression {$$ = $1;}
                 |Expression arithm Expression{
                       $$ = new_expression(arthmexp_ );  
                       $$->sym = tmp_item();
-                      emit($2 , $1 , $3 , $$);
+                      emit($2 , $1 , $3 , $$ , -1);
                 }
             | Expression boolop Expression {
                        $$  =  new_expression(boolexpr_ );
                        $$->sym = tmp_item();
-                       emit($2,$1,$3,$$);
+                       emit($2,$1,$3,$$ , -1);
             }
             | Expression particular Expression{
                     $$ = new_expression(boolexpr_);
                     $$->sym = tmp_item();
-                    emit($2 , $1 , $3 , $$);
+                    emit($2 , $1 , $3 , $$ , -1);
             }
             | Term {;}
              ;
@@ -388,10 +390,23 @@ Multy_id: Multy_id comma id {
 
 
 
-Ifstmt: If left_parenthesis Expression right_parenthesis Stmt {;}
-        | If left_parenthesis Expression right_parenthesis Stmt Else Stmt {;}
+Ifstmt: If left_parenthesis Expression right_parenthesis{               /* STAF */
+                        emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +2);
+                        $$ = nextquad();
+                        emit(JUMP , NULL , NULL , NULL , 0);
+                } Stmt {
+                        patchlabel($$ , nextquad());
+                        }
+        | If left_parenthesis Expression right_parenthesis Stmt elseFix Stmt {
+                patchlabel($$ , $6+1);
+                patchlabel($6 , nextquad());
+        }
         ;
 
+elseFix : Else{
+        $$ = nextquad();                                        /* STAF */
+        emit(JUMP , NULL , NULL ,NULL, 0);
+} 
 Whilestmt: While left_parenthesis Expression right_parenthesis {loopFlag ++;} Stmt {loopFlag--;}
     ;
 

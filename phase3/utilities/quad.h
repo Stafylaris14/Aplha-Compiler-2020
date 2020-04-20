@@ -86,7 +86,7 @@ void print_quads_not_empty();
 
 quad newQuad(iopcode op, expr *arg1, expr *arg2, expr *res);
 
-void emit(iopcode op, expr *arg1, expr *arg2, expr *res);
+void emit(iopcode op, expr *arg1, expr *arg2, expr *res , int label);
 
 item *tmp_item();
 
@@ -97,3 +97,9 @@ expr *switch_expression_type(expr *tmp_expression, void *value);
 char *get_opcode_string(iopcode op);
 
 char *get_opcode_expr_string(expr_t str);
+
+expr *new_expr_constbool(int boolean);
+
+void patchlabel(int quadNo, int label); /* apo oti katalaba einai apla gia na to vazei sto quad to sugkekrimeno label */
+
+int nextquad(); /* epistrefei to epomeno quad (jumps) */

@@ -85,13 +85,14 @@ quad newQuad(iopcode op, expr *arg1, expr *arg2, expr *res)
     return tmp;
 }
 
-void emit(iopcode op, expr *arg1, expr *arg2, expr *res)
+void emit(iopcode op, expr *arg1, expr *arg2, expr *res , int label)
 {
     /* ean den ftanei o xwros kanei extend */
     if (currQuad >= total)
         extend_quads();
     /* create a new Quad */
     quad tmp = newQuad(op, arg1, arg2, res);
+    tmp.label = label;
     /* add it to array */
     quads[currQuad] = tmp;
     /* increse currQuad with 1 */
@@ -313,20 +314,20 @@ char *get_opcode_string(iopcode op)
     return NULL;
 }
 
-/* 
-
-int main()
+expr* new_expr_constbool(int boolean)
 {
-    init_quads();
-    expr *db1 = malloc(sizeof(expr));
-    db1->next = NULL;
-    db1->boolConst = 1;
-
-    emit(ASSIGN, db1, db1, db1);
-    print_quads_not_empty();
-    printf("AFTER EXTENTION1---------\n");
-
-    printf("%u \n", total);
-    return 0;
+    expr* tmp = new_expression(constbool_);
+    tmp->boolConst = boolean;
+    return tmp;
 }
- */
+
+void patchlabel(int quadNo, int label)
+{
+    assert(quadNo < currQuad && !quads[quadNo].label);
+    quads[quadNo].label = label;
+}
+
+int nextquad()
+{
+    return currQuad;
+}
