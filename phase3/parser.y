@@ -45,6 +45,7 @@ char* functionName ; /* used to add formal arguments to linked list */
     int ifs;                            /* gia ta sigritika einai ayto STAF */
     int boolop ;                         /* gia ta boolean STAF */
     int label_jumps;                       /* gia ta jumps */
+    
 }
 
 
@@ -139,8 +140,12 @@ char* functionName ; /* used to add formal arguments to linked list */
 %type <opcode> arithm                   /* STAF */
 %type <ifs> particular                 /* STAF */
 %type <boolop> boolop
+%type <label_jumps> Whilestart
 %type <label_jumps> Ifstmt
-
+%type <label_jumps> Whilestmt
+%type <label_jumps> whilecont
+%type <label_jumps> elseFix
+%type </* //// */> Stmt
 
 %%
 
@@ -406,8 +411,22 @@ Ifstmt: If left_parenthesis Expression right_parenthesis{               /* STAF 
 elseFix : Else{
         $$ = nextquad();                                        /* STAF */
         emit(JUMP , NULL , NULL ,NULL, 0);
-} 
-Whilestmt: While left_parenthesis Expression right_parenthesis {loopFlag ++;} Stmt {loopFlag--;}
+}
+Whilestart: While{
+        $$ = nextquad();
+}
+
+whilecont: left_parenthesis Expression right_parenthesis{
+        emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+1);
+}
+
+Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
+                loopFlag--;
+                emit(JUMP , NULL , NULL , $1);
+                patchlabel($2 , nextquad());
+                patchlabel($3.breaklist , nextquad());                  /* ????????????????? */
+                patchlabel($3.contlist ,$1);
+        }
     ;
 
 Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis {loopFlag ++;} Stmt {loopFlag --;}
