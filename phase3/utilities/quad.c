@@ -331,3 +331,50 @@ int nextquad()
 {
     return currQuad;
 }
+
+expr* make_call(expr* lv,expr* reversed_elist){
+  expr* func = emit_iftableitem(lvalue);
+  while(reversed_elist){
+    emit(param,reversed_elist,NULL,NULL);
+    reversed_elist=reversed_elist->next;
+  }
+  emit(call,func,NULL,NULL);
+  expr* result = newexpr(var_e);
+  result->sym = tmp_item();
+  emit(getretval,result,NULL,NULL,-1,yylineno);
+  return result;
+}
+
+
+expr* newexpr(expr_t t){
+  expr* e = (expr*)malloc(sizeof(expr));
+  memset(e,0,sizeof(expr));
+  e->type = t;
+  return e;
+}
+
+expr *newexpr_constring(char* s){
+  expr* e = newexpr(conststring_e);
+  e->strConst = strdup(s);
+  return e;
+}
+
+
+expr* emit_iftableitem(expr* e){
+  if(e->type!= tableitem_e) return e;
+  else{
+    expr *result = newexpr(var_e);
+    result->sym = tmp_item();
+    //emit(tablegetelem,e,e->index,result);         dgfsdgdfsgdyj//8elei ftia3imo
+    return result;
+  }
+}
+
+expr *newexpr_constint(double i){
+  expr *e = newexpr(constint_e);
+  e->numConst = i;
+  return e;
+}
+
+
+

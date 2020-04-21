@@ -45,7 +45,7 @@ char* functionName ; /* used to add formal arguments to linked list */
     int ifs;                            /* gia ta sigritika einai ayto STAF */
     int boolop ;                         /* gia ta boolean STAF */
     int label_jumps;                       /* gia ta jumps */
-    
+    struct for_call *for_call;
 }
 
 
@@ -133,6 +133,8 @@ char* functionName ; /* used to add formal arguments to linked list */
 
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
+%type <EXPR> Elist
+%type <EXPR> Call
 %type <item> Funcdef
 %type <item> Funcprefix
 %type <strVal> Funcname
@@ -146,6 +148,9 @@ char* functionName ; /* used to add formal arguments to linked list */
 %type <label_jumps> whilecont
 %type <label_jumps> elseFix
 %type </* //// */> Stmt
+%type <for_call> Methodcall
+%type <for_call> Callsuffix
+%type <for_call> Normalcall
 
 %%
 
@@ -272,29 +277,60 @@ Member: Lvalue dot id {libcheck = 0;}
         ;
 
 
-Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {callFlag =0;}
-        |  Lvalue{callFlag =1;libcheck = 0;} Callsuffix {callFlag =0;}
-        | left_parenthesis{callFlag =1;libcheck = 0;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {callFlag =0;}
+Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {$$=make_call($1,$3);callFlag =0;}
+        |  Lvalue{callFlag =1;libcheck = 0;} Callsuffix {
+                if($2->method){
+                        expr* t = $1;
+                        $1 = emit_iftableitem(member_item(t,$2->name));
+                        $2->elist->next = t;
+                }         
+                $$ = make_call($1,$2->elist);
+                callFlag =0;}
+        | left_parenthesis{callFlag =1;libcheck = 0;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {
+                expr* func = newexpr(programfunc_e);
+                func->sym = $2;
+                $$ = make_call(func,$5);
+                callFlag =0;}
         ;
 
 
 
-Callsuffix: Normalcall {callFlag =1;}
-            | Methodcall {callFlag =1;}
+Callsuffix: Normalcall {
+                callFlag =1; 
+                $$ = $1;
+        }
+            | Methodcall {
+                callFlag =1;
+                $$ = $1;
+        }
             ;
 
-Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {;}
-            ;
+Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {
+        $$ = malloc(sizeof(struct for_call));
+        $$->elist = $2;
+        $$->method = 0;
+        $$->name = NULL;
+        }
+        ;
 
 
 
-Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthesis {;}
-            ;
+Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthesis {
+                $$ = malloc(sizeof(struct for_call));
+                $$->elist = $4;
+                $$->method = 1;
+                $$->name = $2;
+        }
+        ;
 
 
 
-Elist:  Expression Multy_exp {;}
-        | {;}
+Elist:  Expression Multy_exp {
+                $1->next = $2;
+                $$ = $1;
+        
+        }
+        | {$$ = NULL;}
         ;
 
 Multy_exp: comma Expression Multy_exp {;}

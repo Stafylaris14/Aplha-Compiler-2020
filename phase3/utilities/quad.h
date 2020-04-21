@@ -62,6 +62,7 @@ typedef struct expression
     double numConst;
     char *stringConst;
     int boolConst;
+    int numConst;
     struct expression *next;
 } expr;
 
@@ -75,6 +76,14 @@ typedef struct Quad
     int label; /* ???????? */
     int lineno;
 } quad;
+
+typedef struct for_call
+{
+    expr *elist;
+    unsigned char method;
+    char* name;
+}for_call;
+
 
 void init_quads();
 
