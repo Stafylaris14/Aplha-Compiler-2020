@@ -263,7 +263,7 @@ sc_spase get_scope_spase(item *new)
     return s;
 }
 
-/* char *get_scope_spase_string(sc_spase spase)
+ char *get_scope_spase_string(sc_spase spase)
 {
     switch (spase)
     {
@@ -277,4 +277,4 @@ sc_spase get_scope_spase(item *new)
     default:
         break;
     }
-} */
+} 

@@ -1,6 +1,7 @@
 #include "quad.h"
 #include "../dataStructs/linkedList.h"
 #include <assert.h>
+
 #define STARTING_SIZE 1024
 
 #define EXTEND 1024
@@ -523,20 +524,21 @@ expr *lvalue_expr(item *sym)
     memset(e, 0, sizeof(expr));
 
     e->next = (expr *)0;
-    e->sym = sym;
-    switch ((int)sym->type)
+    enum Scope_spase sp = get_scope_spase(sym);
+    switch (sp)
     {
-        case var_:
-            e->type = var_;
-            break;
-        case pfunc_:
-            e->type = pfunc_;
-            break;
-        case lfunc_:
-            e->type = lfunc_;
-            break;
-        default:
-            assert(0);
+    case program_variable:
+        e->type = var_;
+        break;
+    case function_local:
+        e->type = pfunc_;
+        break;
+    case formal_argument:
+        e->type = var_;
+        break;
+    default:
+        e->type = lfunc_;
+        assert(0);
     }
     return e;
 }
@@ -668,3 +670,4 @@ void patchlist(zavo *list, int label)
         tmp->next = NULL;
     }
 }
+

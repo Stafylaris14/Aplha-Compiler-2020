@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-/* #include "../dataStructs/symb.h" */
+// #include "../dataStructs/symb.h" 
 #include "../dataStructs/scopeList.h"
 
 extern int yylineno;
