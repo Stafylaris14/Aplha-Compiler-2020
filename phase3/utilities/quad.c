@@ -462,13 +462,13 @@ expr *make_call(expr *lv, expr *reversed_elist)
     expr *func = emit_iftableitem(lvalue);
     while (reversed_elist)
     {
-        emit(param, reversed_elist, NULL, NULL);
+        emit(param, reversed_elist, NULL, NULL,-1);
         reversed_elist = reversed_elist->next;
     }
-    emit(call, func, NULL, NULL);
-    expr *result = newexpr(var_e);
+    emit(call, func, NULL, NULL,-1);
+    expr *result = newexpr(var_);
     result->sym = tmp_item();
-    emit(getretval, result, NULL, NULL, -1, yylineno);
+    emit(getretval, result, NULL, NULL, -1);
     return result;
 }
 
@@ -482,27 +482,27 @@ expr *newexpr(expr_t t)
 
 expr *newexpr_constring(char *s)
 {
-    expr *e = newexpr(conststring_e);
+    expr *e = newexpr(conststring_);
     e->strConst = strdup(s);
     return e;
 }
 
 expr *emit_iftableitem(expr *e)
 {
-    if (e->type != tableitem_e)
+    if (e->type != tableitem_)
         return e;
     else
     {
-        expr *result = newexpr(var_e);
+        expr *result = newexpr(var_);
         result->sym = tmp_item();
-        //emit(tablegetelem,e,e->index,result);         dgfsdgdfsgdyj//8elei ftia3imo
+        //emit(tablegetelem,e,e->index,result,-1);         dgfsdgdfsgdyj//8elei ftia3imo
         return result;
     }
 }
 
 expr *newexpr_constint(double i)
 {
-    expr *e = newexpr(constint_e);
+    expr *e = newexpr(constnum_);
     e->numConst = i;
     return e;
 }
@@ -510,7 +510,7 @@ expr *newexpr_constint(double i)
 expr *member_item(expr *lv, char *name)
 {
     lv = emit_iftableitem(lv);
-    expr *ti = newexpr(tableitem_e);
+    expr *ti = newexpr(tableitem_);
     ti->sym = lv->sym;
     ti->index = newexpr_constring(name);
     return ti;
@@ -526,14 +526,14 @@ expr *lvalue_expr(item *sym)
     e->sym = sym;
     switch (sym->type_t)
     {
-    case var_s:
-        e->type = var_e;
+    case var_:
+        e->type = var_;
         break;
-    case programfunc_s:
-        e->type = programfunc_e;
+    case pfunc_:
+        e->type = pfunc_;
         break;
-    case libraryfunc_s:
-        e->type = libraryfunc_e;
+    case lfunc_:
+        e->type = lfunc_;
         break;
     default:
         assert(0);
@@ -543,20 +543,20 @@ expr *lvalue_expr(item *sym)
 
 expr *newexpr_constnum(double i)
 {
-    expr *e = newexpr(constnum_e);
+    expr *e = newexpr(constnum_);
     e->numConst = i;
     return e;
 }
 
 void check_arith(expr *e, char *context)
 {
-    if (e->type == constbool_e ||
-        e->type == conststring_e ||
-        e->type == nil_e ||
-        e->type == newtable_e ||
-        e->type == programfunc_e ||
-        e->type == libraryfunc_e ||
-        e->type == boolexpr_e)
+    if (e->type == constbool_ ||
+        e->type == conststring_ ||
+        e->type == nill_ ||
+        e->type == newtable_ ||
+        e->type == pfunc_ ||
+        e->type == lfunc_ ||
+        e->type == boolexpr_)
         comperror("Illegal expr used in %s", context);
 }
 

@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <stdio.h>                                                                                                               
 #include <stdlib.h>
 /* #include "../dataStructs/sym.h" */
 #include "parserUtilities.h"
@@ -54,6 +54,12 @@ typedef enum expression_template
     nill_
 } expr_t;
 
+typedef struct I_list{
+    int label;
+    struct I_list* next;
+}i_list;
+
+
 typedef struct expression
 {
     expr_t type;
@@ -62,7 +68,10 @@ typedef struct expression
     double numConst;
     char *stringConst;
     int boolConst;
-    int numConst;
+    i_list *breaklist;
+    i_list *contlist;
+    i_list *falselist;
+    i_list *truelist;
     struct expression *next;
 } expr;
 
@@ -112,3 +121,30 @@ expr *new_expr_constbool(int boolean);
 void patchlabel(int quadNo, int label); /* apo oti katalaba einai apla gia na to vazei sto quad to sugkekrimeno label */
 
 int nextquad(); /* epistrefei to epomeno quad (jumps) */
+
+expr *make_call(expr *lv, expr *reversed_elist);
+
+expr *newexpr(expr_t t);
+
+expr *newexpr_constring(char *s);
+
+expr *emit_iftableitem(expr *e);
+
+expr *newexpr_constint(double i);
+
+expr *member_item(expr *lv, char *name);
+
+expr *lvalue_expr(item *sym);
+
+expr *newexpr_constnum(double i);
+
+void check_arith(expr *e, char *context);
+
+void add_to_contlist(expr* e , int label );
+
+void add_to_breaklist(expr *e, int label);
+
+void add_to_truelist(expr *e, int label);
+
+void add_to_falselist(expr *e, int label);
+
