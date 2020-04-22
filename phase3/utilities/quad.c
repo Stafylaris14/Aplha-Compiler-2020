@@ -459,16 +459,16 @@ int nextquad()
 
 expr *make_call(expr *lv, expr *reversed_elist)
 {
-    expr *func = emit_iftableitem(lvalue);
+    expr *func = emit_iftableitem(lv);
     while (reversed_elist)
     {
-        emit(param, reversed_elist, NULL, NULL,-1);
+        emit(PARAM, reversed_elist, NULL, NULL,-1);
         reversed_elist = reversed_elist->next;
     }
-    emit(call, func, NULL, NULL,-1);
+    emit(CALL, func, NULL, NULL,-1);
     expr *result = newexpr(var_);
     result->sym = tmp_item();
-    emit(getretval, result, NULL, NULL, -1);
+    emit(GETRETVAL, result, NULL, NULL, -1);
     return result;
 }
 
@@ -483,7 +483,7 @@ expr *newexpr(expr_t t)
 expr *newexpr_constring(char *s)
 {
     expr *e = newexpr(conststring_);
-    e->strConst = strdup(s);
+    e->stringConst = strdup(s);
     return e;
 }
 
@@ -524,19 +524,19 @@ expr *lvalue_expr(item *sym)
 
     e->next = (expr *)0;
     e->sym = sym;
-    switch (sym->type_t)
+    switch ((int)sym->type)
     {
-    case var_:
-        e->type = var_;
-        break;
-    case pfunc_:
-        e->type = pfunc_;
-        break;
-    case lfunc_:
-        e->type = lfunc_;
-        break;
-    default:
-        assert(0);
+        case var_:
+            e->type = var_;
+            break;
+        case pfunc_:
+            e->type = pfunc_;
+            break;
+        case lfunc_:
+            e->type = lfunc_;
+            break;
+        default:
+            assert(0);
     }
     return e;
 }
@@ -556,25 +556,27 @@ void check_arith(expr *e, char *context)
         e->type == newtable_ ||
         e->type == pfunc_ ||
         e->type == lfunc_ ||
-        e->type == boolexpr_)
-        comperror("Illegal expr used in %s", context);
+        e->type == boolexpr_){
+        printf("Illegal expr used in %s", context);
+        exit(1);
+        }
 }
 
 void add_to_contlist(expr* e , int label )
 {
-    i_list* head = e->contlist;
+    zavo* head = e->contlist;
 
     if(head == NULL)
     {
         head->label = label;
         head->next = NULL;
     }else{
-        i_list *tmp = head;
+        zavo *tmp = head;
         while(tmp!=NULL)
         {
             tmp = tmp->next;
         }
-        tmp = malloc(sizeof(i_list));
+        tmp = malloc(sizeof(zavo));
         tmp->label = label;
         tmp->next = NULL;
     }
@@ -582,7 +584,7 @@ void add_to_contlist(expr* e , int label )
 
 void add_to_breaklist(expr *e, int label)
 {
-    i_list *head = e->breaklist;
+    zavo *head = e->breaklist;
 
     if (head == NULL)
     {
@@ -591,12 +593,12 @@ void add_to_breaklist(expr *e, int label)
     }
     else
     {
-        i_list *tmp = head;
+        zavo *tmp = head;
         while (tmp != NULL)
         {
             tmp = tmp->next;
         }
-        tmp = malloc(sizeof(i_list));
+        tmp = malloc(sizeof(zavo));
         tmp->label = label;
         tmp->next = NULL;
     }
@@ -604,7 +606,7 @@ void add_to_breaklist(expr *e, int label)
 
 void add_to_truelist(expr *e, int label)
 {
-    i_list *head = e->truelist;
+    zavo *head = e->truelist;
 
     if (head == NULL)
     {
@@ -613,12 +615,12 @@ void add_to_truelist(expr *e, int label)
     }
     else
     {
-        i_list *tmp = head;
+        zavo *tmp = head;
         while (tmp != NULL)
         {
             tmp = tmp->next;
         }
-        tmp = malloc(sizeof(i_list));
+        tmp = malloc(sizeof(zavo));
         tmp->label = label;
         tmp->next = NULL;
     }
@@ -626,7 +628,7 @@ void add_to_truelist(expr *e, int label)
 
 void add_to_falselist(expr *e, int label)
 {
-    i_list *head = e->falselist;
+    zavo *head = e->falselist;
 
     if (head == NULL)
     {
@@ -635,12 +637,33 @@ void add_to_falselist(expr *e, int label)
     }
     else
     {
-        i_list *tmp = head;
+        zavo *tmp = head;
         while (tmp != NULL)
         {
             tmp = tmp->next;
         }
-        tmp = malloc(sizeof(i_list));
+        tmp = malloc(sizeof(zavo));
+        tmp->label = label;
+        tmp->next = NULL;
+    }
+}
+
+void patchlist(zavo *list, int label)
+{
+    zavo* head = list;
+    if (head == NULL)
+    {
+        head->label = label;
+        head->next = NULL;
+    }
+    else
+    {
+        zavo *tmp = head;
+        while (tmp != NULL)
+        {
+            tmp = tmp->next;
+        }
+        tmp = malloc(sizeof(zavo));
         tmp->label = label;
         tmp->next = NULL;
     }

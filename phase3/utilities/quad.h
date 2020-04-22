@@ -54,11 +54,12 @@ typedef enum expression_template
     nill_
 } expr_t;
 
-typedef struct I_list{
+typedef struct zavolist
+{
     int label;
-    struct I_list* next;
-}i_list;
-
+    struct zavolist* next;
+}
+zavo;
 
 typedef struct expression
 {
@@ -68,10 +69,10 @@ typedef struct expression
     double numConst;
     char *stringConst;
     int boolConst;
-    i_list *breaklist;
-    i_list *contlist;
-    i_list *falselist;
-    i_list *truelist;
+    zavo *breaklist;
+    zavo *contlist;
+    zavo *falselist;
+    zavo *truelist;
     struct expression *next;
 } expr;
 
@@ -148,3 +149,4 @@ void add_to_truelist(expr *e, int label);
 
 void add_to_falselist(expr *e, int label);
 
+void patchlist(zavo *list, int label);

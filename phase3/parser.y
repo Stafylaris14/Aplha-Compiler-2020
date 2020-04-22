@@ -1,6 +1,6 @@
 %{
 
-#include "./utilities/quad.h"
+#include "utilities/quad.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 
@@ -514,7 +514,7 @@ Funcname: id{
         }
 ;
 
-Funcargs:  left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;}
+Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;}
         ;
 
 Funcbody: Block{functionFlag --; getoffset();}
@@ -552,37 +552,41 @@ Multy_id: Multy_id comma id {
 
 
 
-Ifstmt: If left_parenthesis Expression right_parenthesis{               /* STAF */
-                        emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +2);
-                        //$$ = nextquad();
-                        emit(JUMP , NULL , NULL , NULL , 0);
+Ifstmt: If left_parenthesis Expression right_parenthesis {
+                emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +2);
+                // $$ = nextquad();
+                emit(JUMP , NULL , NULL , NULL , -1);
                 } Stmt {
-                        patchlabel($$ , nextquad());
-                        }
+                        patchlabel(nextquad()-1 , nextquad());
+        }
         | If left_parenthesis Expression right_parenthesis Stmt elseFix Stmt {
                 patchlabel($$ , $6+1);
                 patchlabel($6 , nextquad());
         }
         ;
 
-elseFix : Else{
+elseFix: Else{
         $$ = nextquad();                                        /* STAF */
         emit(JUMP , NULL , NULL ,NULL, 0);
 }
+;
+
 Whilestart: While{
         $$ = nextquad();
 }
+;
 
 whilecont: left_parenthesis Expression right_parenthesis{
         emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+1);
 }
+;
 
 Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
                 emit(JUMP , NULL , NULL , NULL,$1);
                 patchlabel($2 , nextquad());
-                patchlabel($4->breaklist , nextquad());                  /* ????????????????? */
-                patchlabel($4->contlist ,$1);
+                patchlist($4->breaklist, nextquad());                  /* ????????????????? */
+                patchlist($4->contlist,$1);
                 $$=$4;
         }
     ;
