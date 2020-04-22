@@ -377,4 +377,51 @@ expr *newexpr_constint(double i){
 }
 
 
+expr* member_item(expr *lv,char *name){
+  lv = emit_iftableitem(lv);
+  expr* ti = newexpr(tableitem_e);
+  ti->sym=lv->sym;
+  ti->index = newexpr_constring(name);
+  return ti;
+}
 
+
+expr *lvalue_expr(item *sym){
+  assert(sym);
+  expr *e = (expr*)malloc(sizeof(expr));
+  memset(e,0,sizeof(expr));
+
+  e->next = (expr*) 0;
+  e->sym = sym;
+  switch (sym->type_t) {
+    case var_s:
+      e->type = var_e;
+      break;
+    case programfunc_s:
+      e->type = programfunc_e;
+      break;
+    case libraryfunc_s:
+      e->type = libraryfunc_e;
+      break;
+    default:
+      assert(0);
+  }
+  return e;
+}
+
+expr *newexpr_constnum(double i){
+  expr *e = newexpr(constnum_e);
+  e->numConst = i;
+  return e;
+}
+
+void check_arith(expr *e,char *context){
+  if(e->type == constbool_e ||
+    e->type == conststring_e ||
+    e->type == nil_e  ||
+    e->type == newtable_e ||
+    e->type == programfunc_e  ||
+    e->type == libraryfunc_e  ||
+    e->type == boolexpr_e ) 
+    comperror("Illegal expr used in %s",context);
+}
