@@ -49,7 +49,7 @@ void extend_quads()
     total += EXTEND;
 }
 
-void print_quads()
+/* void print_quads()
 {
     cyn();
     printf("quad#\t opcode\t result \t arg1 \t arg2 \t label \n");
@@ -59,7 +59,128 @@ void print_quads()
     for (i = 0; i < total; i++)
     {
 
-        /* printf("%d:\t %s\t %s\t %s\t %s\t %d  \n", i, quads[i].op, quads[i].result->); */
+        
+    }
+} */
+
+void print_quads()
+{
+    cyn();
+    printf("quad#\t opcode\t result \t arg1 \t arg2 \t label \n");
+    printf("-------------------------------------------------------------------------\n");
+    /* 0-> normal arg | 1-> boolConst 2-> NumConst | 3-> StringConst */
+    int flag = 0;
+    int i;
+    char *a1;
+    char *a2;
+    for (i = 0; i < currQuad; i++)
+    {
+        if (quads + i != NULL)
+        {
+            a1 = malloc(sizeof(expr));
+            a2 = malloc(sizeof(expr));
+            switch (quads[i].arg1->type)
+            {
+            case nill_:
+                a1 = "nill";
+                break;
+            case newtable_:
+                a1 = "newTable";
+                break; /* den exw idea */
+            case assignexp_:
+                a1 = "assign expression";
+                break;
+            case arthmexp_:
+                //itoa(quads[i].arg1->numConst, a1 ,10 );
+                a1 = quads[i].arg1->sym->name;
+                break;
+            case var_:
+                a1 = quads[i].arg1->sym->name;
+                break;
+            case conststring_:
+                a1 = quads[i].arg1->stringConst;
+                break;
+            case constbool_:
+                if (quads[i].arg1->boolConst == 1)
+                    a1 = "TRUE";
+                else if (quads[i].arg1->boolConst == 0)
+                    a1 = "FALSE";
+                else
+                {
+                    red();
+                    printf("den exei oristei to boolean\n");
+                    wht();
+                }
+                break;
+            case constnum_:
+                sprintf(a1, "%d", quads[i].arg1->numConst);
+                break;
+            default:
+                a1 = get_opcode_expr_string(quads[i].arg1->type);
+                break;
+            }
+
+            switch (quads[i].arg2->type)
+            {
+            case nill_:
+                a2 = "nill";
+                break;
+            case newtable_:
+                a2 = "newTable";
+                break; /* den exw idea */
+            case assignexp_:
+                a2 = "assign expression";
+                break;
+            case arthmexp_:
+                //itoa(quads[i].arg2->numConst, a2 ,10 );
+                a2 = quads[i].arg2->sym->name;
+                break;
+            case var_:
+                a2 = quads[i].arg2->sym->name;
+                break;
+            case conststring_:
+                a2 = quads[i].arg2->stringConst;
+                break;
+            case constbool_:
+                if (quads[i].arg2->boolConst == 1)
+                    a2 = "TRUE";
+                else if (quads[i].arg2->boolConst == 0)
+                    a2 = "FALSE";
+                else
+                {
+                    red();
+                    printf("den exei oristei to boolean\n");
+                    wht();
+                }
+                break;
+            case constnum_:
+                sprintf(a2, "%d", quads[i].arg2->numConst);
+                break;
+            default:
+                a2 = get_opcode_expr_string(quads[i].arg2->type);
+                break;
+            }
+
+            if (quads[i].label < 0)
+            {
+                printf("%d:\t %s\t %s\t %s\t %s\t \n",
+                       i,
+                       get_opcode_string(quads[i].op),
+                       quads[i].result->sym->name,
+                       a1,
+                       a2);
+            }
+            else
+            {
+                printf("%d:\t %s\t %s\t %s\t %s\t %d  \n",
+                       i,
+                       get_opcode_string(quads[i].op),
+                       quads[i].result->sym->name,
+                       a1,
+                       a2,
+                       quads[i].label);
+            }
+        }
     }
 }
 
@@ -85,7 +206,7 @@ quad newQuad(iopcode op, expr *arg1, expr *arg2, expr *res)
     return tmp;
 }
 
-void emit(iopcode op, expr *arg1, expr *arg2, expr *res , int label)
+void emit(iopcode op, expr *arg1, expr *arg2, expr *res, int label)
 {
     /* ean den ftanei o xwros kanei extend */
     if (currQuad >= total)
@@ -115,7 +236,11 @@ expr *new_expression(expr_t type)
 {
     expr *tmp_expression = malloc(sizeof(expr));
     tmp_expression->type = type;
-    
+    /* init lists */
+    tmp_expression->truelist = NULL;
+    tmp_expression->falselist = NULL;
+    tmp_expression->contlist = NULL;
+    tmp_expression->breaklist = NULL;
 
     return tmp_expression;
 }
@@ -314,9 +439,9 @@ char *get_opcode_string(iopcode op)
     return NULL;
 }
 
-expr* new_expr_constbool(int boolean)
+expr *new_expr_constbool(int boolean)
 {
-    expr* tmp = new_expression(constbool_);
+    expr *tmp = new_expression(constbool_);
     tmp->boolConst = boolean;
     return tmp;
 }
@@ -332,96 +457,191 @@ int nextquad()
     return currQuad;
 }
 
-expr* make_call(expr* lv,expr* reversed_elist){
-  expr* func = emit_iftableitem(lvalue);
-  while(reversed_elist){
-    emit(param,reversed_elist,NULL,NULL);
-    reversed_elist=reversed_elist->next;
-  }
-  emit(call,func,NULL,NULL);
-  expr* result = newexpr(var_e);
-  result->sym = tmp_item();
-  emit(getretval,result,NULL,NULL,-1,yylineno);
-  return result;
-}
-
-
-expr* newexpr(expr_t t){
-  expr* e = (expr*)malloc(sizeof(expr));
-  memset(e,0,sizeof(expr));
-  e->type = t;
-  return e;
-}
-
-expr *newexpr_constring(char* s){
-  expr* e = newexpr(conststring_e);
-  e->strConst = strdup(s);
-  return e;
-}
-
-
-expr* emit_iftableitem(expr* e){
-  if(e->type!= tableitem_e) return e;
-  else{
+expr *make_call(expr *lv, expr *reversed_elist)
+{
+    expr *func = emit_iftableitem(lvalue);
+    while (reversed_elist)
+    {
+        emit(param, reversed_elist, NULL, NULL);
+        reversed_elist = reversed_elist->next;
+    }
+    emit(call, func, NULL, NULL);
     expr *result = newexpr(var_e);
     result->sym = tmp_item();
-    //emit(tablegetelem,e,e->index,result);         dgfsdgdfsgdyj//8elei ftia3imo
+    emit(getretval, result, NULL, NULL, -1, yylineno);
     return result;
-  }
 }
 
-expr *newexpr_constint(double i){
-  expr *e = newexpr(constint_e);
-  e->numConst = i;
-  return e;
+expr *newexpr(expr_t t)
+{
+    expr *e = (expr *)malloc(sizeof(expr));
+    memset(e, 0, sizeof(expr));
+    e->type = t;
+    return e;
 }
 
-
-expr* member_item(expr *lv,char *name){
-  lv = emit_iftableitem(lv);
-  expr* ti = newexpr(tableitem_e);
-  ti->sym=lv->sym;
-  ti->index = newexpr_constring(name);
-  return ti;
+expr *newexpr_constring(char *s)
+{
+    expr *e = newexpr(conststring_e);
+    e->strConst = strdup(s);
+    return e;
 }
 
+expr *emit_iftableitem(expr *e)
+{
+    if (e->type != tableitem_e)
+        return e;
+    else
+    {
+        expr *result = newexpr(var_e);
+        result->sym = tmp_item();
+        //emit(tablegetelem,e,e->index,result);         dgfsdgdfsgdyj//8elei ftia3imo
+        return result;
+    }
+}
 
-expr *lvalue_expr(item *sym){
-  assert(sym);
-  expr *e = (expr*)malloc(sizeof(expr));
-  memset(e,0,sizeof(expr));
+expr *newexpr_constint(double i)
+{
+    expr *e = newexpr(constint_e);
+    e->numConst = i;
+    return e;
+}
 
-  e->next = (expr*) 0;
-  e->sym = sym;
-  switch (sym->type_t) {
+expr *member_item(expr *lv, char *name)
+{
+    lv = emit_iftableitem(lv);
+    expr *ti = newexpr(tableitem_e);
+    ti->sym = lv->sym;
+    ti->index = newexpr_constring(name);
+    return ti;
+}
+
+expr *lvalue_expr(item *sym)
+{
+    assert(sym);
+    expr *e = (expr *)malloc(sizeof(expr));
+    memset(e, 0, sizeof(expr));
+
+    e->next = (expr *)0;
+    e->sym = sym;
+    switch (sym->type_t)
+    {
     case var_s:
-      e->type = var_e;
-      break;
+        e->type = var_e;
+        break;
     case programfunc_s:
-      e->type = programfunc_e;
-      break;
+        e->type = programfunc_e;
+        break;
     case libraryfunc_s:
-      e->type = libraryfunc_e;
-      break;
+        e->type = libraryfunc_e;
+        break;
     default:
-      assert(0);
-  }
-  return e;
+        assert(0);
+    }
+    return e;
 }
 
-expr *newexpr_constnum(double i){
-  expr *e = newexpr(constnum_e);
-  e->numConst = i;
-  return e;
+expr *newexpr_constnum(double i)
+{
+    expr *e = newexpr(constnum_e);
+    e->numConst = i;
+    return e;
 }
 
-void check_arith(expr *e,char *context){
-  if(e->type == constbool_e ||
-    e->type == conststring_e ||
-    e->type == nil_e  ||
-    e->type == newtable_e ||
-    e->type == programfunc_e  ||
-    e->type == libraryfunc_e  ||
-    e->type == boolexpr_e ) 
-    comperror("Illegal expr used in %s",context);
+void check_arith(expr *e, char *context)
+{
+    if (e->type == constbool_e ||
+        e->type == conststring_e ||
+        e->type == nil_e ||
+        e->type == newtable_e ||
+        e->type == programfunc_e ||
+        e->type == libraryfunc_e ||
+        e->type == boolexpr_e)
+        comperror("Illegal expr used in %s", context);
+}
+
+void add_to_contlist(expr* e , int label )
+{
+    i_list* head = e->contlist;
+
+    if(head == NULL)
+    {
+        head->label = label;
+        head->next = NULL;
+    }else{
+        i_list *tmp = head;
+        while(tmp!=NULL)
+        {
+            tmp = tmp->next;
+        }
+        tmp = malloc(sizeof(i_list));
+        tmp->label = label;
+        tmp->next = NULL;
+    }
+}
+
+void add_to_breaklist(expr *e, int label)
+{
+    i_list *head = e->breaklist;
+
+    if (head == NULL)
+    {
+        head->label = label;
+        head->next = NULL;
+    }
+    else
+    {
+        i_list *tmp = head;
+        while (tmp != NULL)
+        {
+            tmp = tmp->next;
+        }
+        tmp = malloc(sizeof(i_list));
+        tmp->label = label;
+        tmp->next = NULL;
+    }
+}
+
+void add_to_truelist(expr *e, int label)
+{
+    i_list *head = e->truelist;
+
+    if (head == NULL)
+    {
+        head->label = label;
+        head->next = NULL;
+    }
+    else
+    {
+        i_list *tmp = head;
+        while (tmp != NULL)
+        {
+            tmp = tmp->next;
+        }
+        tmp = malloc(sizeof(i_list));
+        tmp->label = label;
+        tmp->next = NULL;
+    }
+}
+
+void add_to_falselist(expr *e, int label)
+{
+    i_list *head = e->falselist;
+
+    if (head == NULL)
+    {
+        head->label = label;
+        head->next = NULL;
+    }
+    else
+    {
+        i_list *tmp = head;
+        while (tmp != NULL)
+        {
+            tmp = tmp->next;
+        }
+        tmp = malloc(sizeof(i_list));
+        tmp->label = label;
+        tmp->next = NULL;
+    }
 }

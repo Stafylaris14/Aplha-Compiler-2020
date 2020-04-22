@@ -30,7 +30,7 @@ expr *result;
 
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
 int libcheck = 0;
-char* functionName ; /* used to add formal arguments to linked list */
+char* functionName ; /* used to ADD formal arguments to linked list */
 %}
 
 
@@ -131,11 +131,13 @@ char* functionName ; /* used to add formal arguments to linked list */
 %left left_bracket right_bracket
 %left left_parenthesis right_parenthesis
 
+
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
 %type <EXPR> Elist
 %type <EXPR> Call
-%type <EXPR> Term
+%type <EXPR> Term  Indexed Multy_exp
+%type <EXPR> Lvalue Primary Objectdef Const Member Stmt
 %type <item> Funcdef
 %type <item> Funcprefix
 %type <strVal> Funcname
@@ -145,10 +147,9 @@ char* functionName ; /* used to add formal arguments to linked list */
 %type <boolop> boolop
 %type <label_jumps> Whilestart
 %type <label_jumps> Ifstmt
-%type <label_jumps> Whilestmt
+%type <EXPR> Whilestmt
 %type <label_jumps> whilecont
 %type <label_jumps> elseFix
-%type </* //// */> Stmt
 %type <for_call> Methodcall
 %type <for_call> Callsuffix
 %type <for_call> Normalcall
@@ -222,12 +223,12 @@ arithm: plus{ $$ = ADD;}
 Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
         | minus Expression %prec uminus {
                 check_arith($2,"uminus");
-                $$ = newexpr(arithexpr_e);
+                $$ = newexpr(arthmexp_);
                 $$->sym = tmp_item();
-                emit(uminus,$2,NULL,$$);
+                emit(uminus,$2,NULL,$$,-1);
         }
         | not Expression {
-                $$ = newexpr(boolexpr_e); 
+                $$ = newexpr(boolexpr_); 
                 $$->sym = tmp_item();
                 printf("na doume meriki apotimisi");//sossssssssssssssosos 
         }
@@ -237,15 +238,15 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                         libcheck=0;
                 }
                 check_arith($2,"++ lvalue");
-                if($2->type == tableitem_e){
+                if($2->type == tableitem_){
                         $$ = emit_iftableitem($2);
-                        emit(add,$$,newexpr_constnum(1),$$);
-                        emit(tablesetelem,$$,$2->index,$2);
+                        emit(ADD,$$,newexpr_constnum(1),$$,-1);
+                        emit(TABLESETELEM,$$,$2->index,$2,-1);
                 }else{
-                        emit(add,$2,newexpr_constnum(1),$2);
-                        $$ = newexpr(arithexpr_e);
+                        emit(ADD,$2,newexpr_constnum(1),$2,-1);
+                        $$ = newexpr(arthmexp_);
                         $$->sym = tmp_item();
-                        emit(assign,$2,NULL,$$);
+                        emit(ASSIGN,$2,NULL,$$,-1);
                 }
                         
         }
@@ -253,17 +254,17 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 if(libcheck == 1){
                 error("Den boreis na kaneis pra3eis me synartiseis", yylineno); 
                 libcheck=0;}
-                check_arith($2,"lvalue ++");
-                $$ = newexpr(boolexpr_e); 
+                check_arith($1,"lvalue ++");
+                $$ = newexpr(boolexpr_); 
                 $$->sym = tmp_item();
-                if($1->type==tableitem_e){
+                if($1->type==tableitem_){
                         expr *val = emit_iftableitem($1);
-                        emit(assign,val,NULL,$$);
-                        emit(add,val,newexpr_constnum(1),val);
-                        emit(tablesetelem,$1->index,val,$1);
+                        emit(ASSIGN,val,NULL,$$,-1);
+                        emit(ADD,val,newexpr_constnum(1),val,-1);
+                        emit(TABLESETELEM,$1->index,val,$1,-1);
                 }else{
-                        emit(assign,$1,NULL,$$);
-                        emit(add,$1,newexpr_constnum(1),$1);
+                        emit(ASSIGN,$1,NULL,$$,-1);
+                        emit(ADD,$1,newexpr_constnum(1),$1,-1);
                 }
                 $$ = $1;
 
@@ -274,15 +275,15 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                         libcheck=0;
                         }
                 check_arith($2,"-- lvalue");
-                if($2->type == tableitem_e){
+                if($2->type == tableitem_){
                         $$ = emit_iftableitem($2);
-                        emit(sub,$$,newexpr_constnum(1),$$);
-                        emit(tablesetelem,$$,$2->index,$2);
+                        emit(SUB,$$,newexpr_constnum(1),$$ ,-1);
+                        emit(TABLESETELEM,$$,$2->index,$2 , -1);
                 }else{
-                        emit(sub,$2,newexpr_constnum(1),$2);
-                        $$ = newexpr(arithexpr_e);
+                        emit(SUB,$2,newexpr_constnum(1),$2 , -1);
+                        $$ = newexpr(arthmexp_);
                         $$->sym = tmp_item();
-                        emit(assign,$2,NULL,$$);
+                        emit(ASSIGN,$2,NULL,$$ , -1);
                 }
                 
         }
@@ -291,17 +292,17 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                         error("Den boreis na kaneis pra3eis me synartiseis", yylineno);
                         libcheck=0;
                 }
-              check_arith($2,"lvalue --");
-                $$ = newexpr(boolexpr_e); 
+              check_arith($1,"lvalue --");
+                $$ = newexpr(boolexpr_); 
                 $$->sym = tmp_item();
-                if($1->type==tableitem_e){
+                if($1->type==tableitem_){
                         expr *val = emit_iftableitem($1);
-                        emit(assign,val,NULL,$$);
-                        emit(sub,val,newexpr_constnum(1),val);
-                        emit(tablesetelem,$1->index,val,$1);
+                        emit(ASSIGN,val,NULL,$$,-1);
+                        emit(SUB,val,newexpr_constnum(1),val , -1);
+                        emit(TABLESETELEM,$1->index,val,$1 , -1);
                 }else{
-                        emit(assign,$1,NULL,$$);
-                        emit(sub,$1,newexpr_constnum(1),$1);
+                        emit(ASSIGN,$1,NULL,$$ , -1);
+                        emit(SUB,$1,newexpr_constnum(1),$1 ,-1);
                 }
                 $$ = $1;
         }
@@ -309,15 +310,15 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
         ;
 
 Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
-                if($1->type == tableitem_e){
-                        emit(tablesetelem, $1, $1->index, $4);
+                if($1->type == tableitem_){
+                        emit(TABLESETELEM, $1, $1->index, $4 , -1);
                         $$ = emit_iftableitem($1);
-                        $$->type = assignexpr_e;
+                        $$->type = assignexp_;
                 }else{
-                        $$ = newexpr(assignexpr_e);
+                        $$ = newexpr(assignexp_);
                         $$->sym = tmp_item();
-                        emit(assign,$4,NULL,$1);
-                        emit(assign,$1,NULL,$$);
+                        emit(ASSIGN,$4,NULL,$1 , -1);
+                        emit(ASSIGN,$1,NULL,$$ , -1);
                 }    
 
                 }
@@ -330,10 +331,10 @@ Primary: Lvalue {$$ = emit_iftableitem($1);}
         | Call {callFlag =1; $$ = $1;}
         | Objectdef {$$ = $1;}
         | left_parenthesis Funcdef right_parenthesis {
-                $$=newexpr(programfunc_e);
+                $$=newexpr(pfunc_);
                 $$->sym = $2;
         }
-        | Const {;}
+        | Const {$$ = $1;}
         ;
 
 
@@ -374,19 +375,19 @@ Member: Lvalue dot id {libcheck = 0;
         ;
 
 
-Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {$$=make_call($1,$3);callFlag =0;}
+Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {$$=make_call($1,$4);callFlag =0;}
         |  Lvalue{callFlag =1;libcheck = 0;} Callsuffix {
-                if($2->method){
+                if($3->method){
                         expr* t = $1;
-                        $1 = emit_iftableitem(member_item(t,$2->name));
-                        $2->elist->next = t;
+                        $1 = emit_iftableitem(member_item(t,$3->name));
+                        $3->elist->next = t;
                 }         
-                $$ = make_call($1,$2->elist);
+                $$ = make_call($1,$3->elist);
                 callFlag =0;}
         | left_parenthesis{callFlag =1;libcheck = 0;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {
-                expr* func = newexpr(programfunc_e);
-                func->sym = $2;
-                $$ = make_call(func,$5);
+                expr* func = newexpr(pfunc_);
+                func->sym = $3;
+                $$ = make_call(func,$6);
                 callFlag =0;}
         ;
 
@@ -404,7 +405,7 @@ Callsuffix: Normalcall {
 
 Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {
         $$ = malloc(sizeof(struct for_call));
-        $$->elist = $2;
+        $$->elist = $3;
         $$->method = 0;
         $$->name = NULL;
         }
@@ -414,9 +415,9 @@ Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {
 
 Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthesis {
                 $$ = malloc(sizeof(struct for_call));
-                $$->elist = $4;
+                $$->elist = $5;
                 $$->method = 1;
-                $$->name = $2;
+                $$->name = $3;
         }
         ;
 
@@ -437,25 +438,25 @@ Multy_exp: comma Expression Multy_exp {;}
 Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
         scopeCounter++;
         objectHide=1;
-        struct expr *t = newexpr(newtable_e);
+        expr *t = newexpr(newtable_);
         t->sym = tmp_item();
-        emit(tablecreate,t,NULL,NULL);
+        emit(TABLECREATE,t,NULL,NULL,-1);
         int i = 0;
-        while($2){
-                emit(tablesetelem, t,newexpr_constnum(i++), $2);
-                $2 = $2->next;
+        while($3){
+                emit(TABLESETELEM, t,newexpr_constnum(i++), $3,-1);
+                $3 = $3->next;
         }
         $$ = t;
         }
         | left_bracket{scopeCounter--;objectHide =0;} Indexed right_bracket {
                 scopeCounter++;
                 objectHide=1;
-                struct expr *t = newexpr(newtable_e);
+                expr *t = newexpr(newtable_);
                 t->sym = tmp_item();
-                emit(tablecreate,t,NULL,NULL);
-                while($2){
-                        emit(tablesetelem, , t,$2->index,t);
-                        $2 = $2->next;
+                emit(TABLECREATE,t,NULL,NULL,-1);
+                while($3){
+                        emit(TABLESETELEM, t,$3->index,t,-1);
+                        $3 = $3->next;
                 }     
                 $$ = t;  
         }
@@ -520,7 +521,7 @@ Funcbody: Block{functionFlag --; getoffset();}
         ;
 
 
-Const:  integer 
+Const:  integer {;}
         | real {;}
         | string {;}
         | nil {;}
@@ -553,7 +554,7 @@ Multy_id: Multy_id comma id {
 
 Ifstmt: If left_parenthesis Expression right_parenthesis{               /* STAF */
                         emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +2);
-                        $$ = nextquad();
+                        //$$ = nextquad();
                         emit(JUMP , NULL , NULL , NULL , 0);
                 } Stmt {
                         patchlabel($$ , nextquad());
@@ -578,10 +579,11 @@ whilecont: left_parenthesis Expression right_parenthesis{
 
 Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
-                emit(JUMP , NULL , NULL , $1);
+                emit(JUMP , NULL , NULL , NULL,$1);
                 patchlabel($2 , nextquad());
-                patchlabel($3.breaklist , nextquad());                  /* ????????????????? */
-                patchlabel($3.contlist ,$1);
+                patchlabel($4->breaklist , nextquad());                  /* ????????????????? */
+                patchlabel($4->contlist ,$1);
+                $$=$4;
         }
     ;
 
