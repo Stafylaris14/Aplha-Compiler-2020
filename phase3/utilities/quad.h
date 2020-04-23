@@ -95,6 +95,17 @@ typedef struct for_call
     char* name;
 }for_call;
 
+typedef struct for_init{
+  int test;
+  int enter;
+}for_init;
+
+typedef struct stack1{
+  int top;
+  int maxsize;
+  int *stackarray;
+}stack1;
+
 
 void init_quads();
 
@@ -151,3 +162,13 @@ void add_to_truelist(expr *e, int label);
 void add_to_falselist(expr *e, int label);
 
 void patchlist(zavo *list, int label);
+
+expr* newexpr_constbool(unsigned int b);
+
+stack1* arxikopoisi();
+
+int isfull(stack1* stiba);
+
+int push1(stack1 *stiba, int data);
+
+int pop1(stack1 *stiba);

@@ -453,6 +453,8 @@ void patchlabel(int quadNo, int label)
     quads[quadNo].label = label;
 }
 
+
+
 int nextquad()
 {
     return currQuad;
@@ -671,3 +673,34 @@ void patchlist(zavo *list, int label)
     }
 }
 
+expr* newexpr_constbool(unsigned int b){
+  expr *e = newexpr(constbool_);
+  e->boolConst = b;
+  return e;
+}
+
+
+stack1* arxikopoisi(){
+  stack1 *tmp = malloc(sizeof(stack1));
+  tmp->maxsize = 200;
+  tmp->top = -1;
+  tmp->stackarray = malloc(tmp->maxsize * sizeof(int));
+  return tmp;
+}
+
+int isfull(stack1* stiba) {
+  if(stiba->top == stiba->maxsize)
+      return 1;
+  else
+      return 0;  
+}
+
+int push1(stack1 *stiba, int data){
+    if(isfull(stiba))return -1;
+    stiba->stackarray[++stiba->top] = data;
+}
+
+int pop1(stack1 *stiba){
+    if(isfull(stiba))return -1;
+    return stiba->stackarray[stiba->top--];
+}

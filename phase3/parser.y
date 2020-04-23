@@ -21,6 +21,7 @@ int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
+stack1 *anakiklosi; //krataei poses anakikloseis exoun anoi3ei
 /* iopcode op; */
 
 
@@ -46,6 +47,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
     int boolop ;                         /* gia ta boolean STAF */
     int label_jumps;                       /* gia ta jumps */
     struct for_call *for_call;
+    struct for_init *for_init;
 }
 
 
@@ -136,7 +138,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <EXPR> Assignexpression
 %type <EXPR> Elist
 %type <EXPR> Call
-%type <EXPR> Term  Indexed Multy_exp
+%type <EXPR> Term  Indexed Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
 %type <item> Funcdef
 %type <item> Funcprefix
@@ -146,13 +148,16 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <ifs> particular                 /* STAF */
 %type <boolop> boolop
 %type <label_jumps> Whilestart
-%type <label_jumps> Ifstmt
 %type <EXPR> Whilestmt
-%type <label_jumps> whilecont
-%type <label_jumps> elseFix
+%type <label_jumps> whilecont M N 
+%type <label_jumps> elseFix ifFix
 %type <for_call> Methodcall
 %type <for_call> Callsuffix
 %type <for_call> Normalcall
+%type <for_init> ForFix
+
+
+
 
 %%
 
@@ -179,19 +184,24 @@ Stmt: Expression semicolon {libcheck =0;}
 Expression: Assignexpression {$$ = $1;}
                         /* EDW TO EKANA OPWS STHN DIALE3I  */
                 |Expression arithm Expression{
+                        //isos xreiastei na kanoume elenxoyn an 3erw egw m er8ei stirng/////////
                       $$ = new_expression(arthmexp_ );  
                       $$->sym = tmp_item();
                       emit($2 , $1 , $3 , $$ , -1);
                 }
             | Expression boolop Expression {
-                       $$  =  new_expression(boolexpr_ );
-                       $$->sym = tmp_item();
-                       emit($2,$1,$3,$$ , -1);
+                    //8elei meriki apotimisi edwwwwwwwwwwwwww
+                        $$  =  new_expression(boolexpr_ );
+                        $$->sym = tmp_item();
+                        emit($2,$1,$3,$$ , -1);
+                        //prepei na alla3oume emit edw opws eisa ston online einai zori
             }
             | Expression particular Expression{
+                    //8elei meriki apotimis edwwwwwwwwwwwwwwwwww me true/false list
                     $$ = new_expression(boolexpr_);
                     $$->sym = tmp_item();
                     emit($2 , $1 , $3 , $$ , -1);
+                    emit(JUMP,NULL,NULL,NULL,-1);
             }
             | Term {$$ = $1;}
              ;
@@ -489,13 +499,14 @@ Block: left_curle_bracket{scopeCounter++;
 
 
 Funcdef: Funcprefix Funcargs Funcbody{
+        loopFlag = pop1(anakiklosi);
         //prepei na ftia3w quad
         }
         ;
 
 Funcprefix: Function Funcname{
-         item* new = newItem($2,"User Function", scopeCounter , yylineno );
-         new_check(new);
+        item* new = newItem($2,"User Function", scopeCounter , yylineno );
+        new_check(new);
         functionName = strdup($2);
         offset =0;
         $$ = new;
@@ -514,7 +525,7 @@ Funcname: id{
         }
 ;
 
-Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;}
+Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;push1(anakiklosi,loopFlag);loopFlag=0;}
         ;
 
 Funcbody: Block{functionFlag --; getoffset();}
@@ -552,22 +563,26 @@ Multy_id: Multy_id comma id {
 
 
 
-Ifstmt: If left_parenthesis Expression right_parenthesis {
-                emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +2);
-                // $$ = nextquad();
-                emit(JUMP , NULL , NULL , NULL , -1);
-                } Stmt {
-                        patchlabel(nextquad()-1 , nextquad());
+Ifstmt: ifFix Stmt {
+                        patchlabel($1 , nextquad());
+                        $$ = $2;
         }
-        | If left_parenthesis Expression right_parenthesis Stmt elseFix Stmt {
-                patchlabel($$ , $6+1);
-                patchlabel($6 , nextquad());
+        | ifFix Stmt elseFix Stmt {
+                patchlabel($1 , $3+1);
+                patchlabel($3 , nextquad());
+                //kati 8elei gia brek/co nti
         }
         ;
 
+ifFix: If left_parenthesis Expression right_parenthesis{
+                emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +2);
+                emit(JUMP , NULL , NULL , NULL , -1);
+                $$ = nextquad();
+};
+
 elseFix: Else{
         $$ = nextquad();                                        /* STAF */
-        emit(JUMP , NULL , NULL ,NULL, 0);
+        emit(JUMP , NULL , NULL ,NULL, -1);
 }
 ;
 
@@ -577,7 +592,9 @@ Whilestart: While{
 ;
 
 whilecont: left_parenthesis Expression right_parenthesis{
-        emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+1);
+        emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+2);
+        emit(JUMP , NULL , NULL , NULL , -1);
+        $$ = nextquad();
 }
 ;
 
@@ -585,15 +602,41 @@ Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
                 emit(JUMP , NULL , NULL , NULL,$1);
                 patchlabel($2 , nextquad());
+                //edw isos 8elei mia ifffffffff
                 patchlist($4->breaklist, nextquad());                  /* ????????????????? */
                 patchlist($4->contlist,$1);
                 $$=$4;
         }
     ;
 
-Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis {loopFlag ++;} Stmt {loopFlag --;}
+Forstmt:ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N{
+        loopFlag --;
+        patchlabel($1->enter,$6+1);
+        patchlabel($2,nextquad());
+        patchlabel($6,$1->test);
+        patchlabel($8,$2+1);
+        //8elei kapoios elenxous edwwwwwwwww
+        patchlist($7->breaklist,nextquad());
+        patchlist($7->contlist,$2+1);
+        $$ = $7;
+}
         ;
 
+ForFix: For left_parenthesis Elist semicolon M Expression semicolon{
+        $$->test = $5;
+        $$->enter = nextquad();
+        emit(IF_EQ,$6,newexpr_constbool(1),NULL,-1);
+}
+;
+
+M:{
+        $$ = nextquad();
+};
+
+N:{
+        $$ = nextquad();
+         emit(JUMP,NULL,NULL,NULL,-1);
+};
 
 Returnstmt: Return semicolon{libcheck =0;}
         | Return{returnFlag = 1; } Expression semicolon {libcheck =0;returnFlag =0; }
@@ -625,7 +668,7 @@ int main(int argc, char** argv)
 	return 1;
     }
   }
-
+    anakiklosi = arxikopoisi();
     yyparse();
     //printSymTable();
     
