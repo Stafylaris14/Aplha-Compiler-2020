@@ -172,22 +172,24 @@ void print_quads()
 
             if (quads[i].label < 0)
             {
-                printf("%d: %s %s %s %s \n",
-                       i,
-                       get_opcode_string(quads[i].op),
-                       a3,
-                       a1,
-                       a2);
-            }
-            else
-            {
-                printf("%d: %s %s %s %s %d  \n",
+                printf("%d: %s %s %s %s [line %d]\n",
                        i,
                        get_opcode_string(quads[i].op),
                        a3,
                        a1,
                        a2,
-                       quads[i].label);
+                       quads[i].lineno);
+            }
+            else
+            {
+                printf("%d: %s %s %s %s %d [line %d] \n",
+                       i,
+                       get_opcode_string(quads[i].op),
+                       a3,
+                       a1,
+                       a2,
+                       quads[i].label,
+                        quads[i].lineno);
             }
         }
     }
@@ -457,7 +459,7 @@ expr *new_expr_constbool(int boolean)
 
 void patchlabel(int quadNo, int label)
 {
-    assert(quadNo < currQuad && !quads[quadNo].label);
+    assert(quadNo < currQuad );
     quads[quadNo].label = label;
 }
 
@@ -663,7 +665,9 @@ void add_to_falselist(expr *e, int label)
 
 void patchlist(zavo *list, int label)
 {
-    zavo* head = list;
+    zavo *head = malloc(sizeof(zavo));
+    head = list;
+    
     if (head == NULL)
     {
         head->label = label;
@@ -671,14 +675,14 @@ void patchlist(zavo *list, int label)
     }
     else
     {
-        zavo *tmp = head;
-        while (tmp != NULL)
+         printf("eeee %d\n",head->label);
+        while (head->next != NULL)
         {
-            tmp = tmp->next;
+            head = head->next;
         }
-        tmp = malloc(sizeof(zavo));
-        tmp->label = label;
-        tmp->next = NULL;
+         printf("eeee\n");
+        head->label = label;
+        head->next = NULL;
     }
 }
 

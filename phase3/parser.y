@@ -451,9 +451,9 @@ Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthes
 
 
 Elist:  Expression Multy_exp {
+                
                 $1->next = $2;
-                $$ = $1;
-        
+                $$ = $1;  
         }
         | {$$ = NULL;}
         ;
@@ -469,10 +469,14 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
         t->sym = tmp_item();
         emit(TABLECREATE,t,NULL,NULL,-1);
         int i = 0;
+        printf("trwww segm sto test p3t_object_creation_expr\n");
         while($3){
+                printf("oo\n");
                 emit(TABLESETELEM, t,newexpr_constnum(i++), $3,-1);
+                printf("e\n");
                 $3 = $3->next;
         }
+         printf("sew232323\n");
         $$ = t;
         }
         | left_bracket{scopeCounter--;objectHide =0;} Indexed right_bracket {
@@ -537,7 +541,7 @@ Funcname: id{
                 char noname[20];
                 sprintf(noname,"function$%d",functionCounter);
                 functionCounter++;
-                $$ = functionName;
+                $$ = noname;
         }
 ;
 
@@ -617,6 +621,7 @@ Whilestart: While{
 whilecont: left_parenthesis Expression right_parenthesis{
         emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+2);
         emit(JUMP , NULL , NULL , NULL , -1);
+
         $$ = nextquad();
 }
 ;
@@ -628,6 +633,7 @@ Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 //edw isos 8elei mia ifffffffff
                 patchlist($4->breaklist, nextquad());                  /* ????????????????? */
                 patchlist($4->contlist,$1);
+                printf("eeeee\n");
                 $$=$4;
         }
     ;
