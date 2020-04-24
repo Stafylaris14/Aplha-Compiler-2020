@@ -257,7 +257,7 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 check_arith($2,"uminus");
                 $$ = newexpr(arthmexp_);
                 $$->sym = tmp_item();
-                emit(uminus,$2,NULL,$$,-1);
+                emit(UMINUS,$2,NULL,$$,-1);
         }
         | not Expression {
                 $$ = newexpr(boolexpr_); 
@@ -553,12 +553,14 @@ Funcblockstart: {push1(loopcounterstack, loopFlag); loopFlag = 0;}
 Funcblockend: {loopFlag = pop1(loopcounterstack);}
         ;
 
-Const:  integer {;}
-        | real {;}
-        | string {;}
-        | nil {;}
-        | True {;}
-        | False {;}
+Const:  integer {$$ = newexpr_constint($1);
+                emit(JUMP , NULL , NULL , NULL , -1);
+        }
+        | real {$$ = newexpr_constnum($1);}
+        | string {$$ = newexpr_constring($1);}
+        | nil {$$ = newexpr(nill_);}
+        | True {$$ = newexpr_constbool(1);}
+        | False {$$ = newexpr_constbool(0);}
         ;
 
 
@@ -702,6 +704,7 @@ int main(int argc, char** argv)
     //printSymTable();
     //printHash();
     printScopeList();
+    
     print_quads();
    
 }

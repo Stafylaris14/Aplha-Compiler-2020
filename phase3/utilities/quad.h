@@ -67,7 +67,7 @@ typedef struct expression
     expr_t type;
     item *sym;
     struct expression *index;
-    double numConst;
+    int numConst;
     char *stringConst;
     int boolConst;
     zavo *breaklist;
@@ -143,13 +143,13 @@ expr *newexpr_constring(char *s);
 
 expr *emit_iftableitem(expr *e);
 
-expr *newexpr_constint(double i);
+expr *newexpr_constint(int i);
 
 expr *member_item(expr *lv, char *name);
 
 expr *lvalue_expr(item *sym);
 
-expr *newexpr_constnum(double i);
+expr *newexpr_constnum(int i);
 
 void check_arith(expr *e, char *context);
 

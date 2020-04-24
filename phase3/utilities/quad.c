@@ -67,21 +67,22 @@ void extend_quads()
 void print_quads()
 {
     cyn();
-    printf("quad#\t opcode\t result \t arg1 \t arg2 \t label \n");
     printf("-------------------------------------------------------------------------\n");
     /* 0-> normal arg | 1-> boolConst 2-> NumConst | 3-> StringConst */
     int flag = 0;
     int i;
     char *a1;
     char *a2;
+    char *a3;
     for (i = 0; i < currQuad; i++)
     {
         if (quads != NULL)
         {   
             a1 = malloc(sizeof(char)*200);
             a2 = malloc(sizeof(char)*200);
+            a3 = malloc(sizeof(char)*200);
             if(quads[i].arg1 != NULL){
-                printf("typee %d\n",quads[i].arg1->type);
+              //  printf("typee %d\n" ,quads[i].arg1->type);
             switch (quads[i].arg1->type)
             {
             case nill_:
@@ -95,13 +96,9 @@ void print_quads()
                 break;
             case arthmexp_:
                 //itoa(quads[i].arg1->numConst, a1 ,10 );
-                printf("se epiasa\n");
                 a1 = quads[i].arg1->sym->name;
                 break;
             case var_:
-                // printf("se gama\n");
-                // printf("%s\n", quads[i].arg1->sym->name);
-                // printf("se gama\n");
                 a1 = quads[i].arg1->sym->name;
                 break;
             case conststring_:
@@ -123,7 +120,6 @@ void print_quads()
                 sprintf(a1, "%d", quads[i].arg1->numConst);
                 break;
             default:
-                printf("e;aa\n");
                 a1 = get_opcode_expr_string(quads[i].arg1->type);
                 break;
             }
@@ -171,21 +167,24 @@ void print_quads()
             }
             }
 
+            if(quads[i].result ==NULL) a3 = "";
+            else a3 = quads[i].result->sym->name;
+
             if (quads[i].label < 0)
             {
-                printf("%d:\t %s\t %s\t %s\t %s\t \n",
+                printf("%d: %s %s %s %s \n",
                        i,
                        get_opcode_string(quads[i].op),
-                       quads[i].result->sym->name,
+                       a3,
                        a1,
                        a2);
             }
             else
             {
-                printf("%d:\t %s\t %s\t %s\t %s\t %d  \n",
+                printf("%d: %s %s %s %s %d  \n",
                        i,
                        get_opcode_string(quads[i].op),
-                       quads[i].result->sym->name,
+                       a3,
                        a1,
                        a2,
                        quads[i].label);
@@ -229,14 +228,13 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *res, int label)
     /* increse currQuad with 1 */
     currQuad = currQuad + 1;
 
-    printf("op  %s\n", get_opcode_string(op));
 }
 
 item *tmp_item()
 {
     item *tmp = malloc(sizeof(item));
     char *str = malloc(35 + tmp_count);
-    sprintf(str, "_t%d", tmp_count);
+    sprintf(str, "^%d", tmp_count);
     tmp = newItem(str, "local Expression", scopeCounter, yylineno);
     tmp_count++;
     return tmp;
@@ -443,6 +441,7 @@ char *get_opcode_string(iopcode op)
         return "TABLESETELEM";
         break;
     default:
+        printf("exw =exi %d\n", op);
         exit(1);
         break;
     }
@@ -512,7 +511,7 @@ expr *emit_iftableitem(expr *e)
     }
 }
 
-expr *newexpr_constint(double i)
+expr *newexpr_constint(int i)
 {
     expr *e = newexpr(constnum_);
     e->numConst = i;
@@ -554,12 +553,13 @@ expr *lvalue_expr(item *sym)
     return e;
 }
 
-expr *newexpr_constnum(double i)
+expr *newexpr_constnum(int i)
 {
     expr *e = newexpr(constnum_);
     e->numConst = i;
     return e;
 }
+
 
 void check_arith(expr *e, char *context)
 {
