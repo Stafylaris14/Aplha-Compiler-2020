@@ -172,3 +172,9 @@ int isfull(stack1* stiba);
 int push1(stack1 *stiba, int data);
 
 int pop1(stack1 *stiba);
+
+for_call* insert_call(expr *elist,unsigned char method,char* name);
+
+zavo* new_list(int i);
+
+zavo* mergelist(zavo* first,zavo* second);

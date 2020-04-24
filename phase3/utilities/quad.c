@@ -76,10 +76,12 @@ void print_quads()
     char *a2;
     for (i = 0; i < currQuad; i++)
     {
-        if (quads + i != NULL)
-        {
-            a1 = malloc(sizeof(expr));
-            a2 = malloc(sizeof(expr));
+        if (quads != NULL)
+        {   
+            a1 = malloc(sizeof(char)*200);
+            a2 = malloc(sizeof(char)*200);
+            if(quads[i].arg1 != NULL){
+                printf("typee %d\n",quads[i].arg1->type);
             switch (quads[i].arg1->type)
             {
             case nill_:
@@ -93,9 +95,13 @@ void print_quads()
                 break;
             case arthmexp_:
                 //itoa(quads[i].arg1->numConst, a1 ,10 );
+                printf("se epiasa\n");
                 a1 = quads[i].arg1->sym->name;
                 break;
             case var_:
+                // printf("se gama\n");
+                // printf("%s\n", quads[i].arg1->sym->name);
+                // printf("se gama\n");
                 a1 = quads[i].arg1->sym->name;
                 break;
             case conststring_:
@@ -117,10 +123,12 @@ void print_quads()
                 sprintf(a1, "%d", quads[i].arg1->numConst);
                 break;
             default:
+                printf("e;aa\n");
                 a1 = get_opcode_expr_string(quads[i].arg1->type);
                 break;
             }
-
+            }
+            if(quads[i].arg2 != NULL){
             switch (quads[i].arg2->type)
             {
             case nill_:
@@ -160,6 +168,7 @@ void print_quads()
             default:
                 a2 = get_opcode_expr_string(quads[i].arg2->type);
                 break;
+            }
             }
 
             if (quads[i].label < 0)
@@ -524,8 +533,8 @@ expr *lvalue_expr(item *sym)
     assert(sym);
     expr *e = (expr *)malloc(sizeof(expr));
     memset(e, 0, sizeof(expr));
-
     e->next = (expr *)0;
+    e->sym=sym;
     enum Scope_spase sp = get_scope_spase(sym);
     switch (sp)
     {
@@ -682,7 +691,7 @@ expr* newexpr_constbool(unsigned int b){
 
 stack1* arxikopoisi(){
   stack1 *tmp = malloc(sizeof(stack1));
-  tmp->maxsize = 200;
+  tmp->maxsize = 250;
   tmp->top = -1;
   tmp->stackarray = malloc(tmp->maxsize * sizeof(int));
   return tmp;
@@ -704,3 +713,28 @@ int pop1(stack1 *stiba){
     if(isfull(stiba))return -1;
     return stiba->stackarray[stiba->top--];
 }
+
+
+
+for_call* insert_call(expr *elist,unsigned char method,char* name){
+        for_call* tmp = malloc(sizeof(for_call));
+        tmp->elist = elist;
+        tmp->method = method;
+        tmp->name = name;
+        return tmp;
+}
+
+zavo* new_list(int i){
+    zavo* quads = malloc(sizeof(zavo));
+    quads->label = i;
+    quads->next = NULL;
+    return quads;
+}
+
+zavo* mergelist(zavo* first,zavo* second){
+    printf("8elei ftia3imooooo");
+
+    //sdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdadasdsadasdasdasdadasdasdasd
+
+}
+

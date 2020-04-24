@@ -21,7 +21,7 @@ int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
-stack1 *anakiklosi; //krataei poses anakikloseis exoun anoi3ei
+stack1 *loopcounterstack; //krataei poses anakikloseis exoun anoi3ei
 /* iopcode op; */
 
 
@@ -137,7 +137,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
 %type <EXPR> Elist
-%type <EXPR> Call
+%type <EXPR> Call stmts 
 %type <EXPR> Term  Indexed Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
 %type <item> Funcdef
@@ -168,13 +168,35 @@ States: States Stmt {;}
     |
     ;
 
-Stmt: Expression semicolon {libcheck =0;}
-    | Ifstmt {;}
-    | Whilestmt {;}
-    | Forstmt {;}
-    | Returnstmt {if(functionFlag == 0)error("no function to return" , yylineno);}
-    | Break semicolon {libcheck =0;if(loopFlag == 0)error("no loop to break" , yylineno);}
-    | Continue semicolon {libcheck =0;if(loopFlag == 0)error("no loop to Continue" , yylineno);}
+stmts: stmts Stmt{
+        $$->breaklist = mergelist($1->breaklist,$2->breaklist);
+        $$->contlist = mergelist($1->contlist,$2->contlist);
+} 
+| Stmt {$$ = $1;}
+;
+
+Stmt: Expression semicolon {libcheck =0;$$ = $1;}
+    | Ifstmt {$$ = $1;}
+    | Whilestmt {$$ = $1;}
+    | Forstmt {$$ = $1;}
+    | Returnstmt {
+            
+            if(functionFlag == 0)error("no function to return" , yylineno);
+            }
+    | Break semicolon {
+            libcheck =0;
+            $$ = malloc(sizeof(expr));
+            //if(loopFlag == 0)error("no loop to break" , yylineno);
+            $$->breaklist = new_list(nextquad());
+            emit(JUMP,NULL,NULL,NULL,-1);
+            }
+    | Continue semicolon {
+            libcheck =0;
+            $$ = malloc(sizeof(expr));
+            if(loopFlag == 0)error("no loop to Continue" , yylineno);
+            $$->contlist = new_list(nextquad());
+            emit(JUMP,NULL,NULL,NULL,-1);
+            }
     | Block {;}
     | Funcdef {;}
     | semicolon {libcheck =0;}
@@ -357,6 +379,7 @@ Lvalue: id {
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
                                 $$ = lvalue_expr(new);
+
         }
         | local id {
                                 if(isLibraryFunction($2))libcheck =1;
@@ -414,20 +437,14 @@ Callsuffix: Normalcall {
             ;
 
 Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {
-        $$ = malloc(sizeof(struct for_call));
-        $$->elist = $3;
-        $$->method = 0;
-        $$->name = NULL;
+        $$ = insert_call($3,0,NULL);
         }
         ;
 
 
 
 Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthesis {
-                $$ = malloc(sizeof(struct for_call));
-                $$->elist = $5;
-                $$->method = 1;
-                $$->name = $3;
+                $$ = insert_call($5,1,$3);
         }
         ;
 
@@ -492,14 +509,13 @@ Indexedelement: left_curle_bracket{scopeCounter++;
 
 Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
-        States right_curle_bracket {
+        stmts right_curle_bracket {
                 if(objectHide)hide(scopeCounter);
                 scopeCounter--;}
         ;
 
 
-Funcdef: Funcprefix Funcargs Funcbody{
-        loopFlag = pop1(anakiklosi);
+Funcdef: Funcprefix Funcargs Funcblockstart Funcbody Funcblockend{
         //prepei na ftia3w quad
         }
         ;
@@ -525,12 +541,17 @@ Funcname: id{
         }
 ;
 
-Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;push1(anakiklosi,loopFlag);loopFlag=0;}
+Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;}
         ;
 
 Funcbody: Block{functionFlag --; getoffset();}
         ;
 
+Funcblockstart: {push1(loopcounterstack, loopFlag); loopFlag = 0;}        
+        ;
+
+Funcblockend: {loopFlag = pop1(loopcounterstack);}
+        ;
 
 Const:  integer {;}
         | real {;}
@@ -638,8 +659,16 @@ N:{
          emit(JUMP,NULL,NULL,NULL,-1);
 };
 
-Returnstmt: Return semicolon{libcheck =0;}
-        | Return{returnFlag = 1; } Expression semicolon {libcheck =0;returnFlag =0; }
+Returnstmt: Return semicolon{libcheck =0;
+        //8elei mallon kapoio jump gia merikiiiiiiiiiiiiiiii
+         emit(RETURN, NULL, NULL, NULL, -1);
+        }
+        | Return{returnFlag = 1; 
+        } Expression semicolon {libcheck =0;
+        returnFlag =0; 
+        //8elei mallon kapoio jump gia merikiiiiiiiiiiiiiiii
+        emit(RETURN, $3, NULL, NULL, -1);
+        }
             ;
 
 
@@ -668,11 +697,11 @@ int main(int argc, char** argv)
 	return 1;
     }
   }
-    anakiklosi = arxikopoisi();
+    loopcounterstack = arxikopoisi();
     yyparse();
     //printSymTable();
-    
     //printHash();
     printScopeList();
+    print_quads();
    
 }
