@@ -21,6 +21,7 @@ int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
+int assign_flag = 0;
 stack1 *loopcounterstack; //krataei poses anakikloseis exoun anoi3ei
 /* iopcode op; */
 
@@ -175,7 +176,16 @@ stmts: stmts Stmt{
 | Stmt {$$ = $1;}
 ;
 
-Stmt: Expression semicolon {libcheck =0;$$ = $1;}
+Stmt: Expression semicolon {
+        libcheck =0;
+        if(assign_flag){
+        emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
+        emit(JUMP,NULL,NULL,NULL,-1);
+        emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
+        assign_flag = 0;
+        }
+        //8elei true false list sigouraaaS
+        $$ = $1;}
     | Ifstmt {$$ = $1;}
     | Whilestmt {$$ = $1;}
     | Forstmt {$$ = $1;}
@@ -186,7 +196,7 @@ Stmt: Expression semicolon {libcheck =0;$$ = $1;}
     | Break semicolon {
             libcheck =0;
             $$ = malloc(sizeof(expr));
-            //if(loopFlag == 0)error("no loop to break" , yylineno);
+            if(loopFlag == 0)error("no loop to break" , yylineno);
             $$->breaklist = new_list(nextquad());
             emit(JUMP,NULL,NULL,NULL,-1);
             }
@@ -215,7 +225,15 @@ Expression: Assignexpression {$$ = $1;}
                     //8elei meriki apotimisi edwwwwwwwwwwwwww
                         $$  =  new_expression(boolexpr_ );
                         $$->sym = tmp_item();
-                        emit($2,$1,$3,$$ , -1);
+                      //  printf("edw\n");
+                        emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
+                        emit(JUMP,NULL,NULL,NULL,-1);
+                        if($3->type != boolexpr_ ){
+                           //     printf( " kai edw\n");
+                        emit(IF_EQ , $3 , newexpr_constbool(1) , NULL, -1);
+                        emit(JUMP,NULL,NULL,NULL,-1);
+                        }
+                        assign_flag = 1;
                         //prepei na alla3oume emit edw opws eisa ston online einai zori
             }
             | Expression particular Expression{
@@ -224,6 +242,7 @@ Expression: Assignexpression {$$ = $1;}
                     $$->sym = tmp_item();
                     emit($2 , $1 , $3 , $$ , -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
+                    assign_flag = 1;
             }
             | Term {$$ = $1;}
              ;
@@ -256,13 +275,16 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
         | minus Expression %prec uminus {
                 check_arith($2,"uminus");
                 $$ = newexpr(arthmexp_);
-                $$->sym = tmp_item();
+                $$->sym = istempexpr($2) ? $2->sym: tmp_item();
                 emit(UMINUS,$2,NULL,$$,-1);
         }
         | not Expression {
                 $$ = newexpr(boolexpr_); 
                 $$->sym = tmp_item();
-                printf("na doume meriki apotimisi");//sossssssssssssssosos 
+                emit(IF_EQ,$2,newexpr_constbool(1),NULL,-1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                assign_flag = 1;
+                printf("na doume meriki apotimisi\n");//sossssssssssssssosos 
         }
         | plus_plus Lvalue {
                 if(libcheck == 1){
@@ -349,8 +371,17 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                 }else{
                         $$ = newexpr(assignexp_);
                         $$->sym = tmp_item();
+                        if(assign_flag){
+                                emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
+                                emit(JUMP,NULL,NULL,NULL , -1);
+                                emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1);   
+                                assign_flag = 0;
+                                printf("oxi edw\n");
+                        }
+                        printf("assssss\n");
                         emit(ASSIGN,$4,NULL,$1 , -1);
                         emit(ASSIGN,$1,NULL,$$ , -1);
+                        
                 }    
 
                 }
@@ -379,6 +410,7 @@ Lvalue: id {
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
                                 $$ = lvalue_expr(new);
+                                printf("gamaa\n");
 
         }
         | local id {
@@ -451,15 +483,18 @@ Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthes
 
 
 Elist:  Expression Multy_exp {
-                
                 $1->next = $2;
                 $$ = $1;  
         }
         | {$$ = NULL;}
         ;
 
-Multy_exp: comma Expression Multy_exp {;}
-        | {;}
+Multy_exp: comma Expression Multy_exp {
+                 $2->next = $3;
+                 $$ = $2;
+                 printf("na to dw ligo stiw diale3eis pou to peira\n");
+        }
+        | {$$ = NULL;}
         ;
 
 Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
@@ -494,10 +529,13 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
         ;
 
 
-Indexed: Indexedelement Multy_ind {;}
+Indexed: Indexedelement Multy_ind {
+        printf("na psa2w diafaneis");
+        ;}
          ;
 
-Multy_ind: Multy_ind comma Indexedelement {;}
+Multy_ind: Multy_ind comma Indexedelement {
+        printf("na psa2w diafaneis");}
         | {;}
          ;
 
@@ -506,7 +544,7 @@ Indexedelement: left_curle_bracket{scopeCounter++;
                 Expression colon Expression right_curle_bracket {
                         if(objectHide)hide(scopeCounter);
                         scopeCounter--;
-
+                printf("8elei ftia3imoooo\n");
                  }
                 ;
 

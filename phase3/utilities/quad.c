@@ -173,7 +173,7 @@ void print_quads()
             if (quads[i].label < 0)
             {
                 printf("%d: %s %s %s %s [line %d]\n",
-                       i,
+                       i + 1,
                        get_opcode_string(quads[i].op),
                        a3,
                        a1,
@@ -183,7 +183,7 @@ void print_quads()
             else
             {
                 printf("%d: %s %s %s %s %d [line %d] \n",
-                       i,
+                       i + 1,
                        get_opcode_string(quads[i].op),
                        a3,
                        a1,
@@ -742,3 +742,10 @@ zavo* mergelist(zavo* first,zavo* second){
 
 }
 
+unsigned int istempname(char* s){
+    return *s == '_';
+}
+
+unsigned int istempexpr(expr* e){
+  return e->sym && istempname(e->sym->name);
+}
