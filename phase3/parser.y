@@ -247,7 +247,7 @@ Expression: Assignexpression {$$ = $1;}
                     }
 
                     if($2 == AND){
-                            printf("eimai sto AND kai %s\n",$1->sym->name);
+                            printf("eimai sto AND \n");
                         backpatch($1->truelist, $4+1);
                         $$->truelist = new_list(nextquad());
                         $$->falselist = new_list(nextquad()-1);
@@ -410,7 +410,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                                 assign_flag = 0;
                                 printf("oxi edw\n");
                         }
-                        printf("assssss\n");
+                        printf("assssss 8elei meriki\n");
                         emit(ASSIGN,$4,NULL,$1 , -1);
                         emit(ASSIGN,$1,NULL,$$ , -1);
                         
@@ -628,7 +628,6 @@ Funcblockend: {loopFlag = pop1(loopcounterstack);}
         ;
 
 Const:  integer {$$ = newexpr_constint($1);
-                emit(JUMP , NULL , NULL , NULL , -1);
         }
         | real {$$ = newexpr_constnum($1);}
         | string {$$ = newexpr_constring($1);}
