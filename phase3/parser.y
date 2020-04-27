@@ -179,8 +179,13 @@ stmts: stmts Stmt{
 Stmt: Expression semicolon {
         libcheck =0;
         if(assign_flag){
+                red();
+                printf("na to dw einai antigrafei ta backpatsch\n");
+                cyn();
+        backpatch($1->truelist, nextquad()+1);
+        backpatch($1->falselist, nextquad()+3);
         emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
-        emit(JUMP,NULL,NULL,NULL,-1);
+        emit(JUMP,NULL,NULL,NULL,nextquad() +3);
         emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
         assign_flag = 0;
         }
@@ -221,18 +226,45 @@ Expression: Assignexpression {$$ = $1;}
                       $$->sym = tmp_item();
                       emit($2 , $1 , $3 , $$ , -1);
                 }
-            | Expression boolop Expression {
+            | Expression boolop
+            {   emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
+                    emit(JUMP,NULL,NULL,NULL,-1);
+                    //einai aigrafi
+                    $1->truelist = new_list(nextquad()-2);
+                    $1->falselist = new_list(nextquad()-1);
+                    //mexri edw
+             }M Expression {
+                    
+                    $$  =  new_expression(boolexpr_ );
+                    $$->sym = tmp_item();
+                 
+                    if($5->type != boolexpr_ ){
+                               printf( " kai edw\n");
+                    emit(IF_EQ , $5 , newexpr_constbool(1) , NULL, -1);
+                    emit(JUMP,NULL,NULL,NULL,-1);
+                    $5->truelist = new_list(nextquad()-2);
+                    $5->falselist = new_list(nextquad()-1);
+                    }
+
+                    if($2 == AND){
+                            printf("eimai sto AND kai %s\n",$1->sym->name);
+                        backpatch($1->truelist, $4+1);
+                        $$->truelist = new_list(nextquad());
+                        $$->falselist = new_list(nextquad()-1);
+                        $$->truelist = $5->truelist;
+                        $$->falselist = mergelist($1->falselist,$5->falselist);
+                    }else {
+                        backpatch($1->falselist,$4+1);
+                        $$->truelist = new_list(nextquad() -2);
+                        $$->falselist = new_list(nextquad() -1);
+                        $$->truelist = mergelist($1->truelist, $5->truelist);
+                        $$->falselist = $5->falselist;
+
+                    }
                     //8elei meriki apotimisi edwwwwwwwwwwwwww
-                        $$  =  new_expression(boolexpr_ );
-                        $$->sym = tmp_item();
+
                       //  printf("edw\n");
-                        emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
-                        emit(JUMP,NULL,NULL,NULL,-1);
-                        if($3->type != boolexpr_ ){
-                           //     printf( " kai edw\n");
-                        emit(IF_EQ , $3 , newexpr_constbool(1) , NULL, -1);
-                        emit(JUMP,NULL,NULL,NULL,-1);
-                        }
+
                         assign_flag = 1;
                         //prepei na alla3oume emit edw opws eisa ston online einai zori
             }
@@ -240,7 +272,7 @@ Expression: Assignexpression {$$ = $1;}
                     //8elei meriki apotimis edwwwwwwwwwwwwwwwwww me true/false list
                     $$ = new_expression(boolexpr_);
                     $$->sym = tmp_item();
-                    emit($2 , $1 , $3 , $$ , -1);
+                    emit($2 , $1 , $3 ,NULL , -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
                     assign_flag = 1;
             }
@@ -410,7 +442,7 @@ Lvalue: id {
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
                                 $$ = lvalue_expr(new);
-                                printf("gamaa\n");
+
 
         }
         | local id {
@@ -669,8 +701,8 @@ Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 emit(JUMP , NULL , NULL , NULL,$1);
                 patchlabel($2 , nextquad());
                 //edw isos 8elei mia ifffffffff
-                patchlist($4->breaklist, nextquad());                  /* ????????????????? */
-                patchlist($4->contlist,$1);
+                backpatch($4->breaklist, nextquad());                  /* ????????????????? */
+                backpatch($4->contlist,$1);
                 printf("eeeee\n");
                 $$=$4;
         }
@@ -683,8 +715,8 @@ Forstmt:ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N{
         patchlabel($6,$1->test);
         patchlabel($8,$2+1);
         //8elei kapoios elenxous edwwwwwwwww
-        patchlist($7->breaklist,nextquad());
-        patchlist($7->contlist,$2+1);
+        backpatch($7->breaklist,nextquad());
+        backpatch($7->contlist,$2+1);
         $$ = $7;
 }
         ;

@@ -169,7 +169,14 @@ void print_quads()
 
             if(quads[i].result ==NULL) a3 = "";
             else a3 = quads[i].result->sym->name;
-
+            if(quads[i].op == JUMP){
+          printf("%d: %s %d [line %d]\n",
+                       i + 1,
+                       get_opcode_string(quads[i].op),
+                       quads[i].label,
+                       quads[i].lineno);
+            }
+else{
             if (quads[i].label < 0)
             {
                 printf("%d: %s %s %s %s [line %d]\n",
@@ -192,7 +199,9 @@ void print_quads()
                         quads[i].lineno);
             }
         }
+        }
     }
+    wht();
 }
 
 void print_quads_not_empty()
@@ -663,28 +672,43 @@ void add_to_falselist(expr *e, int label)
     }
 }
 
-void patchlist(zavo *list, int label)
+// void backpatch(zavo *list, int label)
+// {
+//     printf("eeee %d\n",label);
+//     zavo *head = list;
+//     printf("eeee \n");
+//     if (head == NULL)
+//     {
+//         head->label = label;
+//         head->next = NULL;
+//         printf("eeee \n");
+//     }
+//     else
+//     {
+//          printf("eeee \n");
+//         while (head->next != NULL)
+//         {
+//             head = head->next;
+//         }
+//          printf("eeee\n");
+//         head->label = label;
+//         head->next = NULL;
+//     }
+// }
+
+void backpatch(zavo *list, int label)
 {
-    zavo *head = malloc(sizeof(zavo));
-    head = list;
-    
-    if (head == NULL)
-    {
-        head->label = label;
-        head->next = NULL;
-    }
-    else
-    {
-         printf("eeee %d\n",head->label);
-        while (head->next != NULL)
-        {
-            head = head->next;
-        }
-         printf("eeee\n");
-        head->label = label;
-        head->next = NULL;
-    }
+    zavo *tmp = list;
+    red();
+ printf("8elei ftia3imo einai antigrafiiii %d \n", label);
+ wht();
+  while(tmp){
+    quads[tmp->label].label = label;
+    printf("alazei %d kai label %d\n",quads[tmp->label].op,quads[tmp->label].label);
+    tmp = tmp->next;
+  }
 }
+
 
 expr* newexpr_constbool(unsigned int b){
   expr *e = newexpr(constbool_);
@@ -736,9 +760,38 @@ zavo* new_list(int i){
 }
 
 zavo* mergelist(zavo* first,zavo* second){
-    printf("8elei ftia3imooooo");
-
-    //sdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdadasdsadasdasdasdadasdasdasd
+    red();
+    printf("to exw antigrapseiiiiiiiiiiiiiiiiiiiii\n");
+    wht();
+  zavo *newlist = NULL;
+  zavo *tmp1 = first;
+  zavo *tmp2 = second;
+  zavo *newnode;
+  while(tmp1){
+    newnode = malloc(sizeof(zavo));
+    newnode->label = tmp1->label;
+    newnode->next = NULL;
+    if(newlist == NULL){
+      newlist = newnode;
+    }else {
+      newnode->next = newlist;
+      newlist = newnode;
+    }
+    tmp1 = tmp1->next;
+  }
+  while(tmp2){
+    newnode = malloc(sizeof(zavo));
+    newnode->label = tmp2->label;
+    newnode->next = NULL;
+    if(newlist == NULL){
+      newlist = newnode;
+    }else {
+      newnode->next = newlist;
+      newlist = newnode;
+    }
+    tmp2 = tmp2->next;
+  }
+return newlist;
 
 }
 

@@ -161,7 +161,7 @@ void add_to_truelist(expr *e, int label);
 
 void add_to_falselist(expr *e, int label);
 
-void patchlist(zavo *list, int label);
+void backpatch(zavo *list, int label);
 
 expr* newexpr_constbool(unsigned int b);
 
