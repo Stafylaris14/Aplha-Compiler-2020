@@ -1,11 +1,2 @@
-<<<<<<< Updated upstream
-while(a){
-a;
-}
-
-=======
-while(true)
-{
-    i =1;
-}
->>>>>>> Stashed changes
+a and b;
+b or c;

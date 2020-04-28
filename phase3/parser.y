@@ -706,7 +706,7 @@ Whilestart: While{
 ;
 
 whilecont: left_parenthesis Expression right_parenthesis{
-        emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+2);
+        emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+3);
         emit(JUMP , NULL , NULL , NULL , -1);
 
         $$ = nextquad();
@@ -716,8 +716,8 @@ whilecont: left_parenthesis Expression right_parenthesis{
 Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
                 printf("eeeee\n");
-                emit(JUMP , NULL , NULL , NULL,$1);
-                patchlabel($2 , nextquad());
+                emit(JUMP , NULL , NULL , NULL,$1+1);
+                patchlabel($2 -1, nextquad()+1);
                 //edw isos 8elei mia ifffffffff
                 //edw trwei segmmm
                 backpatch($4->breaklist, nextquad());                  /* ????????????????? */

@@ -687,41 +687,17 @@ void add_to_falselist(expr *e, int label)
     }
 }
 
-// void backpatch(zavo *list, int label)
-// {
-//     printf("eeee %d\n",label);
-//     zavo *head = list;
-//     printf("eeee \n");
-//     if (head == NULL)
-//     {
-//         head->label = label;
-//         head->next = NULL;
-//         printf("eeee \n");
-//     }
-//     else
-//     {
-//          printf("eeee \n");
-//         while (head->next != NULL)
-//         {
-//             head = head->next;
-//         }
-//          printf("eeee\n");
-//         head->label = label;
-//         head->next = NULL;
-//     }
-// }
+
 
 void backpatch(zavo *list, int label)
 {
-    zavo *tmp = list;
-    red();
- printf("8elei ftia3imo einai antigrafiiii %d \n", label);
- wht();
-  while(tmp){
-    quads[tmp->label].label = label;
-    printf("alazei %d kai label %d\n",quads[tmp->label].op,quads[tmp->label].label);
-    tmp = tmp->next;
-  }
+    if(list != NULL){
+        zavo *tmp = list;
+        while(tmp){
+            quads[tmp->label].label = label;
+            tmp = tmp->next;
+        }
+    }
 }
 
 
@@ -779,40 +755,43 @@ zavo* new_list(int i){
     return quads;
 }
 
-zavo* mergelist(zavo* first,zavo* second){
-    red();
-    printf("to exw antigrapseiiiiiiiiiiiiiiiiiiiii\n");
-    wht();
-  zavo *newlist = NULL;
-  zavo *tmp1 = first;
-  zavo *tmp2 = second;
-  zavo *newnode;
-  while(tmp1){
-    newnode = malloc(sizeof(zavo));
-    newnode->label = tmp1->label;
-    newnode->next = NULL;
-    if(newlist == NULL){
-      newlist = newnode;
-    }else {
-      newnode->next = newlist;
-      newlist = newnode;
-    }
-    tmp1 = tmp1->next;
-  }
-  while(tmp2){
-    newnode = malloc(sizeof(zavo));
-    newnode->label = tmp2->label;
-    newnode->next = NULL;
-    if(newlist == NULL){
-      newlist = newnode;
-    }else {
-      newnode->next = newlist;
-      newlist = newnode;
-    }
-    tmp2 = tmp2->next;
-  }
-return newlist;
 
+zavo* insert_before_zavo(zavo* head , int i)
+{
+    if(head == NULL){
+        head = malloc(sizeof(zavo));
+        head->label = i;
+        head->next = NULL;
+    }else
+    {
+        zavo* newNode = malloc(sizeof(zavo));
+        newNode->label = i;
+        newNode->next = head;
+        head = newNode;
+        
+    }
+    
+    
+    return head;
+}
+
+zavo* mergelist(zavo* first,zavo* second){
+     zavo* temp = first;
+     zavo* temp1 = second;
+     zavo* newListhead = NULL;
+    
+     while (temp!=NULL)
+     {
+         newListhead = insert_before_zavo(newListhead , temp->label);
+         temp = temp->next;
+     }
+
+     while (temp1 != NULL)
+     {
+         newListhead = insert_before_zavo(newListhead , temp1->label);
+         temp1 = temp1->next;
+     }
+     return newListhead; 
 }
 
 unsigned int istempname(char* s){
