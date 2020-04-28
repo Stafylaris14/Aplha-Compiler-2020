@@ -528,6 +528,10 @@ expr *emit_iftableitem(expr *e)
 expr *newexpr_constint(int i)
 {
     expr *e = newexpr(constnum_);
+    e->contlist = NULL;
+    e->breaklist = NULL;
+    e->falselist = NULL;
+    e->truelist = NULL;
     e->numConst = i;
     return e;
 }
@@ -536,6 +540,10 @@ expr *member_item(expr *lv, char *name)
 {
     lv = emit_iftableitem(lv);
     expr *ti = newexpr(tableitem_);
+    ti->contlist = NULL;
+    ti->breaklist = NULL;
+    ti->falselist = NULL;
+    ti->truelist = NULL;
     ti->sym = lv->sym;
     ti->index = newexpr_constring(name);
     return ti;
@@ -545,6 +553,10 @@ expr *lvalue_expr(item *sym)
 {
     assert(sym);
     expr *e = (expr *)malloc(sizeof(expr));
+    e->contlist = NULL;
+    e->breaklist = NULL;
+    e->falselist = NULL;
+    e->truelist = NULL;
     memset(e, 0, sizeof(expr));
     e->next = (expr *)0;
     e->sym=sym;
@@ -715,6 +727,10 @@ void backpatch(zavo *list, int label)
 
 expr* newexpr_constbool(unsigned int b){
   expr *e = newexpr(constbool_);
+  e->contlist = NULL;
+  e->breaklist = NULL;
+  e->falselist = NULL;
+  e->truelist = NULL;
   e->boolConst = b;
   return e;
 }
@@ -738,6 +754,7 @@ int isfull(stack1* stiba) {
 int push1(stack1 *stiba, int data){
     if(isfull(stiba))return -1;
     stiba->stackarray[++stiba->top] = data;
+    return 0;
 }
 
 int pop1(stack1 *stiba){

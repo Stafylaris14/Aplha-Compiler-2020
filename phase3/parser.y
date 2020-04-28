@@ -798,7 +798,7 @@ int main(int argc, char** argv)
     yyparse();
     //printSymTable();
     //printHash();
-    printScopeList();
+    //printScopeList();
     
     print_quads();
    
