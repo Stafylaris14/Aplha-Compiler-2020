@@ -1,6 +1,6 @@
 %{
 
-#include "./utilities/quad.h"
+#include "utilities/quad.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 
@@ -21,7 +21,9 @@ int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
-iopcode op;
+int assign_flag = 0;
+stack1 *loopcounterstack; //krataei poses anakikloseis exoun anoi3ei
+/* iopcode op; */
 
 
 
@@ -30,7 +32,7 @@ expr *result;
 
 int loopFlag = 0;       /*1 if its inside a loop (for break and Continue)*/
 int libcheck = 0;
-char* functionName ; /* used to add formal arguments to linked list */
+char* functionName ; /* used to ADD formal arguments to linked list */
 %}
 
 
@@ -40,6 +42,13 @@ char* functionName ; /* used to add formal arguments to linked list */
     int intVal;
     char* strVal;
     double doubleVal;
+    struct Item *item; 
+    int opcode;                         /* gia ta arithimika  STAF */
+    int ifs;                            /* gia ta sigritika einai ayto STAF */
+    int boolop ;                         /* gia ta boolean STAF */
+    int label_jumps;                       /* gia ta jumps */
+    struct for_call *for_call;
+    struct for_init *for_init;
 }
 
 
@@ -125,8 +134,31 @@ char* functionName ; /* used to add formal arguments to linked list */
 %left left_bracket right_bracket
 %left left_parenthesis right_parenthesis
 
+
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
+%type <EXPR> Elist
+%type <EXPR> Call Stmts 
+%type <EXPR> Term  Indexed Multy_exp Ifstmt Forstmt
+%type <EXPR> Lvalue Primary Objectdef Const Member Stmt
+%type <item> Funcdef
+%type <item> Funcprefix
+%type <strVal> Funcname
+%type <intVal> Funcbody
+%type <opcode> arithm                   /* STAF */
+%type <ifs> particular                 /* STAF */
+%type <boolop> boolop
+%type <label_jumps> Whilestart
+%type <EXPR> Whilestmt
+%type <label_jumps> whilecont M N 
+%type <label_jumps> elseFix ifFix
+%type <for_call> Methodcall
+%type <for_call> Callsuffix
+%type <for_call> Normalcall
+%type <for_init> ForFix
+
+
+
 
 %%
 
@@ -137,13 +169,51 @@ States: States Stmt {;}
     |
     ;
 
-Stmt: Expression semicolon {libcheck =0;}
-    | Ifstmt {;}
-    | Whilestmt {;}
-    | Forstmt {;}
-    | Returnstmt {if(functionFlag == 0)error("no function to return" , yylineno);}
-    | Break semicolon {libcheck =0;if(loopFlag == 0)error("no loop to break" , yylineno);}
-    | Continue semicolon {libcheck =0;if(loopFlag == 0)error("no loop to Continue" , yylineno);}
+
+Stmts:Stmts Stmt{
+        $$->breaklist = mergelist($1->breaklist,$2->breaklist);
+        $$->contlist = mergelist($1->contlist,$2->contlist);
+} 
+| Stmt {$$ = $1;}
+;
+
+Stmt: Expression semicolon {
+        
+        libcheck =0;
+        if(assign_flag){
+                red();
+                printf("na to dw einai antigrafei ta backpatsch\n");
+                cyn();
+        backpatch($1->truelist, nextquad()+1);
+        backpatch($1->falselist, nextquad()+3);
+        emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
+        emit(JUMP,NULL,NULL,NULL,nextquad() +3);
+        emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
+        assign_flag = 0;
+        }
+        //8elei true false list sigouraaaS
+        $$ = $1;}
+    | Ifstmt {$$ = $1;}
+    | Whilestmt {$$ = $1;}
+    | Forstmt {$$ = $1;}
+    | Returnstmt {
+            
+            if(functionFlag == 0)error("no function to return" , yylineno);
+            }
+    | Break semicolon {
+            libcheck =0;
+            $$ = malloc(sizeof(expr));
+            if(loopFlag == 0)error("no loop to break" , yylineno);
+            $$->breaklist = new_list(nextquad());
+            emit(JUMP,NULL,NULL,NULL,-1);
+            }
+    | Continue semicolon {
+            libcheck =0;
+            $$ = malloc(sizeof(expr));
+            if(loopFlag == 0)error("no loop to Continue" , yylineno);
+            $$->contlist = new_list(nextquad());
+            emit(JUMP,NULL,NULL,NULL,-1);
+            }
     | Block {;}
     | Funcdef {;}
     | semicolon {libcheck =0;}
@@ -151,88 +221,203 @@ Stmt: Expression semicolon {libcheck =0;}
 
 
 Expression: Assignexpression {$$ = $1;}
-            | Expression plus Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
-                        emit(ADD,$1,$3, result);
-                        $$ = result;
+                        /* EDW TO EKANA OPWS STHN DIALE3I  */
+                |Expression arithm Expression{
+                        //isos xreiastei na kanoume elenxoyn an 3erw egw m er8ei stirng/////////
+                      $$ = new_expression(arthmexp_ );  
+                      $$->sym = tmp_item();
+                      emit($2 , $1 , $3 , $$ , -1);
+                }
+            | Expression boolop
+            {   emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
+                    emit(JUMP,NULL,NULL,NULL,-1);
+                    //einai aigrafi
+                    $1->truelist = new_list(nextquad()-2);
+                    $1->falselist = new_list(nextquad()-1);
+                    //mexri edw
+             }M Expression {
+                    
+                    $$  =  new_expression(boolexpr_ );
+                    $$->sym = tmp_item();
+                 
+                    if($5->type != boolexpr_ ){
+                               printf( " kai edw\n");
+                    emit(IF_EQ , $5 , newexpr_constbool(1) , NULL, -1);
+                    emit(JUMP,NULL,NULL,NULL,-1);
+                    $5->truelist = new_list(nextquad()-2);
+                    $5->falselist = new_list(nextquad()-1);
                     }
-            | Expression minus Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
-                        emit(SUB,$1,$3, result);
-                        $$ = result;
-                    }
-            | Expression multiply Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);              
-                        emit(MUL,$1,$3, result);
-                        $$ = result;
-                    }
-            | Expression division Expression {
-                        result  =  new_expression(arthmexp_ , tmp_item(),NULL);
-                        emit(DIV,$1,$3, result);
-                        $$ = result;
-                  }
-            | Expression and Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(AND,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression or Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(OR,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression mod Expression {
-                       result  =  new_expression(arthmexp_ , tmp_item(),NULL);
-                       emit(MOD,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression equal Expression{
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_EQ,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression n_equal Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_NOTEQ,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression greater Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_GREATER,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression less Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_LESS,$1,$3, result);
-                       $$ = result;
-            }
-            | Expression g_equal Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_GREATEREQ,$1,$3, result);
-                       $$ = result;
 
+                    if($2 == AND){
+                            printf("eimai sto AND \n");
+                        backpatch($1->truelist, $4+1);
+                        $$->truelist = new_list(nextquad());
+                        $$->falselist = new_list(nextquad()-1);
+                        $$->truelist = $5->truelist;
+                        $$->falselist = mergelist($1->falselist,$5->falselist);
+                    }else {
+                        backpatch($1->falselist,$4+1);
+                        $$->truelist = new_list(nextquad() -2);
+                        $$->falselist = new_list(nextquad() -1);
+                        $$->truelist = mergelist($1->truelist, $5->truelist);
+                        $$->falselist = $5->falselist;
+
+                    }
+                    //8elei meriki apotimisi edwwwwwwwwwwwwww
+
+                      //  printf("edw\n");
+
+                        assign_flag = 1;
+                        //prepei na alla3oume emit edw opws eisa ston online einai zori
             }
-            | Expression l_equal Expression {
-                       result  =  new_expression(constbool_ , tmp_item(),NULL);
-                       emit(IF_LESSEQ,$1,$3, result);
-                       $$ = result;
+            | Expression particular Expression{
+                    //8elei meriki apotimis edwwwwwwwwwwwwwwwwww me true/false list
+                    $$ = new_expression(boolexpr_);
+                    $$->sym = tmp_item();
+                    emit($2 , $1 , $3 ,NULL , -1);
+                    emit(JUMP,NULL,NULL,NULL,-1);
+                    assign_flag = 1;
             }
-            | Term {;}
+            | Term {$$ = $1;}
              ;
 
 
-Term:   left_parenthesis Expression right_parenthesis {;}
-        | minus Expression %prec uminus {;}
-        | not Expression {;}
-        | plus_plus Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
-        | Lvalue plus_plus {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
-        | minus_minus Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
-        | Lvalue minus_minus {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}}
-        | Primary {;}
+boolop: and{$$ = AND;}
+        | or {$$ = OR;}
+
+
+particular : greater { $$ = IF_GREATER; }
+        | g_equal { $$ = IF_GREATEREQ; }
+        |less { $$ = IF_LESS; }
+        |l_equal { $$ = IF_LESSEQ; }
+        |equal { $$ = IF_EQ; }
+        |n_equal { $$ = IF_NOTEQ; }
+        ;
+
+arithm: plus{ $$ = ADD;}
+        | minus {$$ = SUB;}
+        | multiply {$$ = MUL;}
+        | division {$$ = DIV;}
+        | mod {$$ = MOD;}
+        ;
+
+
+
+
+
+Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
+        | minus Expression %prec uminus {
+                check_arith($2,"uminus");
+                $$ = newexpr(arthmexp_);
+                $$->sym = istempexpr($2) ? $2->sym: tmp_item();
+                emit(UMINUS,$2,NULL,$$,-1);
+        }
+        | not Expression {
+                $$ = newexpr(boolexpr_); 
+                $$->sym = tmp_item();
+                emit(IF_EQ,$2,newexpr_constbool(1),NULL,-1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                assign_flag = 1;
+                printf("na doume meriki apotimisi\n");//sossssssssssssssosos 
+        }
+        | plus_plus Lvalue {
+                if(libcheck == 1){
+                        error("Den boreis na kaneis pra3eis me synartiseis", yylineno); 
+                        libcheck=0;
+                }
+                check_arith($2,"++ lvalue");
+                if($2->type == tableitem_){
+                        $$ = emit_iftableitem($2);
+                        emit(ADD,$$,newexpr_constnum(1),$$,-1);
+                        emit(TABLESETELEM,$$,$2->index,$2,-1);
+                }else{
+                        emit(ADD,$2,newexpr_constnum(1),$2,-1);
+                        $$ = newexpr(arthmexp_);
+                        $$->sym = tmp_item();
+                        emit(ASSIGN,$2,NULL,$$,-1);
+                }
+                        
+        }
+        | Lvalue plus_plus {
+                if(libcheck == 1){
+                error("Den boreis na kaneis pra3eis me synartiseis", yylineno); 
+                libcheck=0;}
+                check_arith($1,"lvalue ++");
+                $$ = newexpr(boolexpr_); 
+                $$->sym = tmp_item();
+                if($1->type==tableitem_){
+                        expr *val = emit_iftableitem($1);
+                        emit(ASSIGN,val,NULL,$$,-1);
+                        emit(ADD,val,newexpr_constnum(1),val,-1);
+                        emit(TABLESETELEM,$1->index,val,$1,-1);
+                }else{
+                        emit(ASSIGN,$1,NULL,$$,-1);
+                        emit(ADD,$1,newexpr_constnum(1),$1,-1);
+                }
+                $$ = $1;
+
+        }
+        | minus_minus Lvalue {
+                if(libcheck == 1){
+                        error("Den boreis na kaneis pra3eis me synartiseis", yylineno); 
+                        libcheck=0;
+                        }
+                check_arith($2,"-- lvalue");
+                if($2->type == tableitem_){
+                        $$ = emit_iftableitem($2);
+                        emit(SUB,$$,newexpr_constnum(1),$$ ,-1);
+                        emit(TABLESETELEM,$$,$2->index,$2 , -1);
+                }else{
+                        emit(SUB,$2,newexpr_constnum(1),$2 , -1);
+                        $$ = newexpr(arthmexp_);
+                        $$->sym = tmp_item();
+                        emit(ASSIGN,$2,NULL,$$ , -1);
+                }
+                
+        }
+        | Lvalue minus_minus {
+                if(libcheck == 1){
+                        error("Den boreis na kaneis pra3eis me synartiseis", yylineno);
+                        libcheck=0;
+                }
+              check_arith($1,"lvalue --");
+                $$ = newexpr(boolexpr_); 
+                $$->sym = tmp_item();
+                if($1->type==tableitem_){
+                        expr *val = emit_iftableitem($1);
+                        emit(ASSIGN,val,NULL,$$,-1);
+                        emit(SUB,val,newexpr_constnum(1),val , -1);
+                        emit(TABLESETELEM,$1->index,val,$1 , -1);
+                }else{
+                        emit(ASSIGN,$1,NULL,$$ , -1);
+                        emit(SUB,$1,newexpr_constnum(1),$1 ,-1);
+                }
+                $$ = $1;
+        }
+        | Primary {$$ = $1;}
         ;
 
 Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
-
+        
+                if($1->type == tableitem_){ 
+                        emit(TABLESETELEM, $1, $1->index, $4 , -1);
+                        $$ = emit_iftableitem($1);
+                        $$->type = assignexp_;
+                }else{
+                        $$ = newexpr(assignexp_);
+                        $$->sym = tmp_item();
+                        if(assign_flag){
+                                emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
+                                emit(JUMP,NULL,NULL,NULL , -1);
+                                emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1);   
+                                assign_flag = 0;
+                                printf("oxi edw\n");
+                        }
+                        printf("assssss 8elei meriki\n");
+                        emit(ASSIGN,$4,NULL,$1 , -1);
+                        emit(ASSIGN,$1,NULL,$$ , -1);
+                        
+                }    
 
                 }
                 ;
@@ -240,22 +425,28 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
 
 
 
-Primary: Lvalue {;}
-        | Call {callFlag =1;}
-        | Objectdef {;}
-        | left_parenthesis Funcdef right_parenthesis {;}
-        | Const {;}
+Primary: Lvalue { $$ = emit_iftableitem($1);}
+        | Call {callFlag =1; $$ = $1;}
+        | Objectdef {$$ = $1;}
+        | left_parenthesis Funcdef right_parenthesis {
+                $$=newexpr(pfunc_);
+                $$->sym = $2;
+        }
+        | Const {$$ = $1;}
         ;
 
 
 
 
-Lvalue: id {
+Lvalue: id {   
                                 if(isLibraryFunction($1)){libcheck =1;}
                                 if(isFA($1))libcheck =1;
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
+                                $$ = lvalue_expr(new);
+                                 
+
         }
         | local id {
                                 if(isLibraryFunction($2))libcheck =1;
@@ -263,61 +454,129 @@ Lvalue: id {
                                 item* new = NULL;
                                 new = newItem($2,"local", scopeCounter , yylineno );
                                 new_check(new);
+                                $$ = lvalue_expr(new);
         }
         | double_colons id {
                                 if(isFA($2))libcheck =1;
                                 item* tmp = lookupScope($2 , 0);
-                                if(tmp == NULL){error("Cant find Global " , yylineno);}                
+                                if(tmp == NULL){error("Cant find Global " , yylineno);} 
+                                $$ = lvalue_expr(tmp);               
         }
-        | Member {;};
+        | Member {$$ = $1;};
         ;
 
 
-Member: Lvalue dot id {libcheck = 0;}
-        | Lvalue left_bracket Expression right_bracket {libcheck = 0;}
+Member: Lvalue dot id {libcheck = 0;
+            $$ = member_item($1,$3);    
+        }
+        | Lvalue left_bracket Expression right_bracket {
+                libcheck = 0;
+                $1 = emit_iftableitem($1);
+                $$ = newexpr(tableitem_);
+                $$->sym = $1->sym;
+                $$->index = $3;
+                }
         | Call {callFlag =1;libcheck =0;} dot id {callFlag =0;libcheck = 0;}
         | Call {callFlag =1;libcheck=0;} left_bracket Expression right_bracket {callFlag =0;libcheck = 0;}
         ;
 
 
-Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {callFlag =0;}
-        |  Lvalue{callFlag =1;libcheck = 0;} Callsuffix {callFlag =0;}
-        | left_parenthesis{callFlag =1;libcheck = 0;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {callFlag =0;}
+Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {$$=make_call($1,$4);callFlag =0;}
+        |  Lvalue{callFlag =1;libcheck = 0;} Callsuffix {
+                if($3->method){
+                        expr* t = $1;
+                        $1 = emit_iftableitem(member_item(t,$3->name));
+                        $3->elist->next = t;
+                }         
+                $$ = make_call($1,$3->elist);
+                callFlag =0;}
+        | left_parenthesis{callFlag =1;libcheck = 0;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {
+                expr* func = newexpr(pfunc_);
+                func->sym = $3;
+                $$ = make_call(func,$6);
+                callFlag =0;}
         ;
 
 
 
-Callsuffix: Normalcall {callFlag =1;}
-            | Methodcall {callFlag =1;}
+Callsuffix: Normalcall {
+                callFlag =1; 
+                $$ = $1;
+        }
+            | Methodcall {
+                callFlag =1;
+                $$ = $1;
+        }
             ;
 
-Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {;}
-            ;
-
-
-
-Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthesis {;}
-            ;
-
-
-
-Elist:  Expression Multy_exp {;}
-        | {;}
-        ;
-
-Multy_exp: comma Expression Multy_exp {;}
-        | {;}
-        ;
-
-Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {scopeCounter++;objectHide=1;}
-        | left_bracket{scopeCounter--;objectHide =0;} Indexed right_bracket {scopeCounter++;objectHide=1;}
+Normalcall: left_parenthesis {callFlag =1;} Elist right_parenthesis {
+        $$ = insert_call($3,0,NULL);
+        }
         ;
 
 
-Indexed: Indexedelement Multy_ind {;}
+
+Methodcall: double_dots {callFlag =1;} id left_parenthesis Elist right_parenthesis {
+                $$ = insert_call($5,1,$3);
+        }
+        ;
+
+
+
+Elist:  Expression Multy_exp {
+                $1->next = $2;
+                $$ = $1;  
+        }
+        | {$$ = NULL;}
+        ;
+
+Multy_exp: comma Expression Multy_exp {
+                 $2->next = $3;
+                 $$ = $2;
+                 printf("na to dw ligo stiw diale3eis pou to peira\n");
+        }
+        | {$$ = NULL;}
+        ;
+
+Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
+        scopeCounter++;
+        objectHide=1;
+        expr *t = newexpr(newtable_);
+        t->sym = tmp_item();
+        emit(TABLECREATE,t,NULL,NULL,-1);
+        int i = 0;
+        printf("trwww segm sto test p3t_object_creation_expr\n");
+        while($3){
+                printf("oo\n");
+                emit(TABLESETELEM, t,newexpr_constnum(i++), $3,-1);
+                printf("e\n");
+                $3 = $3->next;
+        }
+         printf("sew232323\n");
+        $$ = t;
+        }
+        | left_bracket{scopeCounter--;objectHide =0;} Indexed right_bracket {
+                scopeCounter++;
+                objectHide=1;
+                expr *t = newexpr(newtable_);
+                t->sym = tmp_item();
+                emit(TABLECREATE,t,NULL,NULL,-1);
+                while($3){
+                        emit(TABLESETELEM, t,$3->index,t,-1);
+                        $3 = $3->next;
+                }     
+                $$ = t;  
+        }
+        ;
+
+
+Indexed: Indexedelement Multy_ind {
+        printf("na psa2w diafaneis");
+        ;}
          ;
 
-Multy_ind: Multy_ind comma Indexedelement {;}
+Multy_ind: Multy_ind comma Indexedelement {
+        printf("na psa2w diafaneis");}
         | {;}
          ;
 
@@ -326,60 +585,88 @@ Indexedelement: left_curle_bracket{scopeCounter++;
                 Expression colon Expression right_curle_bracket {
                         if(objectHide)hide(scopeCounter);
                         scopeCounter--;
-
+                printf("8elei ftia3imoooo\n");
                  }
                 ;
 
 
 Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
-        States right_curle_bracket {
+        Stmts right_curle_bracket {
                 if(objectHide)hide(scopeCounter);
                 scopeCounter--;}
         ;
 
 
-Funcdef: Function id {
-                                item* new = newItem($2,"User Function", scopeCounter , yylineno );
-                                new_check(new);
-                                functionName = strdup($2);
-                                offset =0;
-        } left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;} Block{functionFlag --; getoffset();}
-        | Function{
-                        char noname[20];
-                        offset = 0;
-                        sprintf(noname,"function$%d",functionCounter);
-                        functionCounter++;
-                        functionName = strdup(noname);
-                        item* new = newItem(noname,"User Function", scopeCounter , yylineno );
-                        new_check(new);
+Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend{
+        expr*temp = newexpr(pfunc_);
+        temp->sym = $1;
+        emit(FUNCEND,temp,NULL,NULL,-1);
+        $$ = $1;
         }
-         left_parenthesis{scopeCounter++;} Idlist right_parenthesis {offset = 0;scopeCounter--;functionFlag++;} Block{functionFlag --;getoffset();}
         ;
 
+Funcprefix: Function Funcname{
+        item* new = newItem($2,"User Function", scopeCounter , yylineno );
+        new_check(new);
+        expr*temp = newexpr(pfunc_);
+        temp->sym = new;
+        emit(JUMP,NULL,NULL,NULL,-1);
+        emit(FUNCSTART,temp,NULL,NULL,-1);
+        functionName = strdup($2);
+        offset =0;
+        $$ = new;
+}
+;
 
+Funcname: id{
+                $$ = $1;
+        }
+        |{
+                char noname[20];
+                sprintf(noname,"function$%d",functionCounter);
+                functionCounter++;
+                $$ = noname;
+        }
+;
 
-Const:  integer 
-        | real {;}
-        | string {;}
-        | nil {;}
-        | True {;}
-        | False {;}
+Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++; }
+        ;
+
+Funcbody: Block{functionFlag --;getoffset();}
+        ;
+
+Funcblockstart: {push1(loopcounterstack, loopFlag); loopFlag = 0;}        
+        ;
+
+Funcblockend: {loopFlag = pop1(loopcounterstack);}
+        ;
+
+Const:  integer {$$ = newexpr_constint($1);
+        }
+        | real {$$ = newexpr_constnum($1);}
+        | string {$$ = newexpr_constring($1);}
+        | nil {$$ = newexpr(nill_);}
+        | True {$$ = newexpr_constbool(1);}
+        | False {$$ = newexpr_constbool(0);}
         ;
 
 
 
 Idlist: id Multy_id {
+        
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
                     formal_flag = 1;
                     new_check(new);
                     insert_formal_arg(functionName , $1);
                     formal_flag = 0;
+                    
         }
         | {;}
         ;
 
 Multy_id: Multy_id comma id {
+        
                   item* new = newItem($3,"formal argument", scopeCounter , yylineno );
                   new_check(new);
                   insert_formal_arg(functionName , $3);
@@ -390,19 +677,95 @@ Multy_id: Multy_id comma id {
 
 
 
-Ifstmt: If left_parenthesis Expression right_parenthesis Stmt {;}
-        | If left_parenthesis Expression right_parenthesis Stmt Else Stmt {;}
+Ifstmt: ifFix Stmt {
+                        patchlabel($1 , nextquad());
+                        $$ = $2;
+        }
+        | ifFix Stmt elseFix Stmt {
+                patchlabel($1 , $3+1);
+                patchlabel($3 , nextquad());
+                //kati 8elei gia brek/co nti
+        }
         ;
 
-Whilestmt: While left_parenthesis Expression right_parenthesis {loopFlag ++;} Stmt {loopFlag--;}
+ifFix: If left_parenthesis Expression right_parenthesis{
+                emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +2);
+                emit(JUMP , NULL , NULL , NULL , -1);
+                $$ = nextquad();
+};
+
+elseFix: Else{
+        $$ = nextquad();                                        /* STAF */
+        emit(JUMP , NULL , NULL ,NULL, -1);
+}
+;
+
+Whilestart: While{
+        $$ = nextquad();
+}
+;
+
+whilecont: left_parenthesis Expression right_parenthesis{
+        emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+3);
+        emit(JUMP , NULL , NULL , NULL , -1);
+
+        $$ = nextquad();
+}
+;
+
+Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
+                loopFlag--;
+                printf("eeeee\n");
+                emit(JUMP , NULL , NULL , NULL,$1+1);
+                patchlabel($2 -1, nextquad()+1);
+                //edw isos 8elei mia ifffffffff
+                //edw trwei segmmm
+                backpatch($4->breaklist, nextquad());                  /* ????????????????? */
+                backpatch($4->contlist,$1);
+                printf("eeeee\n");
+                $$=$4;
+        }
     ;
 
-Forstmt: For left_parenthesis Elist semicolon Expression semicolon Elist right_parenthesis {loopFlag ++;} Stmt {loopFlag --;}
+Forstmt:ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N{
+        loopFlag --;
+        patchlabel($1->enter,$6+1);
+        patchlabel($2,nextquad());
+        patchlabel($6,$1->test);
+        patchlabel($8,$2+1);
+        //8elei kapoios elenxous edwwwwwwwww
+        backpatch($7->breaklist,nextquad());
+        backpatch($7->contlist,$2+1);
+        $$ = $7;
+}
         ;
 
+ForFix: For left_parenthesis Elist semicolon M Expression semicolon{
+        $$->test = $5;
+        $$->enter = nextquad();
+        emit(IF_EQ,$6,newexpr_constbool(1),NULL,-1);
+}
+;
 
-Returnstmt: Return semicolon{libcheck =0;}
-        | Return{returnFlag = 1; } Expression semicolon {libcheck =0;returnFlag =0; }
+M:{
+        $$ = nextquad();
+};
+
+N:{
+        $$ = nextquad();
+         emit(JUMP,NULL,NULL,NULL,-1);
+};
+
+Returnstmt: Return semicolon{libcheck =0;
+        //8elei mallon kapoio jump gia merikiiiiiiiiiiiiiiii
+         emit(RETURN, NULL, NULL, NULL, -1);
+        }
+        | Return{returnFlag = 1; 
+        } Expression semicolon {libcheck =0;
+        returnFlag =0; 
+        //8elei mallon kapoio jump gia merikiiiiiiiiiiiiiiii
+        emit(RETURN, $3, NULL, NULL, -1);
+        }
             ;
 
 
@@ -431,11 +794,12 @@ int main(int argc, char** argv)
 	return 1;
     }
   }
-
+    loopcounterstack = arxikopoisi();
     yyparse();
     //printSymTable();
-    
     //printHash();
-    printScopeList();
+    //printScopeList();
+    
+    print_quads();
    
 }

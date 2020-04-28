@@ -3,6 +3,7 @@ compiler: parser scanner
 	gcc -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
 	gcc -c utilities/quad.c
 	gcc -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o quad.o
+	./calc Testfile.txt
 
 wall: parser scanner 
 	gcc -Wall -c parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c
@@ -24,8 +25,8 @@ scanner:scanner.l
 
 
 compiler-debug:parser scanner 
-	gcc -c parser.c dataStructs/symb.c utilities/parserUtilities.c
-	gcc -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
+	gcc -c -g -O0 parser.c dataStructs/symb.c utilities/parserUtilities.c
+	gcc -c -g -O0 scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
 	clang -g -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o  quad.o
 	lldb calc
 clean:
