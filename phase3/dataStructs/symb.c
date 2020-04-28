@@ -254,10 +254,10 @@ void getoffset()
 sc_spase get_scope_spase(item *new)
 {
     sc_spase s;
-    if (!strcmp(new->type, "formal argument"))
-        s = formal_argument;
-    else if (functionFlag != 0)
+    if (functionFlag != 0)
         s = function_local;
+    else if (!strcmp(new->type, "formal argument"))
+        s = formal_argument;
     else
         s = program_variable;
     return s;
