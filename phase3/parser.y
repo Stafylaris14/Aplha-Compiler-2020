@@ -138,13 +138,13 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
 %type <EXPR> Elist
-%type <EXPR> Call stmts 
+%type <EXPR> Call Stmts 
 %type <EXPR> Term  Indexed Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
 %type <item> Funcdef
 %type <item> Funcprefix
 %type <strVal> Funcname
-%type <ntVal> Funcbody
+%type <intVal> Funcbody
 %type <opcode> arithm                   /* STAF */
 %type <ifs> particular                 /* STAF */
 %type <boolop> boolop
@@ -169,7 +169,8 @@ States: States Stmt {;}
     |
     ;
 
-stmts: stmts Stmt{
+
+Stmts:Stmts Stmt{
         $$->breaklist = mergelist($1->breaklist,$2->breaklist);
         $$->contlist = mergelist($1->contlist,$2->contlist);
 } 
@@ -177,6 +178,7 @@ stmts: stmts Stmt{
 ;
 
 Stmt: Expression semicolon {
+        
         libcheck =0;
         if(assign_flag){
                 red();
@@ -396,6 +398,7 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
         ;
 
 Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
+        
                 if($1->type == tableitem_){
                         emit(TABLESETELEM, $1, $1->index, $4 , -1);
                         $$ = emit_iftableitem($1);
@@ -422,7 +425,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
 
 
 
-Primary: Lvalue {$$ = emit_iftableitem($1);}
+Primary: Lvalue { $$ = emit_iftableitem($1);}
         | Call {callFlag =1; $$ = $1;}
         | Objectdef {$$ = $1;}
         | left_parenthesis Funcdef right_parenthesis {
@@ -435,14 +438,14 @@ Primary: Lvalue {$$ = emit_iftableitem($1);}
 
 
 
-Lvalue: id {
+Lvalue: id {   
                                 if(isLibraryFunction($1)){libcheck =1;}
                                 if(isFA($1))libcheck =1;
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
                                 $$ = lvalue_expr(new);
-
+                                 
 
         }
         | local id {
@@ -583,24 +586,31 @@ Indexedelement: left_curle_bracket{scopeCounter++;
 
 Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
-        stmts right_curle_bracket {
+        Stmts right_curle_bracket {
                 if(objectHide)hide(scopeCounter);
                 scopeCounter--;}
         ;
 
 
-Funcdef: Funcprefix Funcargs Funcblockstart Funcbody Funcblockend{
-        //prepei na ftia3w quad
+Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend{
+        expr*temp = newexpr(pfunc_);
+        temp->sym = $1;
+        emit(FUNCEND,temp,NULL,NULL,-1);
+        patchlabel($1,currQuad);
+        $$ = $1;
         }
         ;
 
 Funcprefix: Function Funcname{
         item* new = newItem($2,"User Function", scopeCounter , yylineno );
         new_check(new);
+        expr*temp = newexpr(pfunc_);
+        temp->sym = new;
+        emit(JUMP,NULL,NULL,NULL,-1);
+        emit(FUNCSTART,temp,NULL,NULL,-1);
         functionName = strdup($2);
         offset =0;
         $$ = new;
-        //prepei na ftia3w quad
 }
 ;
 
@@ -615,10 +625,10 @@ Funcname: id{
         }
 ;
 
-Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++;}
+Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++; }
         ;
 
-Funcbody: Block{functionFlag --; getoffset();}
+Funcbody: Block{functionFlag --;getoffset();}
         ;
 
 Funcblockstart: {push1(loopcounterstack, loopFlag); loopFlag = 0;}        
@@ -639,16 +649,19 @@ Const:  integer {$$ = newexpr_constint($1);
 
 
 Idlist: id Multy_id {
+        
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
                     formal_flag = 1;
                     new_check(new);
                     insert_formal_arg(functionName , $1);
                     formal_flag = 0;
+                    
         }
         | {;}
         ;
 
 Multy_id: Multy_id comma id {
+        
                   item* new = newItem($3,"formal argument", scopeCounter , yylineno );
                   new_check(new);
                   insert_formal_arg(functionName , $3);

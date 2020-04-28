@@ -119,6 +119,9 @@ void print_quads()
             case constnum_:
                 sprintf(a1, "%d", quads[i].arg1->numConst);
                 break;
+            case pfunc_:
+                a1 = quads[i].arg1->sym->name;
+                break;
             default:
                 a1 = get_opcode_expr_string(quads[i].arg1->type);
                 break;
@@ -517,7 +520,7 @@ expr *emit_iftableitem(expr *e)
     {
         expr *result = newexpr(var_);
         result->sym = tmp_item();
-        //emit(tablegetelem,e,e->index,result,-1);         dgfsdgdfsgdyj//8elei ftia3imo
+        emit(TABLEGETELEM,e,e->index,result,-1);      
         return result;
     }
 }
