@@ -596,7 +596,6 @@ Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend{
         expr*temp = newexpr(pfunc_);
         temp->sym = $1;
         emit(FUNCEND,temp,NULL,NULL,-1);
-        patchlabel($1,currQuad);
         $$ = $1;
         }
         ;
