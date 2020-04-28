@@ -1,4 +1,11 @@
+<<<<<<< Updated upstream
 while(a){
 a;
 }
 
+=======
+while(true)
+{
+    i =1;
+}
+>>>>>>> Stashed changes
