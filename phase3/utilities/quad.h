@@ -1,9 +1,7 @@
-#include <stdio.h>                                                                                                               
+#include <stdio.h>
 #include <stdlib.h>
 /* #include "../dataStructs/sym.h" */
 #include "parserUtilities.h"
-
-
 
 typedef enum Iopcode
 {
@@ -58,9 +56,8 @@ typedef enum expression_template
 typedef struct zavolist
 {
     int label;
-    struct zavolist* next;
-}
-zavo;
+    struct zavolist *next;
+} zavo;
 
 typedef struct expression
 {
@@ -92,20 +89,21 @@ typedef struct for_call
 {
     expr *elist;
     unsigned char method;
-    char* name;
-}for_call;
+    char *name;
+} for_call;
 
-typedef struct for_init{
-  int test;
-  int enter;
-}for_init;
+typedef struct for_init
+{
+    int test;
+    int enter;
+} for_init;
 
-typedef struct stack1{
-  int top;
-  int maxsize;
-  int *stackarray;
-}stack1;
-
+typedef struct stack1
+{
+    int top;
+    int maxsize;
+    int *stackarray;
+} stack1;
 
 void init_quads();
 
@@ -117,7 +115,7 @@ void print_quads_not_empty();
 
 quad newQuad(iopcode op, expr *arg1, expr *arg2, expr *res);
 
-void emit(iopcode op, expr *arg1, expr *arg2, expr *res , int label);
+void emit(iopcode op, expr *arg1, expr *arg2, expr *res, int label);
 
 item *tmp_item();
 
@@ -153,7 +151,7 @@ expr *newexpr_constnum(int i);
 
 void check_arith(expr *e, char *context);
 
-void add_to_contlist(expr* e , int label );
+void add_to_contlist(expr *e, int label);
 
 void add_to_breaklist(expr *e, int label);
 
@@ -163,22 +161,22 @@ void add_to_falselist(expr *e, int label);
 
 void backpatch(zavo *list, int label);
 
-expr* newexpr_constbool(unsigned int b);
+expr *newexpr_constbool(unsigned int b);
 
-stack1* arxikopoisi();
+stack1 *arxikopoisi();
 
-int isfull(stack1* stiba);
+int isfull(stack1 *stiba);
 
 int push1(stack1 *stiba, int data);
 
 int pop1(stack1 *stiba);
 
-for_call* insert_call(expr *elist,unsigned char method,char* name);
+for_call *insert_call(expr *elist, unsigned char method, char *name);
 
-zavo* new_list(int i);
+zavo *new_list(int i);
 
-zavo* mergelist(zavo* first,zavo* second);
+zavo *mergelist(zavo *first, zavo *second);
 
-unsigned int istempname(char* s);
+unsigned int istempname(char *s);
 
-unsigned int istempexpr(expr* e);
+unsigned int istempexpr(expr *e);

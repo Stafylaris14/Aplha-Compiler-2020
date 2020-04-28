@@ -8,7 +8,6 @@ extern int returnFlag;
 extern char *functionName;
 extern int callFlag;
 
-
 int isLibraryFunction(char *name)
 {
   int i = 0;
@@ -341,18 +340,16 @@ void insert_formal_arg(char *functionName, char *name)
   {
 
     formal *tmp_f = formals;
-    while(tmp_f->next!=NULL)
-      {
-          tmp_f = tmp_f->next;
-      }
+    while (tmp_f->next != NULL)
+    {
+      tmp_f = tmp_f->next;
+    }
 
-    
     tmp_f->next = malloc(sizeof(formal));
     tmp_f->next->arg = lookupScope(name, tmp->scope + 1);
     tmp_f->next->next = NULL;
     tmp->formalArg = formals;
   }
-  
 }
 /* just for debug */
 void print_formal_arguments()
@@ -369,8 +366,3 @@ void print_formal_arguments()
     }
   }
 }
-
-
-
-
-
