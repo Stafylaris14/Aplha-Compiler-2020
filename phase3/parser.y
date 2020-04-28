@@ -399,7 +399,7 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
 
 Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
         
-                if($1->type == tableitem_){
+                if($1->type == tableitem_){ 
                         emit(TABLESETELEM, $1, $1->index, $4 , -1);
                         $$ = emit_iftableitem($1);
                         $$->type = assignexp_;
@@ -469,7 +469,13 @@ Lvalue: id {
 Member: Lvalue dot id {libcheck = 0;
             $$ = member_item($1,$3);    
         }
-        | Lvalue left_bracket Expression right_bracket {libcheck = 0;}
+        | Lvalue left_bracket Expression right_bracket {
+                libcheck = 0;
+                $1 = emit_iftableitem($1);
+                $$ = newexpr(tableitem_);
+                $$->sym = $1->sym;
+                $$->index = $3;
+                }
         | Call {callFlag =1;libcheck =0;} dot id {callFlag =0;libcheck = 0;}
         | Call {callFlag =1;libcheck=0;} left_bracket Expression right_bracket {callFlag =0;libcheck = 0;}
         ;
@@ -709,9 +715,11 @@ whilecont: left_parenthesis Expression right_parenthesis{
 
 Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
+                printf("eeeee\n");
                 emit(JUMP , NULL , NULL , NULL,$1);
                 patchlabel($2 , nextquad());
                 //edw isos 8elei mia ifffffffff
+                //edw trwei segmmm
                 backpatch($4->breaklist, nextquad());                  /* ????????????????? */
                 backpatch($4->contlist,$1);
                 printf("eeeee\n");
