@@ -166,6 +166,9 @@ void print_quads()
                 case constnum_:
                     sprintf(a2, "%d", quads[i].arg2->numConst);
                     break;
+                case pfunc_:
+                    a2 = quads[i].arg2->sym->name;
+                break;
                 default:
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
                     break;
