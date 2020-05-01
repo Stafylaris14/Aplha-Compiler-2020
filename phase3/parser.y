@@ -178,21 +178,17 @@ Stmts:Stmts Stmt{
 ;
 
 Stmt: Expression semicolon {
-        
         libcheck =0;
         if(assign_flag){
-                red();
-                printf("na to dw einai antigrafei ta backpatsch\n");
-                cyn();
-        backpatch($1->truelist, nextquad()+1);
-        backpatch($1->falselist, nextquad()+3);
         emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
         emit(JUMP,NULL,NULL,NULL,nextquad() +3);
         emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
+        backpatch($1->truelist, nextquad()-2);
+        backpatch($1->falselist, nextquad());
         assign_flag = 0;
         }
-        //8elei true false list sigouraaaS
-        $$ = $1;}
+        $$ = $1;
+    }
     | Ifstmt {$$ = $1;}
     | Whilestmt {$$ = $1;}
     | Forstmt {$$ = $1;}
@@ -221,7 +217,6 @@ Stmt: Expression semicolon {
 
 
 Expression: Assignexpression {$$ = $1;}
-                        /* EDW TO EKANA OPWS STHN DIALE3I  */
                 |Expression arithm Expression{
                         //isos xreiastei na kanoume elenxoyn an 3erw egw m er8ei stirng/////////
                       $$ = new_expression(arthmexp_ );  
@@ -231,17 +226,14 @@ Expression: Assignexpression {$$ = $1;}
             | Expression boolop
             {   emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
-                    //einai aigrafi
                     $1->truelist = new_list(nextquad()-2);
                     $1->falselist = new_list(nextquad()-1);
-                    //mexri edw
              }M Expression {
                     
                     $$  =  new_expression(boolexpr_ );
                     $$->sym = tmp_item();
                  
                     if($5->type != boolexpr_ ){
-                               printf( " kai edw\n");
                     emit(IF_EQ , $5 , newexpr_constbool(1) , NULL, -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
                     $5->truelist = new_list(nextquad()-2);
@@ -249,37 +241,30 @@ Expression: Assignexpression {$$ = $1;}
                     }
 
                     if($2 == AND){
-                            printf("eimai sto AND \n");
                         backpatch($1->truelist, $4+1);
-                        $$->truelist = new_list(nextquad());
-                        $$->falselist = new_list(nextquad()-1);
                         $$->truelist = $5->truelist;
                         $$->falselist = mergelist($1->falselist,$5->falselist);
                     }else {
                         backpatch($1->falselist,$4+1);
-                        $$->truelist = new_list(nextquad() -2);
-                        $$->falselist = new_list(nextquad() -1);
                         $$->truelist = mergelist($1->truelist, $5->truelist);
                         $$->falselist = $5->falselist;
 
                     }
-                    //8elei meriki apotimisi edwwwwwwwwwwwwww
-
-                      //  printf("edw\n");
-
                         assign_flag = 1;
-                        //prepei na alla3oume emit edw opws eisa ston online einai zori
             }
             | Expression particular Expression{
-                    //8elei meriki apotimis edwwwwwwwwwwwwwwwwww me true/false list
                     $$ = new_expression(boolexpr_);
                     $$->sym = tmp_item();
                     emit($2 , $1 , $3 ,NULL , -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
+                    $$->truelist = new_list(nextquad()-2);
+                    $$->falselist = new_list(nextquad()-1);
                     assign_flag = 1;
             }
             | Term {$$ = $1;}
              ;
+
+
 
 
 boolop: and{$$ = AND;}
@@ -317,8 +302,9 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 $$->sym = tmp_item();
                 emit(IF_EQ,$2,newexpr_constbool(1),NULL,-1);
                 emit(JUMP,NULL,NULL,NULL,-1);
+                $$->truelist = new_list(nextquad()-1);
+                $$->falselist = new_list(nextquad()-2);
                 assign_flag = 1;
-                printf("na doume meriki apotimisi\n");//sossssssssssssssosos 
         }
         | plus_plus Lvalue {
                 if(libcheck == 1){
@@ -408,12 +394,12 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                         $$->sym = tmp_item();
                         if(assign_flag){
                                 emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
-                                emit(JUMP,NULL,NULL,NULL , -1);
-                                emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1);   
+                                emit(JUMP,NULL,NULL,NULL , nextquad() + 3);
+                                emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1);  
+                                backpatch($4->truelist, nextquad() -2);
+                                backpatch($4->falselist, nextquad());
                                 assign_flag = 0;
-                                printf("oxi edw\n");
                         }
-                        printf("assssss 8elei meriki\n");
                         emit(ASSIGN,$4,NULL,$1 , -1);
                         emit(ASSIGN,$1,NULL,$$ , -1);
                         
@@ -533,6 +519,7 @@ Elist:  Expression Multy_exp {
 Multy_exp: comma Expression Multy_exp {
                  $2->next = $3;
                  $$ = $2;
+                 //den to brika diale3eis
                  printf("na to dw ligo stiw diale3eis pou to peira\n");
         }
         | {$$ = NULL;}
@@ -546,6 +533,7 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
         emit(TABLECREATE,t,NULL,NULL,-1);
         int i = 0;
         printf("trwww segm sto test p3t_object_creation_expr\n");
+        //isws 8elei temp to $3
         while($3){
                 printf("oo\n");
                 emit(TABLESETELEM, t,newexpr_constnum(i++), $3,-1);
@@ -562,7 +550,7 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
                 t->sym = tmp_item();
                 emit(TABLECREATE,t,NULL,NULL,-1);
                 while($3){
-                        emit(TABLESETELEM, t,$3->index,t,-1);
+                        emit(TABLESETELEM, $3,$3->index,t,-1);
                         $3 = $3->next;
                 }     
                 $$ = t;  
@@ -602,6 +590,7 @@ Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend{
         expr*temp = newexpr(pfunc_);
         temp->sym = $1;
         emit(FUNCEND,temp,NULL,NULL,-1);
+        patchlabel($1->jump,nextquad()+1);
         $$ = $1;
         }
         ;
@@ -615,6 +604,7 @@ Funcprefix: Function Funcname{
         emit(FUNCSTART,temp,NULL,NULL,-1);
         functionName = strdup($2);
         offset =0;
+        new->jump = nextquad()-2;
         $$ = new;
 }
 ;
@@ -678,20 +668,20 @@ Multy_id: Multy_id comma id {
 
 
 Ifstmt: ifFix Stmt {
-                        patchlabel($1 , nextquad());
+                        patchlabel($1 , nextquad()+1);
                         $$ = $2;
         }
         | ifFix Stmt elseFix Stmt {
-                patchlabel($1 , $3+1);
-                patchlabel($3 , nextquad());
+                patchlabel($1 , $3+2);
+                patchlabel($3 , nextquad()+1);
                 //kati 8elei gia brek/co nti
         }
         ;
 
 ifFix: If left_parenthesis Expression right_parenthesis{
-                emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +2);
+                emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +3);
                 emit(JUMP , NULL , NULL , NULL , -1);
-                $$ = nextquad();
+                $$ = nextquad()-1;
 };
 
 elseFix: Else{
@@ -715,14 +705,10 @@ whilecont: left_parenthesis Expression right_parenthesis{
 
 Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
-                printf("eeeee\n");
                 emit(JUMP , NULL , NULL , NULL,$1+1);
                 patchlabel($2 -1, nextquad()+1);
-                //edw isos 8elei mia ifffffffff
-                //edw trwei segmmm
-                backpatch($4->breaklist, nextquad());                  /* ????????????????? */
+                backpatch($4->breaklist, nextquad());                 
                 backpatch($4->contlist,$1);
-                printf("eeeee\n");
                 $$=$4;
         }
     ;

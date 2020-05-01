@@ -23,6 +23,7 @@ typedef struct Item
     enum Scope_spase scope_spase;                       /* scope Space 3 phase */
     int offset;
     int scope;
+    int jump;
     struct Item *sameScope; /* dixnei sto epomeno me to idio scope */
     int lineno;
     formal *formalArg;

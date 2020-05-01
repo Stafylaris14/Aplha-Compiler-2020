@@ -1,2 +1,2 @@
-a and b;
-b or c;
+function a(){b;}
+

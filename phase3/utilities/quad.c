@@ -37,6 +37,7 @@ void init_quads()
     }
 }
 
+
 void extend_quads()
 {
     assert(total == currQuad);
@@ -83,7 +84,7 @@ void print_quads()
             a3 = malloc(sizeof(char) * 200);
             if (quads[i].arg1 != NULL)
             {
-                //  printf("typee %d\n" ,quads[i].arg1->type);
+                 // printf("typee %d\n" ,quads[i].arg1->type);
                 switch (quads[i].arg1->type)
                 {
                 case nill_:
@@ -121,6 +122,9 @@ void print_quads()
                     sprintf(a1, "%d", quads[i].arg1->numConst);
                     break;
                 case pfunc_:
+                    a1 = quads[i].arg1->sym->name;
+                    break;
+                case boolexpr_:
                     a1 = quads[i].arg1->sym->name;
                     break;
                 default:
@@ -169,6 +173,9 @@ void print_quads()
                 case pfunc_:
                     a2 = quads[i].arg2->sym->name;
                 break;
+                case boolexpr_:
+                    a1 = quads[i].arg1->sym->name;
+                    break;
                 default:
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
                     break;
@@ -177,8 +184,10 @@ void print_quads()
 
             if (quads[i].result == NULL)
                 a3 = "";
-            else
+            else{
                 a3 = quads[i].result->sym->name;
+            }
+            
             if (quads[i].op == JUMP)
             {
                 printf("%d: %s %d [line %d]\n",
