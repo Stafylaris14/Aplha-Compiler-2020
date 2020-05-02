@@ -149,7 +149,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <ifs> particular                 /* STAF */
 %type <boolop> boolop
 %type <label_jumps> Whilestart
-%type <EXPR> Whilestmt
+%type <EXPR> Whilestmt boolemit
 %type <label_jumps> whilecont M N 
 %type <label_jumps> elseFix ifFix
 %type <for_call> Methodcall
@@ -183,6 +183,7 @@ Stmt: Expression semicolon {
         emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
         emit(JUMP,NULL,NULL,NULL,nextquad() +3);
         emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
+        printf("tese \n");
         backpatch($1->truelist, nextquad()-2);
         backpatch($1->falselist, nextquad());
         assign_flag = 0;
@@ -216,6 +217,7 @@ Stmt: Expression semicolon {
     ;
 
 
+
 Expression: Assignexpression {$$ = $1;}
                 |Expression arithm Expression{
                         //isos xreiastei na kanoume elenxoyn an 3erw egw m er8ei stirng/////////
@@ -223,31 +225,27 @@ Expression: Assignexpression {$$ = $1;}
                       $$->sym = tmp_item();
                       emit($2 , $1 , $3 , $$ , -1);
                 }
-            | Expression boolop
-            {   emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
-                    emit(JUMP,NULL,NULL,NULL,-1);
-                    $1->truelist = new_list(nextquad()-2);
-                    $1->falselist = new_list(nextquad()-1);
-             }M Expression {
-                    
+            | boolemit boolop M Expression {
                     $$  =  new_expression(boolexpr_ );
                     $$->sym = tmp_item();
-                 
-                    if($5->type != boolexpr_ ){
-                    emit(IF_EQ , $5 , newexpr_constbool(1) , NULL, -1);
+                    if($4->type != boolexpr_ ){
+                    emit(IF_EQ , $4 , newexpr_constbool(1) , NULL, -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
-                    $5->truelist = new_list(nextquad()-2);
-                    $5->falselist = new_list(nextquad()-1);
+                    $4->truelist = new_list(nextquad()-2);
+                    $4->falselist = new_list(nextquad()-1);
+                    printf("de %d\n",nextquad()-2);
                     }
 
                     if($2 == AND){
-                        backpatch($1->truelist, $4+1);
-                        $$->truelist = $5->truelist;
-                        $$->falselist = mergelist($1->falselist,$5->falselist);
+                            printf("se gamaw\n");
+                        backpatch($1->truelist, $3+1);
+                        $$->truelist = $4->truelist;
+                        $$->falselist = mergelist($1->falselist,$4->falselist);
                     }else {
-                        backpatch($1->falselist,$4+1);
-                        $$->truelist = mergelist($1->truelist, $5->truelist);
-                        $$->falselist = $5->falselist;
+                            printf("den se\n");
+                        backpatch($1->falselist,$3+1);
+                        $$->truelist = mergelist($1->truelist, $4->truelist);
+                        $$->falselist = $4->falselist;
 
                     }
                         assign_flag = 1;
@@ -257,18 +255,29 @@ Expression: Assignexpression {$$ = $1;}
                     $$->sym = tmp_item();
                     emit($2 , $1 , $3 ,NULL , -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
-                    $$->truelist = new_list(nextquad()-2);
-                    $$->falselist = new_list(nextquad()-1);
+                     $$->truelist = new_list(nextquad()-2);
+                     $$->falselist = new_list(nextquad()-1);
                     assign_flag = 1;
             }
             | Term {$$ = $1;}
              ;
 
 
+boolemit: Expression {
+        if($1->type != boolexpr_ ){
+        emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
+        emit(JUMP,NULL,NULL,NULL,-1);
+        printf("pro %d\n",nextquad()-2);
+        $1->truelist = new_list(nextquad()-2);
+        $1->falselist = new_list(nextquad()-1);
+        }
+        $$ = $1;
+};
 
 
 boolop: and{$$ = AND;}
-        | or {$$ = OR;}
+        | or {$$ = OR;
+        };
 
 
 particular : greater { $$ = IF_GREATER; }
@@ -395,7 +404,8 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                         if(assign_flag){
                                 emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
                                 emit(JUMP,NULL,NULL,NULL , nextquad() + 3);
-                                emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1);  
+                                emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1); 
+                                printf("ti leeee\n");
                                 backpatch($4->truelist, nextquad() -2);
                                 backpatch($4->falselist, nextquad());
                                 assign_flag = 0;
@@ -411,7 +421,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
 
 
 
-Primary: Lvalue { $$ = emit_iftableitem($1);}
+Primary: Lvalue {$$ = emit_iftableitem($1);}
         | Call {callFlag =1; $$ = $1;}
         | Objectdef {$$ = $1;}
         | left_parenthesis Funcdef right_parenthesis {
@@ -560,7 +570,7 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
 
 Indexed: Indexedelement Multy_ind {
         printf("na psa2w diafaneis");
-        ;}
+        }
          ;
 
 Multy_ind: Multy_ind comma Indexedelement {
@@ -696,18 +706,34 @@ Whilestart: While{
 ;
 
 whilecont: left_parenthesis Expression right_parenthesis{
+       //
+        if($2->type== boolexpr_){ 
+        emit(ASSIGN,newexpr_constbool(1),NULL,$2,-1);
+        emit(JUMP,NULL,NULL,NULL,nextquad()+3);
+        emit(ASSIGN,newexpr_constbool(0),NULL,$2,-1);
+        backpatch($2->truelist, nextquad()-2);
+        backpatch($2->falselist, nextquad());
+        }
+        assign_flag = 0;
+        red();
+        printf("prepei na dw\n");
+        wht();
+        //
         emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+3);
         emit(JUMP , NULL , NULL , NULL , -1);
-
+        printf("tri\n");
         $$ = nextquad();
 }
 ;
 
 Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
-                emit(JUMP , NULL , NULL , NULL,$1+1);
+                emit(JUMP , NULL , NULL , NULL,$1+1);         
                 patchlabel($2 -1, nextquad()+1);
-                backpatch($4->breaklist, nextquad());                 
+                backpatch($4->breaklist, nextquad()+1); 
+               red() ; 
+                          printf("exwe bgalei ta backpatch\n");    
+                          wht();
                 backpatch($4->contlist,$1);
                 $$=$4;
         }

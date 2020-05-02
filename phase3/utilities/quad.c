@@ -243,6 +243,7 @@ quad newQuad(iopcode op, expr *arg1, expr *arg2, expr *res)
     tmp.arg2 = arg2;
     tmp.result = res;
     tmp.lineno = yylineno;
+    
     /* kati gia to label */
     return tmp;
 }
@@ -276,10 +277,10 @@ expr *new_expression(expr_t type)
     expr *tmp_expression = malloc(sizeof(expr));
     tmp_expression->type = type;
     /* init lists */
-    tmp_expression->truelist = NULL;
-    tmp_expression->falselist = NULL;
-    tmp_expression->contlist = NULL;
-    tmp_expression->breaklist = NULL;
+    // tmp_expression->truelist = NULL;
+    // tmp_expression->falselist = NULL;
+    // tmp_expression->contlist = NULL;
+    // tmp_expression->breaklist = NULL;
 
     return tmp_expression;
 }
@@ -543,10 +544,10 @@ expr *emit_iftableitem(expr *e)
 expr *newexpr_constint(int i)
 {
     expr *e = newexpr(constnum_);
-    e->contlist = NULL;
-    e->breaklist = NULL;
-    e->falselist = NULL;
-    e->truelist = NULL;
+    // e->contlist = NULL;
+    // e->breaklist = NULL;
+    // e->falselist = NULL;
+    // e->truelist = NULL;
     e->numConst = i;
     return e;
 }
@@ -555,10 +556,10 @@ expr *member_item(expr *lv, char *name)
 {
     lv = emit_iftableitem(lv);
     expr *ti = newexpr(tableitem_);
-    ti->contlist = NULL;
-    ti->breaklist = NULL;
-    ti->falselist = NULL;
-    ti->truelist = NULL;
+    // ti->contlist = NULL;
+    // ti->breaklist = NULL;
+    // ti->falselist = NULL;
+    // ti->truelist = NULL;
     ti->sym = lv->sym;
     ti->index = newexpr_constring(name);
     return ti;
@@ -568,10 +569,10 @@ expr *lvalue_expr(item *sym)
 {
     assert(sym);
     expr *e = (expr *)malloc(sizeof(expr));
-    e->contlist = NULL;
-    e->breaklist = NULL;
-    e->falselist = NULL;
-    e->truelist = NULL;
+    // e->contlist = NULL;
+    // e->breaklist = NULL;
+    // e->falselist = NULL;
+    // e->truelist = NULL;
     memset(e, 0, sizeof(expr));
     e->next = (expr *)0;
     e->sym = sym;
@@ -709,8 +710,9 @@ void backpatch(zavo *list, int label)
     if (list != NULL)
     {
         zavo *tmp = list;
-        while (tmp)
+        while (tmp != NULL)
         {
+            printf("labell %d\n",tmp->label);
             quads[tmp->label].label = label;
             tmp = tmp->next;
         }
@@ -720,10 +722,10 @@ void backpatch(zavo *list, int label)
 expr *newexpr_constbool(unsigned int b)
 {
     expr *e = newexpr(constbool_);
-    e->contlist = NULL;
-    e->breaklist = NULL;
-    e->falselist = NULL;
-    e->truelist = NULL;
+    // e->contlist = NULL;
+    // e->breaklist = NULL;
+    // e->falselist = NULL;
+    // e->truelist = NULL;
     e->boolConst = b;
     return e;
 }
