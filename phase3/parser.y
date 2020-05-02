@@ -689,9 +689,16 @@ Ifstmt: ifFix Stmt {
         ;
 
 ifFix: If left_parenthesis Expression right_parenthesis{
+                if($3->type== boolexpr_){
+                emit(ASSIGN,newexpr_constbool(1),NULL,$3,-1);
+                emit(JUMP,NULL,NULL,NULL,nextquad() +3);
+                emit(ASSIGN,newexpr_constbool(0),NULL,$3,-1);
+                assign_flag =0 ;
+                } 
                 emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +3);
                 emit(JUMP , NULL , NULL , NULL , -1);
-                printf("re man \n");
+                backpatch($3->truelist, nextquad()-4);
+                backpatch($3->falselist, nextquad()-2);
                 $$ = nextquad();
 };
 
