@@ -121,16 +121,15 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 
 /*protereothta*/
 
-%left assign
+%right assign
 %left or
 %left and
 %nonassoc equal n_equal
 %nonassoc greater g_equal less l_equal
 %left plus minus
 %left multiply division mod
-%left not plus_plus minus_minus uminus
-%left dot
-%left double_dots
+%right not plus_plus minus_minus uminus
+%left  double_dots dot
 %left left_bracket right_bracket
 %left left_parenthesis right_parenthesis
 
@@ -238,7 +237,7 @@ Expression: Assignexpression {$$ = $1;}
 
                     if($2 == AND){
                             printf("se gamaw\n");
-                        backpatch($1->truelist, $3+1);
+                        backpatch($1->truelist, $3+1); // + 1 einai to swsto mallon
                         $$->truelist = $4->truelist;
                         $$->falselist = mergelist($1->falselist,$4->falselist);
                     }else {
@@ -678,12 +677,13 @@ Multy_id: Multy_id comma id {
 
 
 Ifstmt: ifFix Stmt {
-                        patchlabel($1 , nextquad()+1);
+                        patchlabel($1-1 , nextquad()-1);
                         $$ = $2;
         }
         | ifFix Stmt elseFix Stmt {
                 patchlabel($1 , $3+2);
                 patchlabel($3 , nextquad()+1);
+                $$ = $2;
                 //kati 8elei gia brek/co nti
         }
         ;
@@ -691,7 +691,8 @@ Ifstmt: ifFix Stmt {
 ifFix: If left_parenthesis Expression right_parenthesis{
                 emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +3);
                 emit(JUMP , NULL , NULL , NULL , -1);
-                $$ = nextquad()-1;
+                printf("re man \n");
+                $$ = nextquad();
 };
 
 elseFix: Else{

@@ -1,3 +1,5 @@
-while(a or b and c)a;
+if (a and b) {a;}
+	
+
 	
 
