@@ -677,7 +677,7 @@ Multy_id: Multy_id comma id {
 
 
 Ifstmt: ifFix Stmt {
-                        patchlabel($1-1 , nextquad()-1);
+                        patchlabel($1-1 , nextquad()+1);
                         $$ = $2;
         }
         | ifFix Stmt elseFix Stmt {
@@ -694,11 +694,15 @@ ifFix: If left_parenthesis Expression right_parenthesis{
                 emit(JUMP,NULL,NULL,NULL,nextquad() +3);
                 emit(ASSIGN,newexpr_constbool(0),NULL,$3,-1);
                 assign_flag =0 ;
+                backpatch($3->truelist, nextquad()-2);
+                backpatch($3->falselist, nextquad());
+                }else{
+                        backpatch($3->truelist, nextquad()+1);
+                        backpatch($3->falselist, nextquad()+3);    
                 } 
                 emit(IF_EQ , $3 , new_expr_constbool(1) ,NULL, nextquad() +3);
                 emit(JUMP , NULL , NULL , NULL , -1);
-                backpatch($3->truelist, nextquad()-4);
-                backpatch($3->falselist, nextquad()-2);
+              
                 $$ = nextquad();
 };
 

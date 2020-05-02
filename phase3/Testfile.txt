@@ -1,5 +1,6 @@
-if (a) {a;}
-	
+if (a)
+	d=4;
+else
+	c=a;
 
-	
 

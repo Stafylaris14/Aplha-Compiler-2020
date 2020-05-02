@@ -94,7 +94,7 @@ void print_quads()
                     a1 = "newTable";
                     break; /* den exw idea */
                 case assignexp_:
-                    a1 = "assign expression";
+                    a1 = quads[i].arg1->sym->name;
                     break;
                 case arthmexp_:
                     //itoa(quads[i].arg1->numConst, a1 ,10 );
@@ -126,6 +126,16 @@ void print_quads()
                     break;
                 case boolexpr_:
                     a1 = quads[i].arg1->sym->name;
+                    break;
+                case tableitem_:
+                    red();
+                    printf("na to ftia3oume print\n");
+                    cyn();
+                    break;
+                case lfunc_:
+                    red();
+                    printf("na to libb\n");
+                    cyn();
                     break;
                 default:
                     a1 = get_opcode_expr_string(quads[i].arg1->type);
@@ -175,6 +185,16 @@ void print_quads()
                 break;
                 case boolexpr_:
                     a1 = quads[i].arg1->sym->name;
+                    break;
+                case tableitem_:
+                    red();
+                    printf("na to ftia3oume\n");
+                    cyn();
+                    break;
+                case lfunc_:
+                    red();
+                    printf("na to libb\n");
+                    cyn();
                     break;
                 default:
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
