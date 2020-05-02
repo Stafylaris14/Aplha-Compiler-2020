@@ -677,11 +677,11 @@ Multy_id: Multy_id comma id {
 
 
 Ifstmt: ifFix Stmt {
-                        patchlabel($1-1 , nextquad()+1);
-                        $$ = $2;
+                patchlabel($1-1 , nextquad()+1);
+                $$ = $2;
         }
         | ifFix Stmt elseFix Stmt {
-                patchlabel($1 , $3+2);
+                patchlabel($1 -1 , $3+2);
                 patchlabel($3 , nextquad()+1);
                 $$ = $2;
                 //kati 8elei gia brek/co nti
