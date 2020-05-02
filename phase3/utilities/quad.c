@@ -707,13 +707,14 @@ void add_to_falselist(expr *e, int label)
 
 void backpatch(zavo *list, int label)
 {
+    printf("EDW\n");
     if (list != NULL)
     {
         zavo *tmp = list;
         while (tmp != NULL)
         {
-            printf("labell %d\n",tmp->label);
             quads[tmp->label].label = label;
+            printf("labell %d\n",tmp->label);
             tmp = tmp->next;
         }
     }
@@ -800,10 +801,14 @@ zavo *insert_before_zavo(zavo *head, int i)
 
 zavo *mergelist(zavo *first, zavo *second)
 {
+    printf("einai dikia mas\n");
+    if(first == NULL)return second;
+    if(second == NULL) return first;
+    if(first == NULL && second == NULL) return NULL;
+
     zavo *temp = first;
     zavo *temp1 = second;
     zavo *newListhead = NULL;
-
     while (temp != NULL)
     {
         newListhead = insert_before_zavo(newListhead, temp->label);
@@ -817,6 +822,49 @@ zavo *mergelist(zavo *first, zavo *second)
     }
     return newListhead;
 }
+/* zavo *mergelist(zavo *first, zavo *second)
+{
+    red();
+    printf("to exw antigrapseiiiiiiiiiiiiiiiiiiiii\n");
+    wht();
+    zavo *newlist = NULL;
+    zavo *tmp1 = first;
+    zavo *tmp2 = second;
+    zavo *newnode;
+    while (tmp1)
+    {
+        newnode = malloc(sizeof(zavo));
+        newnode->label = tmp1->label;
+        newnode->next = NULL;
+        if (newlist == NULL)
+        {
+            newlist = newnode;
+        }
+        else
+        {
+            newnode->next = newlist;
+            newlist = newnode;
+        }
+        tmp1 = tmp1->next;
+    }
+    while (tmp2)
+    {
+        newnode = malloc(sizeof(zavo));
+        newnode->label = tmp2->label;
+        newnode->next = NULL;
+        if (newlist == NULL)
+        {
+            newlist = newnode;
+        }
+        else
+        {
+            newnode->next = newlist;
+            newlist = newnode;
+        }
+        tmp2 = tmp2->next;
+    }
+    return newlist;
+} */
 
 unsigned int istempname(char *s)
 {

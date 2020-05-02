@@ -265,11 +265,11 @@ Expression: Assignexpression {$$ = $1;}
 
 boolemit: Expression {
         if($1->type != boolexpr_ ){
-        emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
-        emit(JUMP,NULL,NULL,NULL,-1);
-        printf("pro %d\n",nextquad()-2);
-        $1->truelist = new_list(nextquad()-2);
-        $1->falselist = new_list(nextquad()-1);
+                emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                printf("pro %d\n",nextquad()-2);
+                $1->truelist = new_list(nextquad()-2);
+                $1->falselist = new_list(nextquad()-1);
         }
         $$ = $1;
 };
@@ -393,7 +393,7 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
         ;
 
 Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
-        
+                
                 if($1->type == tableitem_){ 
                         emit(TABLESETELEM, $1, $1->index, $4 , -1);
                         $$ = emit_iftableitem($1);
@@ -707,18 +707,19 @@ Whilestart: While{
 
 whilecont: left_parenthesis Expression right_parenthesis{
        //
-        if($2->type== boolexpr_){ 
-        emit(ASSIGN,newexpr_constbool(1),NULL,$2,-1);
-        emit(JUMP,NULL,NULL,NULL,nextquad()+3);
-        emit(ASSIGN,newexpr_constbool(0),NULL,$2,-1);
-        backpatch($2->truelist, nextquad()-2);
-        backpatch($2->falselist, nextquad());
-        }
+       
+                
+                emit(ASSIGN,newexpr_constbool(1),NULL,$2,-1);
+                emit(JUMP,NULL,NULL,NULL,nextquad()+3);
+                emit(ASSIGN,newexpr_constbool(0),NULL,$2,-1);
+                backpatch($2->truelist, nextquad()-2);
+                backpatch($2->falselist, nextquad());
+        
         assign_flag = 0;
         red();
         printf("prepei na dw\n");
         wht();
-        //
+        
         emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+3);
         emit(JUMP , NULL , NULL , NULL , -1);
         printf("tri\n");
@@ -730,6 +731,7 @@ Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
                 emit(JUMP , NULL , NULL , NULL,$1+1);         
                 patchlabel($2 -1, nextquad()+1);
+                printf("eimai edw gia na tsekarw to $4  ->(%d)\n" , $4 == NULL);
                 backpatch($4->breaklist, nextquad()+1); 
                red() ; 
                           printf("exwe bgalei ta backpatch\n");    
@@ -808,9 +810,9 @@ int main(int argc, char** argv)
   }
     loopcounterstack = arxikopoisi();
     yyparse();
+    printScopeList();
     //printSymTable();
     //printHash();
-    //printScopeList();
     
     print_quads();
    
