@@ -439,7 +439,7 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
 Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
         
                 if($1->type == tableitem_){ 
-                        emit(TABLESETELEM, $1, $1->index, $4 , -1);
+                        emit(TABLESETELEM, $4, $1->index, $1 , -1);
                         $$ = emit_iftableitem($1);
                         $$->type = assignexp_;
                 }else{

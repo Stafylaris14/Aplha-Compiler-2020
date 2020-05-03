@@ -84,7 +84,7 @@ void print_quads()
             a3 = malloc(sizeof(char) * 200);
             if (quads[i].arg1 != NULL)
             {
-                 // printf("typee %d\n" ,quads[i].arg1->type);
+                 // printf("typee arg1 %d\n" ,quads[i].arg1->type);
                 switch (quads[i].arg1->type)
                 {
                 case nill_:
@@ -128,9 +128,7 @@ void print_quads()
                     a1 = quads[i].arg1->sym->name;
                     break;
                 case tableitem_:
-                    red();
-                    printf("na to ftia3oume print\n");
-                    cyn();
+                    a1 = quads[i].arg1->sym->name;
                     break;
                 case lfunc_:
                     red();
@@ -141,9 +139,11 @@ void print_quads()
                     a1 = get_opcode_expr_string(quads[i].arg1->type);
                     break;
                 }
+               // printf("feugw arg1 %s\n" ,a1);
             }
             if (quads[i].arg2 != NULL)
             {
+               // printf("typee a2 %d\n" ,quads[i].arg2->type);
                 switch (quads[i].arg2->type)
                 {
                 case nill_:
@@ -153,7 +153,7 @@ void print_quads()
                     a2 = "newTable";
                     break; /* den exw idea */
                 case assignexp_:
-                    a2 = "assign expression";
+                    a2 = quads[i].arg2->sym->name;
                     break;
                 case arthmexp_:
                     //itoa(quads[i].arg2->numConst, a2 ,10 );
@@ -184,12 +184,10 @@ void print_quads()
                     a2 = quads[i].arg2->sym->name;
                 break;
                 case boolexpr_:
-                    a1 = quads[i].arg1->sym->name;
+                    a1 = quads[i].arg2->sym->name;
                     break;
                 case tableitem_:
-                    red();
-                    printf("na to ftia3oume\n");
-                    cyn();
+                    a2 = quads[i].arg2->sym->name;
                     break;
                 case lfunc_:
                     red();
@@ -200,12 +198,68 @@ void print_quads()
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
                     break;
                 }
+              //  printf("feugw arg2 %s\n" ,a2);
             }
 
             if (quads[i].result == NULL)
                 a3 = "";
             else{
-                a3 = quads[i].result->sym->name;
+             //   printf("typee resy %d\n" ,quads[i].result->type);
+                switch (quads[i].result->type)
+                {
+                case nill_:
+                    a3= "nill";
+                    break;
+                case newtable_:
+                    a3= "newTable";
+                    break; /* den exw idea */
+                case assignexp_:
+                    a3 = quads[i].result->sym->name;
+                    break;
+                case arthmexp_:
+                    //itoa(quads[i].arg2->numConst, a3,10 );
+                    a3= quads[i].result->sym->name;
+                    break;
+                case var_:
+                    a3= quads[i].result->sym->name;
+                    break;
+                case conststring_:
+                    a3= quads[i].result->stringConst;
+                    break;
+                case constbool_:
+                    if (quads[i].result->boolConst == 1)
+                        a3= "TRUE";
+                    else if (quads[i].result->boolConst == 0)
+                        a3= "FALSE";
+                    else
+                    {
+                        red();
+                        printf("den exei oristei to boolean\n");
+                        wht();
+                    }
+                    break;
+                case constnum_:
+                    sprintf(a3, "%d", quads[i].result->numConst);
+                    break;
+                case pfunc_:
+                    a3= quads[i].result->sym->name;
+                break;
+                case boolexpr_:
+                    a1 = quads[i].result->sym->name;
+                    break;
+                case tableitem_:
+                    a3 = quads[i].result->sym->name;
+                    break;
+                case lfunc_:
+                    red();
+                    printf("na to libb\n");
+                    cyn();
+                    break;
+                default:
+                    a3= get_opcode_expr_string(quads[i].result->type);
+                    break;
+                }
+               // printf("feugw res %s\n" ,a3);
             }
             
             if (quads[i].op == JUMP)
@@ -542,7 +596,8 @@ expr *newexpr(expr_t t)
 }
 
 expr *newexpr_constring(char *s)
-{
+{ 
+    
     expr *e = newexpr(conststring_);
     e->stringConst = strdup(s);
     return e;
