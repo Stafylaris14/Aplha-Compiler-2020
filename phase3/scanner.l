@@ -167,6 +167,7 @@ other                 .
 
 
         BEGIN(INITIAL);
+        yylval.strVal=strdup(myString);
         return string;
     }
     "\\\'" {
