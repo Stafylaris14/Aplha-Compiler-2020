@@ -144,11 +144,8 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <item> Funcprefix
 %type <strVal> Funcname
 %type <intVal> Funcbody
-%type <opcode> arithm                   /* STAF */
-%type <ifs> particular                 /* STAF */
-%type <boolop> boolop
 %type <label_jumps> Whilestart
-%type <EXPR> Whilestmt boolemit
+%type <EXPR> Whilestmt 
 %type <label_jumps> whilecont M N 
 %type <label_jumps> elseFix ifFix
 %type <for_call> Methodcall
@@ -217,82 +214,130 @@ Stmt: Expression semicolon {
 
 
 
+
 Expression: Assignexpression {$$ = $1;}
-                |Expression arithm Expression{
-                        //isos xreiastei na kanoume elenxoyn an 3erw egw m er8ei stirng/////////
-                      $$ = new_expression(arthmexp_ );  
-                      $$->sym = tmp_item();
-                      emit($2 , $1 , $3 , $$ , -1);
-                }
-            | boolemit boolop M Expression {
-                    $$  =  new_expression(boolexpr_ );
-                    $$->sym = tmp_item();
-                    if($4->type != boolexpr_ ){
-                    emit(IF_EQ , $4 , newexpr_constbool(1) , NULL, -1);
+            | Expression plus Expression {                     
+                $$ = new_expression(arthmexp_ );  
+                $$->sym = tmp_item();
+                emit(ADD , $1 , $3 , $$ , -1);}
+            | Expression minus Expression {
+                $$ = new_expression(arthmexp_ );  
+                $$->sym = tmp_item();
+                emit(SUB , $1 , $3 , $$ , -1);
+            }
+            | Expression multiply Expression {              
+                $$ = new_expression(arthmexp_ );  
+                $$->sym = tmp_item();
+                emit(MUL , $1 , $3 , $$ , -1);}
+            | Expression division Expression {
+                $$ = new_expression(arthmexp_ );  
+                $$->sym = tmp_item();
+                emit(DIV , $1 , $3 , $$ , -1);}
+            |Expression and  {if($1->type != boolexpr_ ){
+                emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                printf("pro %d\n",nextquad()-2);
+                $1->truelist = new_list(nextquad()-2);
+                $1->falselist = new_list(nextquad()-1);
+        }} M Expression {
+                $$  =  new_expression(boolexpr_ );
+                $$->sym = tmp_item();
+                if($5->type != boolexpr_ ){
+                    emit(IF_EQ , $5 , newexpr_constbool(1) , NULL, -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
-                    $4->truelist = new_list(nextquad()-2);
-                    $4->falselist = new_list(nextquad()-1);
+                    $5->truelist = new_list(nextquad()-2);
+                    $5->falselist = new_list(nextquad()-1);
                     printf("de %d\n",nextquad()-2);
-                    }
+                }
+                printf("se gamaw\n");
+                backpatch($1->truelist, $4+1); // + 1 einai to swsto mallon
+                $$->truelist = $5->truelist;
+                $$->falselist = mergelist($1->falselist,$5->falselist);
+                assign_flag = 1;
 
-                    if($2 == AND){
-                            printf("se gamaw\n");
-                        backpatch($1->truelist, $3+1); // + 1 einai to swsto mallon
-                        $$->truelist = $4->truelist;
-                        $$->falselist = mergelist($1->falselist,$4->falselist);
-                    }else {
-                            printf("den se\n");
-                        backpatch($1->falselist,$3+1);
-                        $$->truelist = mergelist($1->truelist, $4->truelist);
-                        $$->falselist = $4->falselist;
-
-                    }
-                        assign_flag = 1;
-            }
-            | Expression particular Expression{
-                    $$ = new_expression(boolexpr_);
-                    $$->sym = tmp_item();
-                    emit($2 , $1 , $3 ,NULL , -1);
+            }       
+            | Expression or  {if($1->type != boolexpr_ ){
+                emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                printf("pro %d\n",nextquad()-2);
+                $1->truelist = new_list(nextquad()-2);
+                $1->falselist = new_list(nextquad()-1);
+        }}  M Expression {
+                $$  =  new_expression(boolexpr_ );
+                $$->sym = tmp_item();
+                if($5->type != boolexpr_ ){
+                    emit(IF_EQ , $5 , newexpr_constbool(1) , NULL, -1);
                     emit(JUMP,NULL,NULL,NULL,-1);
-                     $$->truelist = new_list(nextquad()-2);
-                     $$->falselist = new_list(nextquad()-1);
-                    assign_flag = 1;
+                    $5->truelist = new_list(nextquad()-2);
+                    $5->falselist = new_list(nextquad()-1);
+                    printf("de %d\n",nextquad()-2);
+                }
+                printf("den se\n");
+                backpatch($1->falselist,$4+1);
+                $$->truelist = mergelist($1->truelist, $5->truelist);
+                $$->falselist = $5->falselist;
+                assign_flag = 1;            
+                }
+            | Expression mod Expression {
+                 $$ = new_expression(arthmexp_ );  
+                $$->sym = tmp_item();
+                emit(MOD , $1 , $3 , $$ , -1);}
+            | Expression equal Expression {
+                $$ = new_expression(boolexpr_);
+                $$->sym = tmp_item();
+                emit(IF_EQ , $1 , $3 ,NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                $$->truelist = new_list(nextquad()-2);
+                $$->falselist = new_list(nextquad()-1);
+                assign_flag = 1; 
+                    }
+            | Expression n_equal Expression {
+                $$ = new_expression(boolexpr_);
+                $$->sym = tmp_item();
+                emit(IF_NOTEQ , $1 , $3 ,NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                $$->truelist = new_list(nextquad()-2);
+                $$->falselist = new_list(nextquad()-1);
+                assign_flag = 1; 
             }
-            | Term {$$ = $1;}
+            | Expression greater Expression {
+                $$ = new_expression(boolexpr_);
+                $$->sym = tmp_item();
+                emit(IF_GREATER , $1 , $3 ,NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                $$->truelist = new_list(nextquad()-2);
+                $$->falselist = new_list(nextquad()-1);
+                assign_flag = 1;     
+                    }
+            | Expression less Expression {
+                $$ = new_expression(boolexpr_);
+                $$->sym = tmp_item();
+                emit(IF_LESS , $1 , $3 ,NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                $$->truelist = new_list(nextquad()-2);
+                $$->falselist = new_list(nextquad()-1);
+                assign_flag = 1; 
+            }
+            | Expression g_equal Expression {
+                $$ = new_expression(boolexpr_);
+                $$->sym = tmp_item();
+                emit(IF_GREATEREQ , $1 , $3 ,NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                $$->truelist = new_list(nextquad()-2);
+                $$->falselist = new_list(nextquad()-1);
+                assign_flag = 1; 
+            }
+            | Expression l_equal Expression {
+                $$ = new_expression(boolexpr_);
+                $$->sym = tmp_item();
+                emit(IF_LESSEQ , $1 , $3 ,NULL , -1);
+                emit(JUMP,NULL,NULL,NULL,-1);
+                $$->truelist = new_list(nextquad()-2);
+                $$->falselist = new_list(nextquad()-1);
+                assign_flag = 1;               
+            }
+            | Term {;}
              ;
-
-
-boolemit: Expression {
-        if($1->type != boolexpr_ ){
-        emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
-        emit(JUMP,NULL,NULL,NULL,-1);
-        printf("pro %d\n",nextquad()-2);
-        $1->truelist = new_list(nextquad()-2);
-        $1->falselist = new_list(nextquad()-1);
-        }
-        $$ = $1;
-};
-
-
-boolop: and{$$ = AND;}
-        | or {$$ = OR;
-        };
-
-
-particular : greater { $$ = IF_GREATER; }
-        | g_equal { $$ = IF_GREATEREQ; }
-        |less { $$ = IF_LESS; }
-        |l_equal { $$ = IF_LESSEQ; }
-        |equal { $$ = IF_EQ; }
-        |n_equal { $$ = IF_NOTEQ; }
-        ;
-
-arithm: plus{ $$ = ADD;}
-        | minus {$$ = SUB;}
-        | multiply {$$ = MUL;}
-        | division {$$ = DIV;}
-        | mod {$$ = MOD;}
-        ;
 
 
 

@@ -1,6 +1,2 @@
-if (a)
-	d=4;
-else
-	c=a;
-
+x = a or b and c;
 

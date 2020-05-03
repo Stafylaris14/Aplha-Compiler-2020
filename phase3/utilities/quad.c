@@ -730,9 +730,10 @@ void backpatch(zavo *list, int label)
     if (list != NULL)
     {
         zavo *tmp = list;
+        printf("back\n");
         while (tmp != NULL)
         {
-            printf("labell %d\n",tmp->label);
+            printf("quad %d labell %d\n",tmp->label,label);
             quads[tmp->label].label = label;
             tmp = tmp->next;
         }
@@ -818,25 +819,62 @@ zavo *insert_before_zavo(zavo *head, int i)
     return head;
 }
 
-zavo *mergelist(zavo *first, zavo *second)
-{
-    zavo *temp = first;
-    zavo *temp1 = second;
-    zavo *newListhead = NULL;
+// zavo *mergelist(zavo *first, zavo *second)
+// {
+//     zavo *temp = first;
+//     zavo *temp1 = second;
+//     zavo *newListhead = NULL;
 
-    while (temp != NULL)
-    {
-        newListhead = insert_before_zavo(newListhead, temp->label);
-        temp = temp->next;
-    }
+//     while (temp != NULL)
+//     {
+//         newListhead = insert_before_zavo(newListhead, temp->label);
+//         temp = temp->next;
+//     }
 
-    while (temp1 != NULL)
-    {
-        newListhead = insert_before_zavo(newListhead, temp1->label);
-        temp1 = temp1->next;
+//     while (temp1 != NULL)
+//     {
+//         newListhead = insert_before_zavo(newListhead, temp1->label);
+//         temp1 = temp1->next;
+//     }
+//     return newListhead;
+// }
+
+zavo * mergelist(zavo *list1, zavo *list2){
+  zavo *newlist = NULL;
+  zavo *tmp1 = list1;
+  zavo *tmp2 = list2;
+  zavo *newnode;
+  red();
+  printf("alazqww\n");
+  wht();
+  while(tmp1){
+    newnode = malloc(sizeof(zavo));
+    newnode->label = tmp1->label;
+    newnode->next = NULL;
+    if(newlist == NULL){
+      newlist = newnode;
+    }else {
+      newnode->next = newlist;
+      newlist = newnode;
     }
-    return newListhead;
+    tmp1 = tmp1->next;
+  }
+  while(tmp2){
+    newnode = malloc(sizeof(zavo));
+    newnode->label = tmp2->label;
+    newnode->next = NULL;
+    if(newlist == NULL){
+      newlist = newnode;
+    }else {
+      newnode->next = newlist;
+      newlist = newnode;
+    }
+    tmp2 = tmp2->next;
+  }
+return newlist;
 }
+
+
 
 unsigned int istempname(char *s)
 {
