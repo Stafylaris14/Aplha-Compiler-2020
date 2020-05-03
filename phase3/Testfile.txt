@@ -1,2 +1,2 @@
-x = a or b and c;
+x = a and b or c;
 
