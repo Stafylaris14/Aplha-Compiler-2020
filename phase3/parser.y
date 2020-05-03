@@ -336,7 +336,7 @@ Expression: Assignexpression {$$ = $1;}
                 $$->falselist = new_list(nextquad()-1);
                 assign_flag = 1;               
             }
-            | Term {;}
+            | Term {$$ = $1;}
              ;
 
 
