@@ -789,10 +789,10 @@ void backpatch(zavo *list, int label)
     if (list != NULL)
     {
         zavo *tmp = list;
-        printf("back\n");
+       // printf("back\n");
         while (tmp != NULL)
         {
-            printf("quad %d labell %d\n",tmp->label,label);
+           // printf("quad %d labell %d\n",tmp->label,label);
             quads[tmp->label].label = label;
             tmp = tmp->next;
         }

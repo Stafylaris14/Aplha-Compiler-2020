@@ -317,6 +317,7 @@ Expression: Assignexpression {$$ = $1;}
                 emit(JUMP,NULL,NULL,NULL,-1);
                 $$->truelist = new_list(nextquad()-2);
                 $$->falselist = new_list(nextquad()-1);
+                printf("lessss\n");
                 assign_flag = 1; 
             }
             | Expression g_equal Expression {
@@ -575,8 +576,6 @@ Elist:  Expression Multy_exp {
 Multy_exp: comma Expression Multy_exp {
                  $2->next = $3;
                  $$ = $2;
-                 //den to brika diale3eis
-                 printf("na to dw ligo stiw diale3eis pou to peira\n");
         }
         | {$$ = NULL;}
         ;
@@ -776,11 +775,12 @@ whilecont: left_parenthesis Expression right_parenthesis{
         emit(ASSIGN,newexpr_constbool(0),NULL,$2,-1);
         backpatch($2->truelist, nextquad()-2);
         backpatch($2->falselist, nextquad());
-        }
         assign_flag = 0;
+        }
         red();
-        printf("prepei na dw\n");
-        wht();
+-        printf("prepei na dw\n");
+-        wht();
+
         //
         emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+3);
         emit(JUMP , NULL , NULL , NULL , -1);
@@ -793,27 +793,21 @@ Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
                 emit(JUMP , NULL , NULL , NULL,$1+1);         
                 patchlabel($2 -1, nextquad()+1);
-                if($4 != NULL){
+   
                 backpatch($4->breaklist, nextquad()+1); 
-                         red() ; 
-                        printf("dennnn preepei na bgalw to backpatch\n");    
-                        wht();
                 backpatch($4->contlist,$1);
-                }else{
-                        red() ; 
-                        printf("preepei na bgalw to backpatch\n");    
-                        wht();
-                }
+                
                 $$=$4;
         }
     ;
 
 Forstmt:ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N{
         loopFlag --;
-        patchlabel($1->enter,$6+1);
-        patchlabel($2,nextquad());
-        patchlabel($6,$1->test);
-        patchlabel($8,$2+1);
+        
+        patchlabel($1->enter,$6+2);
+        patchlabel($2,nextquad()+1);
+        patchlabel($6,$1->test+1);
+        patchlabel($8,$2+2);
         //8elei kapoios elenxous edwwwwwwwww
         
         backpatch($7->breaklist,nextquad());
@@ -823,6 +817,15 @@ Forstmt:ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N{
         ;
 
 ForFix: For left_parenthesis Elist semicolon M Expression semicolon{
+        backpatch($6->truelist, nextquad()+1);
+        backpatch($6->falselist, nextquad()+3);
+        if($6->type == boolexpr_){  
+                emit(ASSIGN,newexpr_constbool(1),NULL,$6,-1);
+                emit(JUMP,NULL,NULL,NULL,nextquad()+3);
+                emit(ASSIGN,newexpr_constbool(0),NULL,$6,-1);
+                assign_flag = 0;
+        }
+        $$ = malloc(sizeof(for_init));
         $$->test = $5;
         $$->enter = nextquad();
         emit(IF_EQ,$6,newexpr_constbool(1),NULL,-1);
@@ -839,7 +842,6 @@ N:{
 };
 
 Returnstmt: Return semicolon{libcheck =0;
-        //8elei mallon kapoio jump gia merikiiiiiiiiiiiiiiii
          emit(RETURN, NULL, NULL, NULL, -1);
          emit(JUMP,NULL,NULL,NULL,-1);
          $$ = malloc(sizeof(expr));
@@ -847,7 +849,6 @@ Returnstmt: Return semicolon{libcheck =0;
         | Return{returnFlag = 1; 
         } Expression semicolon {libcheck =0;
         returnFlag =0; 
-        //8elei mallon kapoio jump gia merikiiiiiiiiiiiiiiii
         emit(RETURN, $3, NULL, NULL, -1);
         emit(JUMP,NULL,NULL,NULL,-1);
         $$= $3;
