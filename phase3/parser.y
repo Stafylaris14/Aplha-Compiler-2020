@@ -485,7 +485,7 @@ Lvalue: id {
                                 if(isFA($1))libcheck =1;
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
-                                else {item* new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
+                                else {new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
                                 $$ = lvalue_expr(new);
                                  
 
