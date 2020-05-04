@@ -136,7 +136,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
-%type <EXPR> Elist
+%type <EXPR> Elist Block
 %type <EXPR> Call Stmts 
 %type <EXPR> Term  Indexed Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
@@ -167,10 +167,11 @@ States: States Stmt {;}
 
 
 Stmts:Stmts Stmt{
+        $$ = $2;
         $$->breaklist = mergelist($1->breaklist,$2->breaklist);
         $$->contlist = mergelist($1->contlist,$2->contlist);
 } 
-| Stmt {$$ = $1;}
+|{printf("AN TRWW SEGM NA BALW ELENXW\n");}
 ;
 
 Stmt: Expression semicolon {
@@ -207,7 +208,7 @@ Stmt: Expression semicolon {
             $$->contlist = new_list(nextquad());
             emit(JUMP,NULL,NULL,NULL,-1);
             }
-    | Block {;}
+    | Block {$$ = $1;}
     | Funcdef {;}
     | semicolon {libcheck =0;}
     ;
@@ -357,7 +358,6 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 emit(JUMP,NULL,NULL,NULL,-1);
                 $$->truelist = new_list(nextquad()-1);
                 $$->falselist = new_list(nextquad()-2);
-                assign_flag = 1;
         }
         | plus_plus Lvalue {
                 if(libcheck == 1){
@@ -636,7 +636,9 @@ Block: left_curle_bracket{scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         Stmts right_curle_bracket {
                 if(objectHide)hide(scopeCounter);
-                scopeCounter--;}
+                scopeCounter--;
+                $$ = $3;
+                }
         ;
 
 
@@ -787,11 +789,17 @@ Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
                 emit(JUMP , NULL , NULL , NULL,$1+1);         
                 patchlabel($2 -1, nextquad()+1);
+                if($4 != NULL){
                 backpatch($4->breaklist, nextquad()+1); 
-               red() ; 
-                          printf("exwe bgalei ta backpatch\n");    
-                          wht();
+                         red() ; 
+                        printf("dennnn preepei na bgalw to backpatch\n");    
+                        wht();
                 backpatch($4->contlist,$1);
+                }else{
+                        red() ; 
+                        printf("preepei na bgalw to backpatch\n");    
+                        wht();
+                }
                 $$=$4;
         }
     ;
@@ -803,6 +811,7 @@ Forstmt:ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N{
         patchlabel($6,$1->test);
         patchlabel($8,$2+1);
         //8elei kapoios elenxous edwwwwwwwww
+        
         backpatch($7->breaklist,nextquad());
         backpatch($7->contlist,$2+1);
         $$ = $7;
