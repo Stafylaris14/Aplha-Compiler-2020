@@ -84,7 +84,7 @@ void print_quads()
             a3 = malloc(sizeof(char) * 200);
             if (quads[i].arg1 != NULL)
             {
-                 // printf("typee arg1 %d\n" ,quads[i].arg1->type);
+               //   printf("typee arg1 %d\n" ,quads[i].arg1->type);
                 switch (quads[i].arg1->type)
                 {
                 case nill_:
@@ -104,13 +104,14 @@ void print_quads()
                     a1 = quads[i].arg1->sym->name;
                     break;
                 case conststring_:
-                    a1 = quads[i].arg1->stringConst;
+                   // a1 = quads[i].arg1->stringConst;
+                    sprintf(a1, "\'%s\'",quads[i].arg1->stringConst);
                     break;
                 case constbool_:
                     if (quads[i].arg1->boolConst == 1)
-                        a1 = "TRUE";
+                        a1 = "\'true\'";
                     else if (quads[i].arg1->boolConst == 0)
-                        a1 = "FALSE";
+                        a1 = "\'false\'";
                     else
                     {
                         red();
@@ -139,11 +140,11 @@ void print_quads()
                     a1 = get_opcode_expr_string(quads[i].arg1->type);
                     break;
                 }
-               // printf("feugw arg1 %s\n" ,a1);
+              //  printf("feugw arg1 %s\n" ,a1);
             }
             if (quads[i].arg2 != NULL)
             {
-               // printf("typee a2 %d\n" ,quads[i].arg2->type);
+              //  printf("typee a2 %d\n" ,quads[i].arg2->type);
                 switch (quads[i].arg2->type)
                 {
                 case nill_:
@@ -163,13 +164,14 @@ void print_quads()
                     a2 = quads[i].arg2->sym->name;
                     break;
                 case conststring_:
-                    a2 = quads[i].arg2->stringConst;
+                    sprintf(a2, "\'%s\'",quads[i].arg2->stringConst);
+                    //a2 = quads[i].arg2->stringConst;
                     break;
                 case constbool_:
                     if (quads[i].arg2->boolConst == 1)
-                        a2 = "TRUE";
+                        a2 = "\'true\'";
                     else if (quads[i].arg2->boolConst == 0)
-                        a2 = "FALSE";
+                        a2 = "\'false\'";
                     else
                     {
                         red();
@@ -184,7 +186,7 @@ void print_quads()
                     a2 = quads[i].arg2->sym->name;
                 break;
                 case boolexpr_:
-                    a1 = quads[i].arg2->sym->name;
+                    a2 = quads[i].arg2->sym->name;
                     break;
                 case tableitem_:
                     a2 = quads[i].arg2->sym->name;
@@ -204,7 +206,7 @@ void print_quads()
             if (quads[i].result == NULL)
                 a3 = "";
             else{
-             //   printf("typee resy %d\n" ,quads[i].result->type);
+               // printf("typee resy %d\n" ,quads[i].result->type);
                 switch (quads[i].result->type)
                 {
                 case nill_:
@@ -224,13 +226,14 @@ void print_quads()
                     a3= quads[i].result->sym->name;
                     break;
                 case conststring_:
-                    a3= quads[i].result->stringConst;
+                    //a3= quads[i].result->stringConst;
+                    sprintf(a3, "\'%s\'",quads[i].result->stringConst);
                     break;
                 case constbool_:
                     if (quads[i].result->boolConst == 1)
-                        a3= "TRUE";
+                        a3= "\'true\'";
                     else if (quads[i].result->boolConst == 0)
-                        a3= "FALSE";
+                        a3= "\'false\'";
                     else
                     {
                         red();
@@ -245,7 +248,7 @@ void print_quads()
                     a3= quads[i].result->sym->name;
                 break;
                 case boolexpr_:
-                    a1 = quads[i].result->sym->name;
+                    a3 = quads[i].result->sym->name;
                     break;
                 case tableitem_:
                     a3 = quads[i].result->sym->name;
@@ -259,7 +262,7 @@ void print_quads()
                     a3= get_opcode_expr_string(quads[i].result->type);
                     break;
                 }
-               // printf("feugw res %s\n" ,a3);
+              //  printf("feugw res %s\n" ,a3);
             }
             
             if (quads[i].op == JUMP)

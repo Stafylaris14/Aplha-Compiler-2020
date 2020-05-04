@@ -1,1 +1,1 @@
-while(TRUE){};
+not i == j;

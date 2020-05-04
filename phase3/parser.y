@@ -171,7 +171,7 @@ Stmts:Stmts Stmt{
         $$->breaklist = mergelist($1->breaklist,$2->breaklist);
         $$->contlist = mergelist($1->contlist,$2->contlist);
 } 
-|{printf("AN TRWW SEGM NA BALW ELENXW\n");}
+|{$$ = malloc(sizeof(expr));}
 ;
 
 Stmt: Expression semicolon {
@@ -356,8 +356,10 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 $$->sym = tmp_item();
                 emit(IF_EQ,$2,newexpr_constbool(1),NULL,-1);
                 emit(JUMP,NULL,NULL,NULL,-1);
+                printf("not tru %d kai false %d\n",nextquad()-1,nextquad()-2);
                 $$->truelist = new_list(nextquad()-1);
                 $$->falselist = new_list(nextquad()-2);
+                assign_flag = 1;
         }
         | plus_plus Lvalue {
                 if(libcheck == 1){
@@ -439,7 +441,7 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
 Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis me synartiseis", yylineno); libcheck=0;}} assign Expression {
         
                 if($1->type == tableitem_){ 
-                        emit(TABLESETELEM, $4, $1->index, $1 , -1);
+                        emit(TABLESETELEM, $1->index,$4 , $1 , -1);
                         $$ = emit_iftableitem($1);
                         $$->type = assignexp_;
                 }else{
@@ -637,6 +639,7 @@ Block: left_curle_bracket{scopeCounter++;
         Stmts right_curle_bracket {
                 if(objectHide)hide(scopeCounter);
                 scopeCounter--;
+                if($3 == NULL)printf("gameeee\n");
                 $$ = $3;
                 }
         ;
@@ -724,6 +727,7 @@ Multy_id: Multy_id comma id {
 
 
 Ifstmt: ifFix Stmt {
+               
                 patchlabel($1-1 , nextquad()+1);
                 $$ = $2;
         }
