@@ -1,1 +1,8 @@
-not i == j;
+
+function aa(a, b) { 
+	a + b;
+	return 8;
+	9-0;
+}
+
+aa(h,u);

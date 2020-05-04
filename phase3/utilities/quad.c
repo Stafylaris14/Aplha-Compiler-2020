@@ -82,9 +82,10 @@ void print_quads()
             a1 = malloc(sizeof(char) * 200);
             a2 = malloc(sizeof(char) * 200);
             a3 = malloc(sizeof(char) * 200);
+           // printf("quad %s\n" , get_opcode_string(quads[i].op));
             if (quads[i].arg1 != NULL)
             {
-               //   printf("typee arg1 %d\n" ,quads[i].arg1->type);
+                // printf("typee arg1 %d\n" ,quads[i].arg1->type);
                 switch (quads[i].arg1->type)
                 {
                 case nill_:
@@ -140,7 +141,7 @@ void print_quads()
                     a1 = get_opcode_expr_string(quads[i].arg1->type);
                     break;
                 }
-              //  printf("feugw arg1 %s\n" ,a1);
+               // printf("feugw arg1 %s\n" ,a1);
             }
             if (quads[i].arg2 != NULL)
             {
@@ -200,13 +201,13 @@ void print_quads()
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
                     break;
                 }
-              //  printf("feugw arg2 %s\n" ,a2);
+            //    printf("feugw arg2 %s\n" ,a2);
             }
 
             if (quads[i].result == NULL)
                 a3 = "";
             else{
-               // printf("typee resy %d\n" ,quads[i].result->type);
+            //    printf("typee resy %d\n" ,quads[i].result->type);
                 switch (quads[i].result->type)
                 {
                 case nill_:
@@ -262,7 +263,7 @@ void print_quads()
                     a3= get_opcode_expr_string(quads[i].result->type);
                     break;
                 }
-              //  printf("feugw res %s\n" ,a3);
+             //  printf("feugw res %s\n" ,a3);
             }
             
             if (quads[i].op == JUMP)

@@ -145,7 +145,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <strVal> Funcname
 %type <intVal> Funcbody
 %type <label_jumps> Whilestart
-%type <EXPR> Whilestmt 
+%type <EXPR> Whilestmt  Returnstmt
 %type <label_jumps> whilecont M N 
 %type <label_jumps> elseFix ifFix
 %type <for_call> Methodcall
@@ -191,7 +191,7 @@ Stmt: Expression semicolon {
     | Whilestmt {$$ = $1;}
     | Forstmt {$$ = $1;}
     | Returnstmt {
-            
+            $$ = $1;
             if(functionFlag == 0)error("no function to return" , yylineno);
             }
     | Break semicolon {
@@ -841,12 +841,16 @@ N:{
 Returnstmt: Return semicolon{libcheck =0;
         //8elei mallon kapoio jump gia merikiiiiiiiiiiiiiiii
          emit(RETURN, NULL, NULL, NULL, -1);
+         emit(JUMP,NULL,NULL,NULL,-1);
+         $$ = malloc(sizeof(expr));
         }
         | Return{returnFlag = 1; 
         } Expression semicolon {libcheck =0;
         returnFlag =0; 
         //8elei mallon kapoio jump gia merikiiiiiiiiiiiiiiii
         emit(RETURN, $3, NULL, NULL, -1);
+        emit(JUMP,NULL,NULL,NULL,-1);
+        $$= $3;
         }
             ;
 
