@@ -51,19 +51,7 @@ void extend_quads()
     total += EXTEND;
 }
 
-/* void print_quads()
-{
-    cyn();
-    printf("quad#\t opcode\t result \t arg1 \t arg2 \t label \n");
-    printf("-------------------------------------------------------------------------\n");
 
-    int i;
-    for (i = 0; i < total; i++)
-    {
-
-        
-    }
-} */
 
 void print_quads()
 {
@@ -82,7 +70,7 @@ void print_quads()
             a1 = malloc(sizeof(char) * 200);
             a2 = malloc(sizeof(char) * 200);
             a3 = malloc(sizeof(char) * 200);
-           // printf("quad %s\n" , get_opcode_string(quads[i].op));
+            //printf("quad %s\n" , get_opcode_string(quads[i].op));
             if (quads[i].arg1 != NULL)
             {
                 // printf("typee arg1 %d\n" ,quads[i].arg1->type);
@@ -786,6 +774,7 @@ void add_to_falselist(expr *e, int label)
 
 void backpatch(zavo *list, int label)
 {
+
     if (list != NULL)
     {
         zavo *tmp = list;

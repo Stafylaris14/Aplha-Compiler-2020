@@ -176,11 +176,12 @@ Stmts:Stmts Stmt{
 
 Stmt: Expression semicolon {
         libcheck =0;
+        printf("tese \n");
         if(assign_flag){
         emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
         emit(JUMP,NULL,NULL,NULL,nextquad() +3);
         emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
-        printf("tese \n");
+        
         backpatch($1->truelist, nextquad()-2);
         backpatch($1->falselist, nextquad());
         assign_flag = 0;
@@ -210,7 +211,7 @@ Stmt: Expression semicolon {
             }
     | Block {$$ = $1;}
     | Funcdef {;}
-    | semicolon {libcheck =0;}
+    | semicolon {libcheck =0;$$ = malloc(sizeof(expr));}
     ;
 
 
@@ -448,6 +449,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                 }else{
                         $$ = newexpr(assignexp_);
                         $$->sym = tmp_item();
+                        if($4->type == boolexpr_){
                         if(assign_flag){
                                 emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
                                 emit(JUMP,NULL,NULL,NULL , nextquad() + 3);
@@ -456,6 +458,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                                 backpatch($4->truelist, nextquad() -2);
                                 backpatch($4->falselist, nextquad());
                                 assign_flag = 0;
+                        }
                         }
                         emit(ASSIGN,$4,NULL,$1 , -1);
                         emit(ASSIGN,$1,NULL,$$ , -1);
@@ -778,24 +781,26 @@ whilecont: left_parenthesis Expression right_parenthesis{
         assign_flag = 0;
         }
         red();
--        printf("prepei na dw\n");
--        wht();
+        printf("prepei na dw\n");
+        wht();
 
         //
         emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+3);
         emit(JUMP , NULL , NULL , NULL , -1);
-        printf("tri\n");
         $$ = nextquad();
 }
 ;
 
 Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 loopFlag--;
+                
                 emit(JUMP , NULL , NULL , NULL,$1+1);         
                 patchlabel($2 -1, nextquad()+1);
-   
+
+              //  if($4 == NULL)
+              //  printf("elaaaa \n");
                 backpatch($4->breaklist, nextquad()+1); 
-                backpatch($4->contlist,$1);
+                backpatch($4->contlist,$1+ 1);
                 
                 $$=$4;
         }
@@ -810,8 +815,8 @@ Forstmt:ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N{
         patchlabel($8,$2+2);
         //8elei kapoios elenxous edwwwwwwwww
         
-        backpatch($7->breaklist,nextquad());
-        backpatch($7->contlist,$2+1);
+        backpatch($7->breaklist,nextquad()+1);
+        backpatch($7->contlist,$2+2);
         $$ = $7;
 }
         ;
