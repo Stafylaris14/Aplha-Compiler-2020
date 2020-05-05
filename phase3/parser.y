@@ -176,12 +176,11 @@ Stmts:Stmts Stmt{
 
 Stmt: Expression semicolon {
         libcheck =0;
-        printf("tese \n");
         if(assign_flag){
         emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
         emit(JUMP,NULL,NULL,NULL,nextquad() +3);
         emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
-        
+        printf("tese \n");
         backpatch($1->truelist, nextquad()-2);
         backpatch($1->falselist, nextquad());
         assign_flag = 0;
@@ -356,12 +355,21 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
         | not Expression {
                 $$ = newexpr(boolexpr_); 
                 $$->sym = tmp_item();
-                emit(IF_EQ,$2,newexpr_constbool(1),NULL,-1);
-                emit(JUMP,NULL,NULL,NULL,-1);
+                emit(IF_EQ,$2,newexpr_constbool(1),NULL,nextquad()+5);
+                emit(JUMP,NULL,NULL,NULL,nextquad()+2);
                 printf("not tru %d kai false %d\n",nextquad()-1,nextquad()-2);
-                $$->truelist = new_list(nextquad()-1);
-                $$->falselist = new_list(nextquad()-2);
-                assign_flag = 1;
+                // $$->truelist = new_list(nextquad()-1);
+                // $$->falselist = new_list(nextquad()-2);
+ 
+                emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
+                emit(JUMP,NULL,NULL,NULL , nextquad() + 3);
+                emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1); 
+                printf("NOTTTT\n");
+                backpatch($2->truelist, nextquad() -2);
+                backpatch($2->falselist, nextquad());
+                                
+
+                assign_flag = 0;
         }
         | plus_plus Lvalue {
                 if(libcheck == 1){
@@ -372,7 +380,7 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 if($2->type == tableitem_){
                         $$ = emit_iftableitem($2);
                         emit(ADD,$$,newexpr_constnum(1),$$,-1);
-                        emit(TABLESETELEM,$$,$2->index,$2,-1);
+                        emit(TABLESETELEM,$2->index,$$,$2,-1);
                 }else{
                         emit(ADD,$2,newexpr_constnum(1),$2,-1);
                         $$ = newexpr(arthmexp_);
@@ -409,7 +417,7 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 if($2->type == tableitem_){
                         $$ = emit_iftableitem($2);
                         emit(SUB,$$,newexpr_constnum(1),$$ ,-1);
-                        emit(TABLESETELEM,$$,$2->index,$2 , -1);
+                        emit(TABLESETELEM,$2->index,$$,$2 , -1);
                 }else{
                         emit(SUB,$2,newexpr_constnum(1),$2 , -1);
                         $$ = newexpr(arthmexp_);
