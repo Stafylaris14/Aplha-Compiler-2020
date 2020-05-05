@@ -1,3 +1,4 @@
-  not i == j or not k != l;
-
-
+	while (not y) {
+		print(not y);
+		break;
+	}

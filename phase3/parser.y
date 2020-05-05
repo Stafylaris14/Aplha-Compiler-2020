@@ -176,7 +176,7 @@ Stmts:Stmts Stmt{
 
 Stmt: Expression semicolon {
         libcheck =0;
-        if(assign_flag){
+        if(assign_flag ==1){
         emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
         emit(JUMP,NULL,NULL,NULL,nextquad() +3);
         emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
@@ -184,6 +184,10 @@ Stmt: Expression semicolon {
         backpatch($1->truelist, nextquad()-2);
         backpatch($1->falselist, nextquad());
         assign_flag = 0;
+        }else if(assign_flag ==2){
+                backpatch($1->truelist, nextquad()-2);
+                backpatch($1->falselist, nextquad());
+                assign_flag = 0;
         }
         $$ = $1;
     }
@@ -254,6 +258,7 @@ Expression: Assignexpression {$$ = $1;}
                 backpatch($1->truelist, $4+1); // + 1 einai to swsto mallon
                 $$->truelist = $5->truelist;
                 $$->falselist = mergelist($1->falselist,$5->falselist);
+                if(assign_flag !=2)
                 assign_flag = 1;
 
             }       
@@ -277,7 +282,8 @@ Expression: Assignexpression {$$ = $1;}
                 backpatch($1->falselist,$4+1);
                 $$->truelist = mergelist($1->truelist, $5->truelist);
                 $$->falselist = $5->falselist;
-                assign_flag = 1;            
+                 if(assign_flag !=2)
+                assign_flag = 1;           
                 }
             | Expression mod Expression {
                  $$ = new_expression(arthmexp_ );  
@@ -358,18 +364,17 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 emit(IF_EQ,$2,newexpr_constbool(1),NULL,nextquad()+5);
                 emit(JUMP,NULL,NULL,NULL,nextquad()+2);
                 printf("not tru %d kai false %d\n",nextquad()-1,nextquad()-2);
-                // $$->truelist = new_list(nextquad()-1);
-                // $$->falselist = new_list(nextquad()-2);
- 
+                 $$->truelist = new_list(nextquad()-1);
+                 $$->falselist = new_list(nextquad()-2);
+                if($2->type != boolexpr_ )printf("booleeen notttt\n");
                 emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
                 emit(JUMP,NULL,NULL,NULL , nextquad() + 3);
                 emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1); 
-                printf("NOTTTT\n");
                 backpatch($2->truelist, nextquad() -2);
                 backpatch($2->falselist, nextquad());
                                 
 
-                assign_flag = 0;
+                assign_flag = 2;
         }
         | plus_plus Lvalue {
                 if(libcheck == 1){
@@ -458,7 +463,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                         $$ = newexpr(assignexp_);
                         $$->sym = tmp_item();
                         if($4->type == boolexpr_){
-                        if(assign_flag){
+                        if(assign_flag==1){
                                 emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
                                 emit(JUMP,NULL,NULL,NULL , nextquad() + 3);
                                 emit(ASSIGN,newexpr_constbool(0),NULL,$$ , -1); 
@@ -466,6 +471,10 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                                 backpatch($4->truelist, nextquad() -2);
                                 backpatch($4->falselist, nextquad());
                                 assign_flag = 0;
+                        }else if(assign_flag==2){
+                                backpatch($4->truelist, nextquad() -2);
+                                backpatch($4->falselist, nextquad());
+
                         }
                         }
                         emit(ASSIGN,$4,NULL,$1 , -1);
@@ -781,12 +790,14 @@ Whilestart: While{
 whilecont: left_parenthesis Expression right_parenthesis{
        //
         if($2->type== boolexpr_){ 
+        if(assign_flag != 2){       
         emit(ASSIGN,newexpr_constbool(1),NULL,$2,-1);
         emit(JUMP,NULL,NULL,NULL,nextquad()+3);
         emit(ASSIGN,newexpr_constbool(0),NULL,$2,-1);
         backpatch($2->truelist, nextquad()-2);
         backpatch($2->falselist, nextquad());
         assign_flag = 0;
+        }
         }
         red();
         printf("prepei na dw\n");
