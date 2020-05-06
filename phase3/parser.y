@@ -49,6 +49,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
     int label_jumps;                       /* gia ta jumps */
     struct for_call *for_call;
     struct for_init *for_init;
+    struct indexstr *indexstr;
 }
 
 
@@ -138,7 +139,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <EXPR> Assignexpression
 %type <EXPR> Elist Block
 %type <EXPR> Call Stmts 
-%type <EXPR> Term  Indexed Multy_exp Ifstmt Forstmt
+%type <EXPR> Term   Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
 %type <item> Funcdef
 %type <item> Funcprefix
@@ -152,7 +153,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <for_call> Callsuffix
 %type <for_call> Normalcall
 %type <for_init> ForFix
-
+%type <indexstr> Indexed Indexedelement Multy_ind
 
 
 
@@ -611,7 +612,7 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
         //isws 8elei temp to $3
         while($3){
                 printf("oo\n");
-                emit(TABLESETELEM, t,newexpr_constnum(i++), $3,-1);
+                emit(TABLESETELEM, newexpr_constnum(i++),$3, t,-1);
                 printf("e\n");
                 $3 = $3->next;
         }
@@ -623,9 +624,10 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
                 objectHide=1;
                 expr *t = newexpr(newtable_);
                 t->sym = tmp_item();
+                
                 emit(TABLECREATE,t,NULL,NULL,-1);
                 while($3){
-                        emit(TABLESETELEM, $3,$3->index,t,-1);
+                        emit(TABLESETELEM, $3->ena,$3->dio,t,-1);
                         $3 = $3->next;
                 }     
                 $$ = t;  
@@ -634,21 +636,41 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
 
 
 Indexed: Indexedelement Multy_ind {
-        printf("na psa2w diafaneis");
+        printf("inmdexed\n");
+                 $1->next=$2;
+                 $$ = $1;
         }
          ;
 
 Multy_ind: Multy_ind comma Indexedelement {
-        printf("na psa2w diafaneis");}
-        | {;}
+         printf("multui\n");
+                // if($3 == NULL){
+                //         cyn();
+                //         printf("se 8elwwwww\n");
+                //         $1 = malloc(sizeof(indexstr));
+                //         $1 = $3;
+                // }else{
+                //      red();
+                //      printf("tapa\n"); 
+                //      $1->next = $3;  
+                // }
+                
+                $3->next = $1;
+                $$ = $3;}
+        | {$$= NULL;}
          ;
 
 Indexedelement: left_curle_bracket{scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
-                Expression colon Expression right_curle_bracket {
+                Expression colon Expression right_curle_bracket {       
                         if(objectHide)hide(scopeCounter);
                         scopeCounter--;
-                printf("8elei ftia3imoooo\n");
+                        $$ = malloc(sizeof(indexstr));
+                        printf("gamw ta index\n");
+                        $$->ena = $3;
+                        $$->dio = $5;
+                        $$->next = NULL;
+                        printf("gamw ta e3ww\n");
                  }
                 ;
 

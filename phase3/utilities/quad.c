@@ -80,7 +80,7 @@ void print_quads()
                     a1 = "nill";
                     break;
                 case newtable_:
-                    a1 = "newTable";
+                    a1 = quads[i].arg1->sym->name;
                     break; /* den exw idea */
                 case assignexp_:
                     a1 = quads[i].arg1->sym->name;
@@ -140,10 +140,10 @@ void print_quads()
                     a2 = "nill";
                     break;
                 case newtable_:
-                    a2 = "newTable";
+                    a2 = quads[i].arg2->sym->name;
                     break; /* den exw idea */
                 case assignexp_:
-                    a2 = quads[i].arg2->sym->name;
+                    quads[i].arg2->sym->name;
                     break;
                 case arthmexp_:
                     //itoa(quads[i].arg2->numConst, a2 ,10 );
@@ -202,7 +202,7 @@ void print_quads()
                     a3= "nill";
                     break;
                 case newtable_:
-                    a3= "newTable";
+                    a3 =  quads[i].result->sym->name;
                     break; /* den exw idea */
                 case assignexp_:
                     a3 = quads[i].result->sym->name;

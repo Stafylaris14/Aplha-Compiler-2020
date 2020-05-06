@@ -105,6 +105,12 @@ typedef struct stack1
     int *stackarray;
 } stack1;
 
+typedef struct indexstr{
+    expr *ena;
+    expr *dio;
+    struct indexstr *next;
+}indexstr;
+
 void init_quads();
 
 void extend_quads();
