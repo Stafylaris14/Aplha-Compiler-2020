@@ -168,9 +168,11 @@ States: States Stmt {;}
 
 
 Stmts:Stmts Stmt{
+        
         $$ = $2;
         $$->breaklist = mergelist($1->breaklist,$2->breaklist);
         $$->contlist = mergelist($1->contlist,$2->contlist);
+
 } 
 |{$$ = malloc(sizeof(expr));}
 ;
@@ -214,7 +216,7 @@ Stmt: Expression semicolon {
             emit(JUMP,NULL,NULL,NULL,-1);
             }
     | Block {$$ = $1;}
-    | Funcdef {;}
+    | Funcdef {$$=  malloc(sizeof(expr));}
     | semicolon {libcheck =0;$$ = malloc(sizeof(expr));}
     ;
 
@@ -608,15 +610,10 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
         t->sym = tmp_item();
         emit(TABLECREATE,t,NULL,NULL,-1);
         int i = 0;
-        printf("trwww segm sto test p3t_object_creation_expr\n");
-        //isws 8elei temp to $3
         while($3){
-                printf("oo\n");
                 emit(TABLESETELEM, newexpr_constnum(i++),$3, t,-1);
-                printf("e\n");
                 $3 = $3->next;
         }
-         printf("sew232323\n");
         $$ = t;
         }
         | left_bracket{scopeCounter--;objectHide =0;} Indexed right_bracket {
@@ -624,7 +621,6 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
                 objectHide=1;
                 expr *t = newexpr(newtable_);
                 t->sym = tmp_item();
-                
                 emit(TABLECREATE,t,NULL,NULL,-1);
                 while($3){
                         emit(TABLESETELEM, $3->ena,$3->dio,t,-1);
@@ -636,14 +632,12 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
 
 
 Indexed: Indexedelement Multy_ind {
-        printf("inmdexed\n");
                  $1->next=$2;
                  $$ = $1;
         }
          ;
 
 Multy_ind: Multy_ind comma Indexedelement {
-         printf("multui\n");
                 // if($3 == NULL){
                 //         cyn();
                 //         printf("se 8elwwwww\n");
@@ -666,11 +660,9 @@ Indexedelement: left_curle_bracket{scopeCounter++;
                         if(objectHide)hide(scopeCounter);
                         scopeCounter--;
                         $$ = malloc(sizeof(indexstr));
-                        printf("gamw ta index\n");
                         $$->ena = $3;
                         $$->dio = $5;
                         $$->next = NULL;
-                        printf("gamw ta e3ww\n");
                  }
                 ;
 
