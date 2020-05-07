@@ -555,9 +555,9 @@ Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {
                 }         
                 $$ = make_call($1,$3->elist);
                 callFlag =0;}
-        | left_parenthesis{callFlag =1;libcheck = 0;} Funcdef right_parenthesis left_parenthesis Elist right_parenthesis {
+        | left_parenthesis Funcdef right_parenthesis {callFlag =1;libcheck = 0;} left_parenthesis Elist right_parenthesis {
                 expr* func = newexpr(pfunc_);
-                func->sym = $3;
+                func->sym = $2;
                 $$ = make_call(func,$6);
                 callFlag =0;}
         ;
