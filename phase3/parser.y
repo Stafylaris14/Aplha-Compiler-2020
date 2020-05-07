@@ -137,14 +137,13 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 
 %type <EXPR> Expression
 %type <EXPR> Assignexpression
-%type <EXPR> Elist Block
+%type <EXPR> Elist Block Funcbody
 %type <EXPR> Call Stmts 
 %type <EXPR> Term   Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
 %type <item> Funcdef
 %type <item> Funcprefix
 %type <strVal> Funcname
-%type <intVal> Funcbody
 %type <label_jumps> Whilestart
 %type <EXPR> Whilestmt  Returnstmt
 %type <label_jumps> whilecont M N 
@@ -172,7 +171,7 @@ Stmts:Stmts Stmt{
         $$ = $2;
         $$->breaklist = mergelist($1->breaklist,$2->breaklist);
         $$->contlist = mergelist($1->contlist,$2->contlist);
-
+        $$->returnlist = mergelist($1->returnlist,$2->returnlist);
 } 
 |{$$ = malloc(sizeof(expr));}
 ;
@@ -679,6 +678,7 @@ Block: left_curle_bracket{scopeCounter++;
 
 
 Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend{
+        backpatch($4->returnlist, nextquad()+1);
         expr*temp = newexpr(pfunc_);
         temp->sym = $1;
         emit(FUNCEND,temp,NULL,NULL,-1);
@@ -715,13 +715,17 @@ Funcname: id{
 Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++; }
         ;
 
-Funcbody: Block{functionFlag --;getoffset();}
+Funcbody: Block{
+        $$=$1;
+        functionFlag --;getoffset();
+        }
         ;
 
 Funcblockstart: {push1(loopcounterstack, loopFlag); loopFlag = 0;}        
         ;
 
-Funcblockend: {loopFlag = pop1(loopcounterstack);}
+Funcblockend: {
+        loopFlag = pop1(loopcounterstack);}
         ;
 
 Const:  integer {$$ = newexpr_constint($1);
@@ -883,6 +887,7 @@ Returnstmt: Return semicolon{libcheck =0;
          emit(RETURN, NULL, NULL, NULL, -1);
          emit(JUMP,NULL,NULL,NULL,-1);
          $$ = malloc(sizeof(expr));
+         $$->returnlist = new_list(nextquad()-1);
         }
         | Return{returnFlag = 1; 
         } Expression semicolon {libcheck =0;
@@ -890,6 +895,7 @@ Returnstmt: Return semicolon{libcheck =0;
         emit(RETURN, $3, NULL, NULL, -1);
         emit(JUMP,NULL,NULL,NULL,-1);
         $$= $3;
+        $$->returnlist = new_list(nextquad()-1);
         }
             ;
 

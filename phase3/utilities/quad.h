@@ -71,6 +71,7 @@ typedef struct expression
     zavo *contlist;
     zavo *falselist;
     zavo *truelist;
+    zavo *returnlist;
     struct expression *next;
 } expr;
 
