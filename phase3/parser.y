@@ -17,6 +17,7 @@ extern int yylineno;
 int returnFlag = 0;
 extern char* yytext;
 extern FILE* yyin;
+extern int tmp_count;
 int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
@@ -166,14 +167,14 @@ States: States Stmt {;}
     ;
 
 
-Stmts:Stmts Stmt{
+Stmts:Stmts Stmt {
         
         $$ = $2;
         $$->breaklist = mergelist($1->breaklist,$2->breaklist);
         $$->contlist = mergelist($1->contlist,$2->contlist);
         $$->returnlist = mergelist($1->returnlist,$2->returnlist);
 } 
-|{$$ = malloc(sizeof(expr));}
+| {$$ = malloc(sizeof(expr));}
 ;
 
 Stmt: Expression semicolon {
@@ -182,7 +183,6 @@ Stmt: Expression semicolon {
         emit(ASSIGN,newexpr_constbool(1),NULL,$1,-1);
         emit(JUMP,NULL,NULL,NULL,nextquad() +3);
         emit(ASSIGN,newexpr_constbool(0),NULL,$1,-1);
-        printf("tese \n");
         backpatch($1->truelist, nextquad()-2);
         backpatch($1->falselist, nextquad());
         assign_flag = 0;
@@ -192,7 +192,8 @@ Stmt: Expression semicolon {
                 assign_flag = 0;
         }
         $$ = $1;
-    }
+        tmp_count = 0;
+    } 
     | Ifstmt {$$ = $1;}
     | Whilestmt {$$ = $1;}
     | Forstmt {$$ = $1;}
@@ -240,7 +241,7 @@ Expression: Assignexpression {$$ = $1;}
                 $$ = new_expression(arthmexp_ );  
                 $$->sym = tmp_item();
                 emit(DIV , $1 , $3 , $$ , -1);}
-            |Expression and  {if($1->type != boolexpr_ ){
+            |Expression and  {if($1->type != boolexpr_ ) {
                 emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
                 emit(JUMP,NULL,NULL,NULL,-1);
                 printf("pro %d\n",nextquad()-2);
@@ -264,7 +265,7 @@ Expression: Assignexpression {$$ = $1;}
                 assign_flag = 1;
 
             }       
-            | Expression or  {if($1->type != boolexpr_ ){
+            | Expression or  {if($1->type != boolexpr_ ) {
                 emit(IF_EQ , $1 , newexpr_constbool(1) , NULL , -1);
                 emit(JUMP,NULL,NULL,NULL,-1);
                 printf("pro %d\n",nextquad()-2);
@@ -541,13 +542,13 @@ Member: Lvalue dot id {libcheck = 0;
                 $$->sym = $1->sym;
                 $$->index = $3;
                 }
-        | Call {callFlag =1;libcheck =0;} dot id {callFlag =0;libcheck = 0;}
-        | Call {callFlag =1;libcheck=0;} left_bracket Expression right_bracket {callFlag =0;libcheck = 0;}
+        | Call {callFlag =1;libcheck =0;} dot id {callFlag =0;libcheck = 0;printf("emaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");}
+        | Call {callFlag =1;libcheck=0;} left_bracket Expression right_bracket {callFlag =0;libcheck = 0;printf("emaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");}
         ;
 
 
-Call: Call {callFlag =1;libcheck = 0;}left_parenthesis Elist right_parenthesis {$$=make_call($1,$4);callFlag =0;}
-        |  Lvalue{callFlag =1;libcheck = 0;} Callsuffix {
+Call: Call {callFlag =1;libcheck = 0;} left_parenthesis Elist right_parenthesis {$$=make_call($1,$4);callFlag =0;}
+        |  Lvalue {callFlag =1;libcheck = 0;} Callsuffix {
                 if($3->method){
                         expr* t = $1;
                         $1 = emit_iftableitem(member_item(t,$3->name));
@@ -602,7 +603,7 @@ Multy_exp: comma Expression Multy_exp {
         | {$$ = NULL;}
         ;
 
-Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
+Objectdef: left_bracket {scopeCounter--;objectHide =0;} Elist right_bracket {
         scopeCounter++;
         objectHide=1;
         expr *t = newexpr(newtable_);
@@ -615,7 +616,7 @@ Objectdef: left_bracket{scopeCounter--;objectHide =0;}Elist right_bracket {
         }
         $$ = t;
         }
-        | left_bracket{scopeCounter--;objectHide =0;} Indexed right_bracket {
+        | left_bracket {scopeCounter--;objectHide =0;} Indexed right_bracket {
                 scopeCounter++;
                 objectHide=1;
                 expr *t = newexpr(newtable_);
@@ -653,7 +654,7 @@ Multy_ind: Multy_ind comma Indexedelement {
         | {$$= NULL;}
          ;
 
-Indexedelement: left_curle_bracket{scopeCounter++;
+Indexedelement: left_curle_bracket {scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
                 Expression colon Expression right_curle_bracket {       
                         if(objectHide)hide(scopeCounter);
@@ -666,7 +667,7 @@ Indexedelement: left_curle_bracket{scopeCounter++;
                 ;
 
 
-Block: left_curle_bracket{scopeCounter++;
+Block: left_curle_bracket {scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         Stmts right_curle_bracket {
                 if(objectHide)hide(scopeCounter);
@@ -677,7 +678,8 @@ Block: left_curle_bracket{scopeCounter++;
         ;
 
 
-Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend{
+Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend {
+
         backpatch($4->returnlist, nextquad()+1);
         expr*temp = newexpr(pfunc_);
         temp->sym = $1;
@@ -701,10 +703,10 @@ Funcprefix: Function Funcname{
 }
 ;
 
-Funcname: id{
+Funcname: id {
                 $$ = $1;
         }
-        |{
+        | {
                 char noname[20];
                 sprintf(noname,"function$%d",functionCounter);
                 functionCounter++;
@@ -712,10 +714,10 @@ Funcname: id{
         }
 ;
 
-Funcargs: left_parenthesis{scopeCounter++;} Idlist  right_parenthesis{offset = 0;scopeCounter--;functionFlag++; }
+Funcargs: left_parenthesis {scopeCounter++;} Idlist  right_parenthesis {offset = 0;scopeCounter--;functionFlag++; }
         ;
 
-Funcbody: Block{
+Funcbody: Block {
         $$=$1;
         functionFlag --;getoffset();
         }
@@ -794,18 +796,18 @@ ifFix: If left_parenthesis Expression right_parenthesis{
                 $$ = nextquad();
 };
 
-elseFix: Else{
+elseFix: Else {
         $$ = nextquad();                                        /* STAF */
         emit(JUMP , NULL , NULL ,NULL, -1);
 }
 ;
 
-Whilestart: While{
+Whilestart: While {
         $$ = nextquad();
 }
 ;
 
-whilecont: left_parenthesis Expression right_parenthesis{
+whilecont: left_parenthesis Expression right_parenthesis {
        //
         if($2->type== boolexpr_){ 
         if(assign_flag != 2){       
@@ -816,10 +818,11 @@ whilecont: left_parenthesis Expression right_parenthesis{
         backpatch($2->falselist, nextquad());
         assign_flag = 0;
         }
-        }
-        red();
+                red();
         printf("prepei na dw\n");
         wht();
+        }
+
 
         //
         emit(IF_EQ , $2 , new_expr_constbool(1) , NULL , nextquad()+3);
@@ -834,31 +837,32 @@ Whilestmt: Whilestart whilecont {loopFlag ++;} Stmt {
                 emit(JUMP , NULL , NULL , NULL,$1+1);         
                 patchlabel($2 -1, nextquad()+1);
 
-              //  if($4 == NULL)
-              //  printf("elaaaa \n");
                 backpatch($4->breaklist, nextquad()+1); 
                 backpatch($4->contlist,$1+ 1);
-                
                 $$=$4;
+                $$->breaklist = NULL;
+                $$->contlist = NULL;
         }
     ;
 
-Forstmt:ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N{
+Forstmt: ForFix N Elist right_parenthesis {loopFlag ++;} N Stmt N {
         loopFlag --;
         
         patchlabel($1->enter,$6+2);
         patchlabel($2,nextquad()+1);
         patchlabel($6,$1->test+1);
         patchlabel($8,$2+2);
-        //8elei kapoios elenxous edwwwwwwwww
         
         backpatch($7->breaklist,nextquad()+1);
         backpatch($7->contlist,$2+2);
+        
         $$ = $7;
+        $$->breaklist = NULL;
+        $$->contlist = NULL;
 }
         ;
 
-ForFix: For left_parenthesis Elist semicolon M Expression semicolon{
+ForFix: For left_parenthesis Elist semicolon M Expression semicolon {
         backpatch($6->truelist, nextquad()+1);
         backpatch($6->falselist, nextquad()+3);
         if($6->type == boolexpr_){  
@@ -883,13 +887,13 @@ N:{
          emit(JUMP,NULL,NULL,NULL,-1);
 };
 
-Returnstmt: Return semicolon{libcheck =0;
+Returnstmt: Return semicolon {libcheck =0;
          emit(RETURN, NULL, NULL, NULL, -1);
          emit(JUMP,NULL,NULL,NULL,-1);
          $$ = malloc(sizeof(expr));
          $$->returnlist = new_list(nextquad()-1);
         }
-        | Return{returnFlag = 1; 
+        | Return {returnFlag = 1; 
         } Expression semicolon {libcheck =0;
         returnFlag =0; 
         emit(RETURN, $3, NULL, NULL, -1);
