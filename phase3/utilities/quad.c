@@ -37,6 +37,7 @@ void init_quads()
     }
 }
 
+
 void extend_quads()
 {
     assert(total == currQuad);
@@ -50,19 +51,7 @@ void extend_quads()
     total += EXTEND;
 }
 
-/* void print_quads()
-{
-    cyn();
-    printf("quad#\t opcode\t result \t arg1 \t arg2 \t label \n");
-    printf("-------------------------------------------------------------------------\n");
 
-    int i;
-    for (i = 0; i < total; i++)
-    {
-
-        
-    }
-} */
 
 void print_quads()
 {
@@ -81,19 +70,20 @@ void print_quads()
             a1 = malloc(sizeof(char) * 200);
             a2 = malloc(sizeof(char) * 200);
             a3 = malloc(sizeof(char) * 200);
+            //printf("quad %s\n" , get_opcode_string(quads[i].op));
             if (quads[i].arg1 != NULL)
             {
-                //  printf("typee %d\n" ,quads[i].arg1->type);
+                // printf("typee arg1 %d\n" ,quads[i].arg1->type);
                 switch (quads[i].arg1->type)
                 {
                 case nill_:
                     a1 = "nill";
                     break;
                 case newtable_:
-                    a1 = "newTable";
+                    a1 = quads[i].arg1->sym->name;
                     break; /* den exw idea */
                 case assignexp_:
-                    a1 = "assign expression";
+                    a1 = quads[i].arg1->sym->name;
                     break;
                 case arthmexp_:
                     //itoa(quads[i].arg1->numConst, a1 ,10 );
@@ -103,13 +93,14 @@ void print_quads()
                     a1 = quads[i].arg1->sym->name;
                     break;
                 case conststring_:
-                    a1 = quads[i].arg1->stringConst;
+                   // a1 = quads[i].arg1->stringConst;
+                    sprintf(a1, "\'%s\'",quads[i].arg1->stringConst);
                     break;
                 case constbool_:
                     if (quads[i].arg1->boolConst == 1)
-                        a1 = "TRUE";
+                        a1 = "\'true\'";
                     else if (quads[i].arg1->boolConst == 0)
-                        a1 = "FALSE";
+                        a1 = "\'false\'";
                     else
                     {
                         red();
@@ -123,23 +114,36 @@ void print_quads()
                 case pfunc_:
                     a1 = quads[i].arg1->sym->name;
                     break;
+                case boolexpr_:
+                    a1 = quads[i].arg1->sym->name;
+                    break;
+                case tableitem_:
+                    a1 = quads[i].arg1->sym->name;
+                    break;
+                case lfunc_:
+                    red();
+                    printf("na to libb\n");
+                    cyn();
+                    break;
                 default:
                     a1 = get_opcode_expr_string(quads[i].arg1->type);
                     break;
                 }
+               // printf("feugw arg1 %s\n" ,a1);
             }
             if (quads[i].arg2 != NULL)
             {
+              //  printf("typee a2 %d\n" ,quads[i].arg2->type);
                 switch (quads[i].arg2->type)
                 {
                 case nill_:
                     a2 = "nill";
                     break;
                 case newtable_:
-                    a2 = "newTable";
+                    a2 = quads[i].arg2->sym->name;
                     break; /* den exw idea */
                 case assignexp_:
-                    a2 = "assign expression";
+                    quads[i].arg2->sym->name;
                     break;
                 case arthmexp_:
                     //itoa(quads[i].arg2->numConst, a2 ,10 );
@@ -149,13 +153,14 @@ void print_quads()
                     a2 = quads[i].arg2->sym->name;
                     break;
                 case conststring_:
-                    a2 = quads[i].arg2->stringConst;
+                    sprintf(a2, "\'%s\'",quads[i].arg2->stringConst);
+                    //a2 = quads[i].arg2->stringConst;
                     break;
                 case constbool_:
                     if (quads[i].arg2->boolConst == 1)
-                        a2 = "TRUE";
+                        a2 = "\'true\'";
                     else if (quads[i].arg2->boolConst == 0)
-                        a2 = "FALSE";
+                        a2 = "\'false\'";
                     else
                     {
                         red();
@@ -169,16 +174,86 @@ void print_quads()
                 case pfunc_:
                     a2 = quads[i].arg2->sym->name;
                 break;
+                case boolexpr_:
+                    a2 = quads[i].arg2->sym->name;
+                    break;
+                case tableitem_:
+                    a2 = quads[i].arg2->sym->name;
+                    break;
+                case lfunc_:
+                    red();
+                    printf("na to libb\n");
+                    cyn();
+                    break;
                 default:
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
                     break;
                 }
+            //    printf("feugw arg2 %s\n" ,a2);
             }
 
             if (quads[i].result == NULL)
                 a3 = "";
-            else
-                a3 = quads[i].result->sym->name;
+            else{
+            //    printf("typee resy %d\n" ,quads[i].result->type);
+                switch (quads[i].result->type)
+                {
+                case nill_:
+                    a3= "nill";
+                    break;
+                case newtable_:
+                    a3 =  quads[i].result->sym->name;
+                    break; /* den exw idea */
+                case assignexp_:
+                    a3 = quads[i].result->sym->name;
+                    break;
+                case arthmexp_:
+                    //itoa(quads[i].arg2->numConst, a3,10 );
+                    a3= quads[i].result->sym->name;
+                    break;
+                case var_:
+                    a3= quads[i].result->sym->name;
+                    break;
+                case conststring_:
+                    //a3= quads[i].result->stringConst;
+                    sprintf(a3, "\'%s\'",quads[i].result->stringConst);
+                    break;
+                case constbool_:
+                    if (quads[i].result->boolConst == 1)
+                        a3= "\'true\'";
+                    else if (quads[i].result->boolConst == 0)
+                        a3= "\'false\'";
+                    else
+                    {
+                        red();
+                        printf("den exei oristei to boolean\n");
+                        wht();
+                    }
+                    break;
+                case constnum_:
+                    sprintf(a3, "%d", quads[i].result->numConst);
+                    break;
+                case pfunc_:
+                    a3= quads[i].result->sym->name;
+                break;
+                case boolexpr_:
+                    a3 = quads[i].result->sym->name;
+                    break;
+                case tableitem_:
+                    a3 = quads[i].result->sym->name;
+                    break;
+                case lfunc_:
+                    red();
+                    printf("na to libb\n");
+                    cyn();
+                    break;
+                default:
+                    a3= get_opcode_expr_string(quads[i].result->type);
+                    break;
+                }
+             //  printf("feugw res %s\n" ,a3);
+            }
+            
             if (quads[i].op == JUMP)
             {
                 printf("%d: %s %d [line %d]\n",
@@ -234,6 +309,7 @@ quad newQuad(iopcode op, expr *arg1, expr *arg2, expr *res)
     tmp.arg2 = arg2;
     tmp.result = res;
     tmp.lineno = yylineno;
+    
     /* kati gia to label */
     return tmp;
 }
@@ -267,10 +343,10 @@ expr *new_expression(expr_t type)
     expr *tmp_expression = malloc(sizeof(expr));
     tmp_expression->type = type;
     /* init lists */
-    tmp_expression->truelist = NULL;
-    tmp_expression->falselist = NULL;
-    tmp_expression->contlist = NULL;
-    tmp_expression->breaklist = NULL;
+    // tmp_expression->truelist = NULL;
+    // tmp_expression->falselist = NULL;
+    // tmp_expression->contlist = NULL;
+    // tmp_expression->breaklist = NULL;
 
     return tmp_expression;
 }
@@ -512,7 +588,8 @@ expr *newexpr(expr_t t)
 }
 
 expr *newexpr_constring(char *s)
-{
+{ 
+    
     expr *e = newexpr(conststring_);
     e->stringConst = strdup(s);
     return e;
@@ -534,10 +611,10 @@ expr *emit_iftableitem(expr *e)
 expr *newexpr_constint(int i)
 {
     expr *e = newexpr(constnum_);
-    e->contlist = NULL;
-    e->breaklist = NULL;
-    e->falselist = NULL;
-    e->truelist = NULL;
+    // e->contlist = NULL;
+    // e->breaklist = NULL;
+    // e->falselist = NULL;
+    // e->truelist = NULL;
     e->numConst = i;
     return e;
 }
@@ -546,10 +623,10 @@ expr *member_item(expr *lv, char *name)
 {
     lv = emit_iftableitem(lv);
     expr *ti = newexpr(tableitem_);
-    ti->contlist = NULL;
-    ti->breaklist = NULL;
-    ti->falselist = NULL;
-    ti->truelist = NULL;
+    // ti->contlist = NULL;
+    // ti->breaklist = NULL;
+    // ti->falselist = NULL;
+    // ti->truelist = NULL;
     ti->sym = lv->sym;
     ti->index = newexpr_constring(name);
     return ti;
@@ -559,10 +636,10 @@ expr *lvalue_expr(item *sym)
 {
     assert(sym);
     expr *e = (expr *)malloc(sizeof(expr));
-    e->contlist = NULL;
-    e->breaklist = NULL;
-    e->falselist = NULL;
-    e->truelist = NULL;
+    // e->contlist = NULL;
+    // e->breaklist = NULL;
+    // e->falselist = NULL;
+    // e->truelist = NULL;
     memset(e, 0, sizeof(expr));
     e->next = (expr *)0;
     e->sym = sym;
@@ -697,11 +774,14 @@ void add_to_falselist(expr *e, int label)
 
 void backpatch(zavo *list, int label)
 {
+
     if (list != NULL)
     {
         zavo *tmp = list;
-        while (tmp)
+       // printf("back\n");
+        while (tmp != NULL)
         {
+           // printf("quad %d labell %d\n",tmp->label,label);
             quads[tmp->label].label = label;
             tmp = tmp->next;
         }
@@ -711,10 +791,10 @@ void backpatch(zavo *list, int label)
 expr *newexpr_constbool(unsigned int b)
 {
     expr *e = newexpr(constbool_);
-    e->contlist = NULL;
-    e->breaklist = NULL;
-    e->falselist = NULL;
-    e->truelist = NULL;
+    // e->contlist = NULL;
+    // e->breaklist = NULL;
+    // e->falselist = NULL;
+    // e->truelist = NULL;
     e->boolConst = b;
     return e;
 }
@@ -806,6 +886,7 @@ zavo *mergelist(zavo *first, zavo *second)
     }
     return newListhead;
 }
+
 
 unsigned int istempname(char *s)
 {

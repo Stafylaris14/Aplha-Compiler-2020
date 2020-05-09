@@ -1,9 +1,9 @@
 compiler: parser scanner 
-	gcc -c parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c
-	gcc -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
-	gcc -c utilities/quad.c
+	gcc -c  parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c
+	gcc -c  scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
+	gcc -c  utilities/quad.c
 	gcc -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o quad.o
-	./calc Testfile.txt
+	
 
 wall: parser scanner 
 	gcc -Wall -c parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c

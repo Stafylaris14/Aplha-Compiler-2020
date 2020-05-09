@@ -71,6 +71,7 @@ typedef struct expression
     zavo *contlist;
     zavo *falselist;
     zavo *truelist;
+    zavo *returnlist;
     struct expression *next;
 } expr;
 
@@ -104,6 +105,12 @@ typedef struct stack1
     int maxsize;
     int *stackarray;
 } stack1;
+
+typedef struct indexstr{
+    expr *ena;
+    expr *dio;
+    struct indexstr *next;
+}indexstr;
 
 void init_quads();
 
@@ -180,3 +187,4 @@ zavo *mergelist(zavo *first, zavo *second);
 unsigned int istempname(char *s);
 
 unsigned int istempexpr(expr *e);
+

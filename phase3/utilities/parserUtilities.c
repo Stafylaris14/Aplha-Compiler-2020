@@ -108,7 +108,7 @@ int accessToFunction(item *new)
       if (returnFlag != 1)
       {
         char *str = returnErrorString("Not access", new->name);
-
+        return 1;
         error(str, yylineno);
       }
       else
