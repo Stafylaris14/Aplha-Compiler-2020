@@ -386,7 +386,12 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 }
                 check_arith($2,"++ lvalue");
                 if($2->type == tableitem_){
-                        $$ = emit_iftableitem($2);
+
+
+                         $$ = newexpr(var_);
+                         $$->sym = tmp_item();
+                         emit(TABLEGETELEM, $2, $2->index, $$, -1);
+
                         emit(ADD,$$,newexpr_constnum(1),$$,-1);
                         emit(TABLESETELEM,$2->index,$$,$2,-1);
                 }else{
@@ -405,15 +410,21 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 $$ = newexpr(boolexpr_); 
                 $$->sym = tmp_item();
                 if($1->type==tableitem_){
-                        expr *val = emit_iftableitem($1);
+
+                        expr *val = newexpr(var_);
+                        val->sym = tmp_item();
+                        emit(TABLEGETELEM, $1, $1->index, val, -1);
+
                         emit(ASSIGN,val,NULL,$$,-1);
-                        emit(ADD,val,newexpr_constnum(1),val,-1);
-                        emit(TABLESETELEM,$1->index,val,$1,-1);
+                        emit(ADD,val,newexpr_constnum(1),val , -1);
+                        emit(TABLESETELEM,$1->index,val,$1 , -1);
+                       // $$= val;
+
                 }else{
                         emit(ASSIGN,$1,NULL,$$,-1);
                         emit(ADD,$1,newexpr_constnum(1),$1,-1);
+                        //$$ = $1;
                 }
-                $$ = $1;
 
         }
         | minus_minus Lvalue {
@@ -423,7 +434,12 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                         }
                 check_arith($2,"-- lvalue");
                 if($2->type == tableitem_){
-                        $$ = emit_iftableitem($2);
+
+                        $$ = newexpr(var_);
+                        $$->sym = tmp_item();
+                        emit(TABLEGETELEM, $2, $2->index, $$, -1);
+
+
                         emit(SUB,$$,newexpr_constnum(1),$$ ,-1);
                         emit(TABLESETELEM,$2->index,$$,$2 , -1);
                 }else{
@@ -443,15 +459,20 @@ Term:   left_parenthesis Expression right_parenthesis {$$ = $2;}
                 $$ = newexpr(boolexpr_); 
                 $$->sym = tmp_item();
                 if($1->type==tableitem_){
-                        expr *val = emit_iftableitem($1);
+                        expr *val = newexpr(var_);
+                        val->sym = tmp_item();
+                        emit(TABLEGETELEM, $1, $1->index, val, -1);
+
                         emit(ASSIGN,val,NULL,$$,-1);
                         emit(SUB,val,newexpr_constnum(1),val , -1);
                         emit(TABLESETELEM,$1->index,val,$1 , -1);
+                       // $$= val;
                 }else{
                         emit(ASSIGN,$1,NULL,$$ , -1);
                         emit(SUB,$1,newexpr_constnum(1),$1 ,-1);
+                       // $$ = $1;
                 }
-                $$ = $1;
+                
         }
         | Primary {$$ = $1;}
         ;
@@ -624,6 +645,8 @@ Objectdef: left_bracket {scopeCounter--;objectHide =0;} Elist right_bracket {
                 emit(TABLECREATE,t,NULL,NULL,-1);
                 while($3){
                         emit(TABLESETELEM, $3->ena,$3->dio,t,-1);
+                        
+                        
                         $3 = $3->next;
                 }     
                 $$ = t;  
@@ -637,20 +660,18 @@ Indexed: Indexedelement Multy_ind {
         }
          ;
 
-Multy_ind: Multy_ind comma Indexedelement {
+Multy_ind:  comma Indexedelement Multy_ind  {
                 // if($3 == NULL){
                 //         cyn();
-                //         printf("se 8elwwwww\n");
                 //         $1 = malloc(sizeof(indexstr));
                 //         $1 = $3;
                 // }else{
                 //      red();
-                //      printf("tapa\n"); 
                 //      $1->next = $3;  
                 // }
                 
-                $3->next = $1;
-                $$ = $3;}
+                $2->next = $3;
+                $$ = $2;}
         | {$$= NULL;}
          ;
 

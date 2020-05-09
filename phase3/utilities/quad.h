@@ -187,4 +187,3 @@ zavo *mergelist(zavo *first, zavo *second);
 unsigned int istempname(char *s);
 
 unsigned int istempexpr(expr *e);
-

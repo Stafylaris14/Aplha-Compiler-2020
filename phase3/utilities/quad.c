@@ -73,7 +73,7 @@ void print_quads()
             //printf("quad %s\n" , get_opcode_string(quads[i].op));
             if (quads[i].arg1 != NULL)
             {
-                // printf("typee arg1 %d\n" ,quads[i].arg1->type);
+                 //printf("typee arg1 %d\n" ,quads[i].arg1->type);
                 switch (quads[i].arg1->type)
                 {
                 case nill_:
@@ -133,7 +133,7 @@ void print_quads()
             }
             if (quads[i].arg2 != NULL)
             {
-              //  printf("typee a2 %d\n" ,quads[i].arg2->type);
+               // printf("typee a2 %d\n" ,quads[i].arg2->type);
                 switch (quads[i].arg2->type)
                 {
                 case nill_:
@@ -143,7 +143,7 @@ void print_quads()
                     a2 = quads[i].arg2->sym->name;
                     break; /* den exw idea */
                 case assignexp_:
-                    quads[i].arg2->sym->name;
+                    a2 =quads[i].arg2->sym->name;
                     break;
                 case arthmexp_:
                     //itoa(quads[i].arg2->numConst, a2 ,10 );
@@ -189,13 +189,13 @@ void print_quads()
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
                     break;
                 }
-            //    printf("feugw arg2 %s\n" ,a2);
+                //printf("feugw arg2 %s\n" ,a2);
             }
 
             if (quads[i].result == NULL)
                 a3 = "";
             else{
-            //    printf("typee resy %d\n" ,quads[i].result->type);
+                //printf("typee resy %d\n" ,quads[i].result->type);
                 switch (quads[i].result->type)
                 {
                 case nill_:
@@ -251,7 +251,7 @@ void print_quads()
                     a3= get_opcode_expr_string(quads[i].result->type);
                     break;
                 }
-             //  printf("feugw res %s\n" ,a3);
+               //printf("feugw res %s\n" ,a3);
             }
             
             if (quads[i].op == JUMP)
@@ -897,3 +897,5 @@ unsigned int istempexpr(expr *e)
 {
     return e->sym && istempname(e->sym->name);
 }
+
+

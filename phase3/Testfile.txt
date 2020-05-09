@@ -1,18 +1,18 @@
-while (11)
-	for (12-0; 13; 14-0) {
-		if (15)
-			16-0;
-		else if (17)
-			18-0;
-		else
-			19-0;
-		break;
-		continue;
-	}
 
-for (20-0; 21; 22-0) {
-	while (23)
-		break;
-	continue;
+function iamafunction(a, b) { 
+	a + b;
+	return 8;
+	9-0;
 }
+
+function iamnothing() { iamafunction; }
+
+ihavenoname = (function(){ 10-0; return 12; 11-0; });
+
+function(){}
+
+function(){ function() { iamafunction(3,4); } }
+
+
+
 
