@@ -17,7 +17,6 @@ extern int yylineno;
 int returnFlag = 0;
 extern char* yytext;
 extern FILE* yyin;
-extern int tmp_count;
 int functionCounter = 0; /* for no name functions */
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
@@ -192,7 +191,6 @@ Stmt: Expression semicolon {
                 assign_flag = 0;
         }
         $$ = $1;
-        tmp_count = 0;
     } 
     | Ifstmt {$$ = $1;}
     | Whilestmt {$$ = $1;}
