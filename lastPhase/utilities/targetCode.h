@@ -2,6 +2,9 @@
 #include "quad.h"
 #include <assert.h>
 
+#define CONST_ARR_SIZE 100
+
+
 #define AVM_STACKSIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
@@ -71,12 +74,12 @@ typedef struct instruction
     int line;
 }instr;
 
-struct userFunc
+typedef struct userFunc
 {
     int address;
     int localsize;
-    int id;
-};
+    char* id;
+}userFunc;
 
 
 
@@ -132,7 +135,7 @@ char** stringConsts;
 int stringConstSize = 0;
 char** namedLibFuncs;
 int namedLibFuncsSize = 0;
-struct userFunc* userFuncs;
+struct userFunc* userFuncs[CONST_ARR_SIZE];
 int userFuncSize = 0;
 
 
@@ -140,6 +143,20 @@ void make_operand(expr* e , vmarg* argumnent);
 
 void emit_target(instr *i);
 
+void init_const_arrays();
+
+
+//gia ta add sta const arrays gia paragori target code
+            int consts_add_numconst(int val);
+
+            int consts_add_stringconst(char* str);
+
+            int consts_add_namedLibFuncs(char* funcName);
+
+            userFunc* newUserFunction(int address , int localsize , char* name);
+
+            int consts_add_userFunc(userFunc *func);
+//
 avm_memcell stack[AVM_STACKSIZE];
 
 avm_table *avm_tablenew(void); 
