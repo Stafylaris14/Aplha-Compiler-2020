@@ -1,4 +1,74 @@
 #include "targetCode.h"
+#include "../dataStructs/linkedList.h"
+void expand_instractions()
+{
+    assert(I_CURRENT_SIZE == current_instraction);
+    instr *a = malloc(I_NEW_SIZE);
+    int i;
+    if (instractions)
+    {
+        memcpy(a, instractions, I_CURRENT_SIZE);
+        free(instractions);
+    }
+    instractions = a;
+}
+
+void init_instractions()
+{
+    int i;
+    current_instraction = 0;
+    instractions = malloc(sizeof(instractions) * I_SIZE);
+
+    for (i = 0; i < I_SIZE; i++)
+    {
+        instractions[i].res = NULL;
+        instractions[i].arg1 = NULL;
+        instractions[i].arg2 = NULL;
+        instractions[i].op = -1;
+        instractions[i].line = -1;
+    }
+}
+
+void print_instractions()
+{
+    int i;
+    cyn();
+    printf("-----------instractions (target CODE) -----------------\n");
+    for(i = 0; i < current_instraction; i++)
+    {
+        if(!instractions[i].res)
+        printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n" ,i ,instractions[i].op, instractions[i].res->val , instractions[i].arg1->val ,instractions[i].arg2->val);
+    }
+    print_const_arrays();
+}
+
+void print_const_arrays()
+{
+    int i;
+    grn();
+    printf("-----NUM CONSTS -----\n");
+    for (i = 0;i < numConstSize; i++)
+    {
+        printf("%d: %d\n" , i ,numConsts[i] );
+    }
+    printf("-----STRING CONSTS -----\n");
+    for (i = 0;i < stringConstSize; i++)
+    {
+        printf("%d: %s\n" , i ,stringConsts[i] );
+    }
+    
+    printf("-----NAMED LIB FUNCTIONS -----\n");
+    for (i = 0;i < namedLibFuncsSize; i++)
+    {
+        printf("%d: %s\n" , i ,namedLibFuncs[i] );
+    }
+    printf("-----USER FUNCTIONS -----\n");
+    for (i = 0;i < userFuncSize; i++)
+    {
+        printf("%d: %s\n" , i ,userFuncs[i]->id );
+    }
+    wht();
+}
 
 void make_operand(expr *e, vmarg *arg)
 {
@@ -84,73 +154,34 @@ int consts_add_stringconst(char *str)
 {
     stringConsts[stringConstSize] = strdup(str);
     stringConstSize++;
-    return stringConstSize-1;
+    return stringConstSize - 1;
 }
 
-int consts_add_namedLibFuncs(char* funcName)
+int consts_add_namedLibFuncs(char *funcName)
 {
     namedLibFuncs[namedLibFuncsSize] = funcName;
     namedLibFuncsSize++;
-    return namedLibFuncsSize-1;
+    return namedLibFuncsSize - 1;
 }
 
 //to address einai to quad pou 3ekinaei h sinartisi kai to localsize einai to plithos tws formal arguments
-userFunc* newUserFunction(int address , int localsize , char* name)
+userFunc *newUserFunction(int address, int localsize, char *name)
 {
-    userFunc* tmp = malloc(sizeof(userFunc));
+    userFunc *tmp = malloc(sizeof(userFunc));
     tmp->address = address;
     tmp->localsize = localsize;
 
     tmp->id = strdup(name);
 
-
     return tmp;
 }
-
 
 int consts_add_userFunc(userFunc *func)
 {
     userFuncs[userFuncSize] = func;
     userFuncSize++;
-    return userFuncSize-1;
+    return userFuncSize - 1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 static void avm_initstack(void)
 {
@@ -199,7 +230,7 @@ void avm_tablebucketsdestroy(avm_table_bucket **p)
     for (i = 0; i < AVM_TABLE_HASHSIZE; ++i, ++p)
     {
         avm_table_bucket *b;
-        for (*b=*p; b;)         //den exw idea! TODO
+        for (*b = *p; b;) //den exw idea! TODO
         {
             avm_table_bucket *del = b;
             b = b->next;

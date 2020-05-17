@@ -4,6 +4,14 @@
 
 #define CONST_ARR_SIZE 100
 
+//gia ton pinaka tou telikou kwdika
+        #define I_SIZE 1024
+        #define I_EXPAND 1024
+        #define I_CURRENT_SIZE current_instraction * sizeof(instr)
+        #define I_NEW_SIZE (I_SIZE * sizeof(instr) + I_CURRENT_SIZE)
+
+        int current_instraction = 0;
+//
 
 #define AVM_STACKSIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
@@ -68,9 +76,9 @@ typedef struct vmarg
 typedef struct instruction
 {
     vmop op;
-    vmarg arg1;
-    vmarg arg2;
-    vmarg res;
+    vmarg *arg1;
+    vmarg *arg2;
+    vmarg *res;
     int line;
 }instr;
 
@@ -121,12 +129,17 @@ struct avm_table_bucket {
 };
 
 
+instr* instractions = (instr*)0;
 
+void init_instractions();
 
+void expand_instractions();
 
+void init_instractions();
 
+void print_instractions();
 
-
+void print_const_arrays();
 
 
 int* numConsts;                             
@@ -168,16 +181,16 @@ avm_memcell* avm_tablegetelem(avm_memcell* key);//8elei ftia3imo
 void avm_tablesetelem(avm_memcell* key, avm_memcell* value); //8elei ftia3imo
 
 
- static void avm_initstack(void);
+static void avm_initstack(void);
 
- void avm_tableincrefcounter(avm_table *t);
+void avm_tableincrefcounter(avm_table *t);
 
- void avm_tabledecrefcounter(avm_table *t);
+void avm_tabledecrefcounter(avm_table *t);
 
- void avm_tablebucketsinit(avm_table_bucket **p);
+void avm_tablebucketsinit(avm_table_bucket **p);
 
- void avm_memcellclear(avm_memcell* m);//8elei ilopoihsh
+void avm_memcellclear(avm_memcell* m);//8elei ilopoihsh
 
- void avm_tablebucketsdestroy(avm_table_bucket **p);
+void avm_tablebucketsdestroy(avm_table_bucket **p);
 
- void avm_tabledestroy(avm_table *t);
+void avm_tabledestroy(avm_table *t);
