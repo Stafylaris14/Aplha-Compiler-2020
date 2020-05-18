@@ -3,7 +3,7 @@
 /* #include "../dataStructs/sym.h" */
 #include "parserUtilities.h"
 unsigned int total = 0;
-quad *quads = (quad *)0;
+
 typedef enum Iopcode
 {
     ASSIGN,
@@ -86,6 +86,8 @@ typedef struct Quad
     int label; /* ???????? */
     int lineno;
 } quad;
+
+quad *quads = (quad *)0;
 
 typedef struct for_call
 {

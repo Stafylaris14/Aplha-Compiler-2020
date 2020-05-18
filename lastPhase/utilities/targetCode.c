@@ -3,6 +3,197 @@
 
 extern unsigned int total;
 
+void generate_ASSIGN(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(assign_v , vmres , vmarg1 , vmarg2);
+}
+void generate_ADD(quad q)
+{
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(add_v , vmres , vmarg1 , vmarg2);
+}
+void generate_SUB(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(sub_v , vmres , vmarg1 , vmarg2);
+}
+void generate_MUL(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(mul_v , vmres , vmarg1 , vmarg2);
+}
+void generate_DIV(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(div_v , vmres , vmarg1 , vmarg2);
+}
+void generate_MOD(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(mod_v , vmres , vmarg1 , vmarg2);
+}
+void generate_UMINUS(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(assign_v , vmres , vmarg1 , vmarg2);//TODO na to dw to uminus
+}
+void generate_AND(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1); 
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(and_v , vmres , vmarg1 , vmarg2);
+}
+void generate_OR(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(or_v , vmres , vmarg1 , vmarg2);//TODO
+}
+void generate_NOT(quad q){
+        vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(assign_v , vmres , vmarg1 , vmarg2);//TODO
+}
+void generate_IF_EQ(quad q){
+        vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(jeq_v , vmres , vmarg1 , vmarg2);
+}
+void generate_IF_NOTEQ(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(jne_v , vmres , vmarg1 , vmarg2);
+}
+void generate_IF_LESSEQ(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(jle_v , vmres , vmarg1 , vmarg2);
+}
+void generate_IF_GREATEREQ(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(jge_v , vmres , vmarg1 , vmarg2);
+}
+void generate_IF_LESS(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(jle_v , vmres , vmarg1 , vmarg2);//TODO
+}
+void generate_IF_GREATER(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(jgt_v , vmres , vmarg1 , vmarg2);
+}
+void generate_JUMP(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(jump_v , vmres , vmarg1 , vmarg2);
+}
+void generate_CALL(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(callfunc_v , vmres , vmarg1 , vmarg2);//TODO edw prepei na einai me to onoma tis func apo ton pinaka
+}
+void generate_PARAM(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(jge_v , vmres , vmarg1 , vmarg2);
+}
+void generate_RETURN(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(nop_v , vmres , vmarg1 , vmarg2);//TODO DEN EINAII SWOSTO
+}
+void generate_GETRETVAL(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres); //TODO idia fasi me panw
+    // emit_instraction( , vmres , vmarg1 , vmarg2);
+}
+void generate_FUNCSTART(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(enterfunc_v , vmres , vmarg1 , vmarg2);
+}
+void generate_FUNCEND(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(exitfunc_v , vmres , vmarg1 , vmarg2);
+}
+void generate_TABLECREATE(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(newtable_v , vmres , vmarg1 , vmarg2);
+}
+void generate_TABLEGETELEM(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(tablegetelem_v , vmres , vmarg1 , vmarg2);
+}
+void generate_TABLESETELEM(quad q){
+    vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    make_operand(q.arg1 , vmarg1);
+    make_operand(q.arg2 , vmarg2);
+    make_operand(q.result , vmres);
+    emit_instraction(tablesetelem_v , vmres , vmarg1 , vmarg2);
+}
+void generate(){
+    init_instractions();
+    for (int i = 0; i < total; ++i)
+    {
+        (*generators[quads[i].op])(quads[i]);
+    }
+}
+
 void expand_instractions()
 {
     assert(I_CURRENT_SIZE == current_instraction);
@@ -196,11 +387,25 @@ int consts_add_userFunc(userFunc *func)
     return userFuncSize - 1;
 }
 
-void emit_instraction(vmop op, vmarg *res, vmarg *arg1, vmarg arg2)
+//pairnei ola ta arguments kai ta vazei ston pinaka (opws kai sta quads)
+void emit_instraction(vmop op, vmarg *res, vmarg *arg1, vmarg *arg2)
 {
     if(current_instraction >= total_instraction_size )
         expand_instractions();
+    
+    instr tmp;
+
+    tmp.op = op;
+    tmp.arg1 = arg1;
+    tmp.arg2 = arg2;
+    tmp.res = res;
+
+    instractions[current_instraction] = tmp;
+
+    current_instraction++;
 }
+
+
 // static void avm_initstack(void)
 // {
 //     unsigned i;
