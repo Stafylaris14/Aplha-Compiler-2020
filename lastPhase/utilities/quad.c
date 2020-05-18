@@ -15,8 +15,8 @@
 extern int yylineno;
 extern int scopeCounter;
 
-quad *quads = (quad *)0;
-unsigned int total = 0;
+
+
 unsigned int currQuad = 0;
 int tmp_count = 0;
 

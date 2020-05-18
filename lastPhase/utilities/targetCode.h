@@ -9,7 +9,7 @@
         #define I_EXPAND 1024
         #define I_CURRENT_SIZE current_instraction * sizeof(instr)
         #define I_NEW_SIZE (I_SIZE * sizeof(instr) + I_CURRENT_SIZE)
-
+        int total_instraction_size = 0;
         int current_instraction = 0;
 //
 
@@ -170,27 +170,27 @@ void init_const_arrays();
 
             int consts_add_userFunc(userFunc *func);
 //
-avm_memcell stack[AVM_STACKSIZE];
+// avm_memcell stack[AVM_STACKSIZE];
 
-avm_table *avm_tablenew(void); 
+// avm_table *avm_tablenew(void); 
 
-void avm_tabledestroy(avm_table* t); //8elei ilopoish
+// void avm_tabledestroy(avm_table* t); //8elei ilopoish
 
-avm_memcell* avm_tablegetelem(avm_memcell* key);//8elei ftia3imo
+// avm_memcell* avm_tablegetelem(avm_memcell* key);//8elei ftia3imo
 
-void avm_tablesetelem(avm_memcell* key, avm_memcell* value); //8elei ftia3imo
+// void avm_tablesetelem(avm_memcell* key, avm_memcell* value); //8elei ftia3imo
 
 
-static void avm_initstack(void);
+// static void avm_initstack(void);
 
-void avm_tableincrefcounter(avm_table *t);
+// void avm_tableincrefcounter(avm_table *t);
 
-void avm_tabledecrefcounter(avm_table *t);
+// void avm_tabledecrefcounter(avm_table *t);
 
-void avm_tablebucketsinit(avm_table_bucket **p);
+// void avm_tablebucketsinit(avm_table_bucket **p);
 
-void avm_memcellclear(avm_memcell* m);//8elei ilopoihsh
+// void avm_memcellclear(avm_memcell* m);//8elei ilopoihsh
 
-void avm_tablebucketsdestroy(avm_table_bucket **p);
+// void avm_tablebucketsdestroy(avm_table_bucket **p);
 
-void avm_tabledestroy(avm_table *t);
+// void avm_tabledestroy(avm_table *t);

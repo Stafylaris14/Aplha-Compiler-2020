@@ -1,5 +1,8 @@
 #include "targetCode.h"
 #include "../dataStructs/linkedList.h"
+
+extern unsigned int total;
+
 void expand_instractions()
 {
     assert(I_CURRENT_SIZE == current_instraction);
@@ -11,6 +14,7 @@ void expand_instractions()
         free(instractions);
     }
     instractions = a;
+    total_instraction_size += I_EXPAND;
 }
 
 void init_instractions()
@@ -34,10 +38,10 @@ void print_instractions()
     int i;
     cyn();
     printf("-----------instractions (target CODE) -----------------\n");
-    for(i = 0; i < current_instraction; i++)
+    for (i = 0; i < current_instraction; i++)
     {
-        if(!instractions[i].res)
-        printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n" ,i ,instractions[i].op, instractions[i].res->val , instractions[i].arg1->val ,instractions[i].arg2->val);
+        if (!instractions[i].res)
+            printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n", i, instractions[i].op, instractions[i].res->val, instractions[i].arg1->val, instractions[i].arg2->val);
     }
     print_const_arrays();
 }
@@ -47,27 +51,36 @@ void print_const_arrays()
     int i;
     grn();
     printf("-----NUM CONSTS -----\n");
-    for (i = 0;i < numConstSize; i++)
+    for (i = 0; i < numConstSize; i++)
     {
-        printf("%d: %d\n" , i ,numConsts[i] );
+        printf("%d: %d\n", i, numConsts[i]);
     }
     printf("-----STRING CONSTS -----\n");
-    for (i = 0;i < stringConstSize; i++)
+    for (i = 0; i < stringConstSize; i++)
     {
-        printf("%d: %s\n" , i ,stringConsts[i] );
+        printf("%d: %s\n", i, stringConsts[i]);
     }
-    
+
     printf("-----NAMED LIB FUNCTIONS -----\n");
-    for (i = 0;i < namedLibFuncsSize; i++)
+    for (i = 0; i < namedLibFuncsSize; i++)
     {
-        printf("%d: %s\n" , i ,namedLibFuncs[i] );
+        printf("%d: %s\n", i, namedLibFuncs[i]);
     }
     printf("-----USER FUNCTIONS -----\n");
-    for (i = 0;i < userFuncSize; i++)
+    for (i = 0; i < userFuncSize; i++)
     {
-        printf("%d: %s\n" , i ,userFuncs[i]->id );
+        printf("%d: %s\n", i, userFuncs[i]->id);
     }
     wht();
+}
+
+void from_quads_to_instractions()
+{
+    int i;
+    for (i = 0; i < total_instraction_size; i++)
+    {
+        
+    }
 }
 
 void make_operand(expr *e, vmarg *arg)
@@ -183,68 +196,73 @@ int consts_add_userFunc(userFunc *func)
     return userFuncSize - 1;
 }
 
-static void avm_initstack(void)
+void emit_instraction(vmop op, vmarg *res, vmarg *arg1, vmarg arg2)
 {
-    unsigned i;
-    for (i = 0; i < AVM_STACKSIZE; i++)
-    {
-        AVM_WIPEOUT(stack[i]);
-        stack[i].type = undef_m;
-    }
+    if(current_instraction >= total_instraction_size )
+        expand_instractions();
 }
+// static void avm_initstack(void)
+// {
+//     unsigned i;
+//     for (i = 0; i < AVM_STACKSIZE; i++)
+//     {
+//         AVM_WIPEOUT(stack[i]);
+//         stack[i].type = undef_m;
+//     }
+// }
 
-void avm_tableincrefcounter(avm_table *t)
-{
-    ++t->refCounter;
-}
+// void avm_tableincrefcounter(avm_table *t)
+// {
+//     ++t->refCounter;
+// }
 
-void avm_tabledecrefcounter(avm_table *t)
-{
-    assert(t->refCounter > 0);
-    if (!--t->refCounter)
-        avm_tabledestroy(t);
-}
+// void avm_tabledecrefcounter(avm_table *t)
+// {
+//     assert(t->refCounter > 0);
+//     if (!--t->refCounter)
+//         avm_tabledestroy(t);
+// }
 
-void avm_tablebucketsinit(avm_table_bucket **p)
-{
-    unsigned i;
-    for (i = 0; i < AVM_TABLE_HASHSIZE; i++)
-        p[i] = (avm_table_bucket *)0;
-}
+// void avm_tablebucketsinit(avm_table_bucket **p)
+// {
+//     unsigned i;
+//     for (i = 0; i < AVM_TABLE_HASHSIZE; i++)
+//         p[i] = (avm_table_bucket *)0;
+// }
 
-avm_table *avm_tablenew(void)
-{
-    avm_table *t = (avm_table *)malloc(sizeof(avm_table));
-    AVM_WIPEOUT(*t);
+// avm_table *avm_tablenew(void)
+// {
+//     avm_table *t = (avm_table *)malloc(sizeof(avm_table));
+//     AVM_WIPEOUT(*t);
 
-    t->refCounter = t->total = 0;
-    avm_tablebucketsinit(t->numIndexed);
-    avm_tablebucketsinit(t->strIndexed);
+//     t->refCounter = t->total = 0;
+//     avm_tablebucketsinit(t->numIndexed);
+//     avm_tablebucketsinit(t->strIndexed);
 
-    return t;
-}
+//     return t;
+// }
 
-void avm_tablebucketsdestroy(avm_table_bucket **p)
-{
-    unsigned i;
-    for (i = 0; i < AVM_TABLE_HASHSIZE; ++i, ++p)
-    {
-        avm_table_bucket *b;
-        for (*b = *p; b;) //den exw idea! TODO
-        {
-            avm_table_bucket *del = b;
-            b = b->next;
-            avm_memcellclear(&del->key);
-            avm_memcellclear(&del->value);
-            free(del);
-        }
-        p[i] = (avm_table_bucket *)0;
-    }
-}
+// void avm_tablebucketsdestroy(avm_table_bucket **p)
+// {
+//     unsigned i;
+//     for (i = 0; i < AVM_TABLE_HASHSIZE; ++i, ++p)
+//     {
+//         avm_table_bucket *b;
+//         for (*b = *p; b;) //den exw idea! TODO
+//         {
+//             avm_table_bucket *del = b;
+//             b = b->next;
+//             avm_memcellclear(&del->key);
+//             avm_memcellclear(&del->value);
+//             free(del);
+//         }
+//         p[i] = (avm_table_bucket *)0;
+//     }
+// }
 
-void avm_tabledestroy(avm_table *t)
-{
-    avm_tablebucketsdestroy(t->strIndexed);
-    avm_tablebucketsdestroy(t->numIndexed);
-    free(t);
-}
+// void avm_tabledestroy(avm_table *t)
+// {
+//     avm_tablebucketsdestroy(t->strIndexed);
+//     avm_tablebucketsdestroy(t->numIndexed);
+//     free(t);
+// }
