@@ -1,6 +1,7 @@
 %{
 
-#include "utilities/quad.h"
+//#include "utilities/quad.h"
+#include "utilities/targetcode.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 

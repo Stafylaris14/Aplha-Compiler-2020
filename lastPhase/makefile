@@ -25,10 +25,11 @@ scanner:scanner.l
 
 
 compiler-debug:parser scanner 
-	gcc -c -g -O0 parser.c dataStructs/symb.c utilities/parserUtilities.c
-	gcc -c -g -O0 scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
-	clang -g -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o  quad.o
-	lldb calc
+	gcc -c -g parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
+	gcc -c -g scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
+	gcc -c -g  utilities/quad.c  utilities/targetCode.c
+	gcc -o  calc -g parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o quad.o targetCode.o
+	gdb calc
 clean:
 	rm -f scanner.c
 	rm -f scanner

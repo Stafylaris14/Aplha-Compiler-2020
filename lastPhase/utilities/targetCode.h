@@ -1,4 +1,3 @@
-
 #include "quad.h"
 #include <assert.h>
 
@@ -10,9 +9,11 @@
 #define I_CURRENT_SIZE current_instraction * sizeof(instr)
 #define I_NEW_SIZE (I_SIZE * sizeof(instr) + I_CURRENT_SIZE)
 int total_instraction_size = 0;
+
 int current_instraction = 0;
 //
-
+// extern unsigned int total;
+// extern quad* quads;
 #define AVM_STACKSIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
@@ -208,8 +209,6 @@ int userFuncSize = 0;
 
 void make_operand(expr *e, vmarg *argumnent);
 
-void emit_instraction(vmop op, vmarg *res, vmarg *arg1, vmarg *arg2);
-
 void init_const_arrays();
 
 //gia ta add sta const arrays gia paragori target code
@@ -222,6 +221,7 @@ int consts_add_namedLibFuncs(char *funcName);
 userFunc *newUserFunction(int address, int localsize, char *name);
 
 int consts_add_userFunc(userFunc *func);
+void emit_instraction(vmop op, vmarg *res, vmarg *arg1, vmarg *arg2);
 //
 // avm_memcell stack[AVM_STACKSIZE];
 

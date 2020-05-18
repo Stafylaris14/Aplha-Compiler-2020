@@ -1,7 +1,7 @@
 #include "targetCode.h"
 #include "../dataStructs/linkedList.h"
 
-extern unsigned int total;
+
 
 void generate_ASSIGN(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
@@ -263,15 +263,6 @@ void print_const_arrays()
         printf("%d: %s\n", i, userFuncs[i]->id);
     }
     wht();
-}
-
-void from_quads_to_instractions()
-{
-    int i;
-    for (i = 0; i < total_instraction_size; i++)
-    {
-        
-    }
 }
 
 void make_operand(expr *e, vmarg *arg)
