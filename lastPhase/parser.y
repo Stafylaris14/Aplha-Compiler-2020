@@ -948,5 +948,6 @@ int main(int argc, char** argv)
     //printScopeList();
     
     print_quads();
-   
+    generate();
+    print_instructions();   
 }

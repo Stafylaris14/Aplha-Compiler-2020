@@ -1,10 +1,10 @@
 #include "quad.h"
 #include <assert.h>
 
-#define CONST_ARR_SIZE 100
+#define CONST_ARR_SIZE 1000
 
 //gia ton pinaka tou telikou kwdika
-#define I_SIZE 1024
+#define I_SIZE 499
 #define I_EXPAND 1024
 #define I_CURRENT_SIZE current_instraction * sizeof(instr)
 #define I_NEW_SIZE (I_SIZE * sizeof(instr) + I_CURRENT_SIZE)
@@ -158,6 +158,7 @@ extern void generate_TABLEGETELEM(quad q);
 extern void generate_TABLESETELEM(quad q);
 
 
+void generate_single_quad(vmop op , quad *q);
 
 void generate();
 
@@ -187,7 +188,7 @@ int consts_add_namedLibFuncs(char *funcName);
 userFunc *newUserFunction(int address, int localsize, char *name);
 
 int consts_add_userFunc(userFunc *func);
-void emit_instraction(vmop op, vmarg *res, vmarg *arg1, vmarg *arg2);
+void emit_instruction(instr i);
 //
 // avm_memcell stack[AVM_STACKSIZE];
 
