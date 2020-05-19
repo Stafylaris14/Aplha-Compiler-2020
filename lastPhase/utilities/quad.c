@@ -15,8 +15,9 @@
 extern int yylineno;
 extern int scopeCounter;
 
+unsigned int total = 0;
 
-
+quad* quads = (quad *)0;
 unsigned int currQuad = 0;
 int tmp_count = 0;
 
@@ -842,10 +843,10 @@ for_call *insert_call(expr *elist, unsigned char method, char *name)
 
 zavo *new_list(int i)
 {
-    zavo *quads = malloc(sizeof(zavo));
-    quads->label = i;
-    quads->next = NULL;
-    return quads;
+    zavo *Quads = malloc(sizeof(zavo));
+    Quads->label = i;
+    Quads->next = NULL;
+    return Quads;
 }
 
 zavo *insert_before_zavo(zavo *head, int i)

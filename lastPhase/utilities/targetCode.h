@@ -8,12 +8,13 @@
 #define I_EXPAND 1024
 #define I_CURRENT_SIZE current_instraction * sizeof(instr)
 #define I_NEW_SIZE (I_SIZE * sizeof(instr) + I_CURRENT_SIZE)
-int total_instraction_size = 0;
 
-int current_instraction = 0;
+
+
 //
-// extern unsigned int total;
-// extern quad* quads;
+ extern unsigned int total;
+extern quad* quads;
+
 #define AVM_STACKSIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
@@ -156,56 +157,21 @@ extern void generate_TABLECREATE(quad q);
 extern void generate_TABLEGETELEM(quad q);
 extern void generate_TABLESETELEM(quad q);
 
-generator_func_t generators[] = {
-    generate_ASSIGN,
-    generate_SUB,
-    generate_ADD,
-    generate_MUL,
-    generate_DIV,
-    generate_MOD,
-    generate_UMINUS,
-    generate_AND,
-    generate_OR,
-    generate_NOT,
-    generate_IF_EQ,
-    generate_IF_NOTEQ,
-    generate_IF_LESSEQ,
-    generate_IF_LESS,
-    generate_IF_GREATEREQ,
-    generate_IF_GREATER,
-    generate_JUMP,
-    generate_CALL,
-    generate_PARAM,
-    generate_RETURN,
-    generate_GETRETVAL,
-    generate_FUNCSTART,
-    generate_FUNCEND,
-    generate_TABLECREATE,
-    generate_TABLEGETELEM,
-    generate_TABLESETELEM
-};
 
 
 void generate();
 
-instr *instractions = (instr *)0;
 
-void expand_instractions();
 
-void init_instractions();
+void expand_instructions();
 
-void print_instractions();
+void init_instructions();
+
+void print_instructions();
 
 void print_const_arrays();
 
-int *numConsts;
-int numConstSize = 0;
-char **stringConsts;
-int stringConstSize = 0;
-char **namedLibFuncs;
-int namedLibFuncsSize = 0;
-struct userFunc *userFuncs[CONST_ARR_SIZE];
-int userFuncSize = 0;
+
 
 void make_operand(expr *e, vmarg *argumnent);
 

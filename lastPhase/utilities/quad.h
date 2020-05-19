@@ -2,7 +2,7 @@
 #include <stdlib.h>
 /* #include "../dataStructs/sym.h" */
 #include "parserUtilities.h"
-unsigned int total = 0;
+
 
 typedef enum Iopcode
 {
@@ -87,7 +87,7 @@ typedef struct Quad
     int lineno;
 } quad;
 
-quad *quads = (quad *)0;
+// quad *quads;
 
 typedef struct for_call
 {

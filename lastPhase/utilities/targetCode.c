@@ -1,6 +1,47 @@
 #include "targetCode.h"
 #include "../dataStructs/linkedList.h"
 
+int total_instraction_size = 0; 
+int current_instraction = 0;
+instr *instructions = (instr *)0;
+
+
+int *numConsts;
+int numConstSize = 0;
+char **stringConsts;
+int stringConstSize = 0;
+char **namedLibFuncs;
+int namedLibFuncsSize = 0;
+struct userFunc *userFuncs[CONST_ARR_SIZE];
+int userFuncSize = 0;
+generator_func_t generators[] = {
+    generate_ASSIGN,
+    generate_SUB,
+    generate_ADD,
+    generate_MUL,
+    generate_DIV,
+    generate_MOD,
+    generate_UMINUS,
+    generate_AND,
+    generate_OR,
+    generate_NOT,
+    generate_IF_EQ,
+    generate_IF_NOTEQ,
+    generate_IF_LESSEQ,
+    generate_IF_LESS,
+    generate_IF_GREATEREQ,
+    generate_IF_GREATER,
+    generate_JUMP,
+    generate_CALL,
+    generate_PARAM,
+    generate_RETURN,
+    generate_GETRETVAL,
+    generate_FUNCSTART,
+    generate_FUNCEND,
+    generate_TABLECREATE,
+    generate_TABLEGETELEM,
+    generate_TABLESETELEM
+};
 
 
 void generate_ASSIGN(quad q){
@@ -187,52 +228,52 @@ void generate_TABLESETELEM(quad q){
     emit_instraction(tablesetelem_v , vmres , vmarg1 , vmarg2);
 }
 void generate(){
-    init_instractions();
+    init_instructions();
     for (int i = 0; i < total; ++i)
     {
         (*generators[quads[i].op])(quads[i]);
     }
 }
 
-void expand_instractions()
+void expand_instructions()
 {
     assert(I_CURRENT_SIZE == current_instraction);
     instr *a = malloc(I_NEW_SIZE);
     int i;
-    if (instractions)
+    if (instructions)
     {
-        memcpy(a, instractions, I_CURRENT_SIZE);
-        free(instractions);
+        memcpy(a, instructions, I_CURRENT_SIZE);
+        free(instructions);
     }
-    instractions = a;
+    instructions = a;
     total_instraction_size += I_EXPAND;
 }
 
-void init_instractions()
+void init_instructions()
 {
     int i;
     current_instraction = 0;
-    instractions = malloc(sizeof(instractions) * I_SIZE);
+    instructions = malloc(sizeof(instructions) * I_SIZE);
 
     for (i = 0; i < I_SIZE; i++)
     {
-        instractions[i].res = NULL;
-        instractions[i].arg1 = NULL;
-        instractions[i].arg2 = NULL;
-        instractions[i].op = -1;
-        instractions[i].line = -1;
+        instructions[i].res = NULL;
+        instructions[i].arg1 = NULL;
+        instructions[i].arg2 = NULL;
+        instructions[i].op = -1;
+        instructions[i].line = -1;
     }
 }
 
-void print_instractions()
+void print_instructions()
 {
     int i;
     cyn();
-    printf("-----------instractions (target CODE) -----------------\n");
+    printf("-----------instructions (target CODE) -----------------\n");
     for (i = 0; i < current_instraction; i++)
     {
-        if (!instractions[i].res)
-            printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n", i, instractions[i].op, instractions[i].res->val, instractions[i].arg1->val, instractions[i].arg2->val);
+        if (!instructions[i].res)
+            printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n", i, instructions[i].op, instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
     }
     print_const_arrays();
 }
@@ -382,7 +423,7 @@ int consts_add_userFunc(userFunc *func)
 void emit_instraction(vmop op, vmarg *res, vmarg *arg1, vmarg *arg2)
 {
     if(current_instraction >= total_instraction_size )
-        expand_instractions();
+        expand_instructions();
     
     instr tmp;
 
@@ -391,7 +432,7 @@ void emit_instraction(vmop op, vmarg *res, vmarg *arg1, vmarg *arg2)
     tmp.arg2 = arg2;
     tmp.res = res;
 
-    instractions[current_instraction] = tmp;
+    instructions[current_instraction] = tmp;
 
     current_instraction++;
 }

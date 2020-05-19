@@ -1,8 +1,8 @@
 compiler: parser scanner 
-	gcc -c  parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
+	gcc -c  utilities/targetCode.c utilities/quad.c  
 	gcc -c  scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
-	gcc -c  utilities/quad.c  utilities/targetCode.c
-	gcc -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o quad.o targetCode.o
+	gcc -c  parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
+	gcc -o calc targetCode.o quad.o parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o  
 	
 
 wall: parser scanner 
