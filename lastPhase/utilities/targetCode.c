@@ -52,108 +52,108 @@ void generate_DIV(quad q){generate_single_quad(div_v, &q);}
 void generate_MOD(quad q){generate_single_quad(mod_v, &q);}
 void generate_UMINUS(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
     //TODO na to dw to uminus
 }
 void generate_AND(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1); 
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);    
+    vmarg1 = make_operand(q.arg1); 
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );    
 }
 void generate_OR(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
     // _TODO
 }
 void generate_NOT(quad q){
         vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
     //TODO
 }
 void generate_IF_EQ(quad q){
         vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
 }
 void generate_IF_NOTEQ(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
 }
 void generate_IF_LESSEQ(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
 }
 void generate_IF_GREATEREQ(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
 }
 void generate_IF_LESS(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
 // TODO
 }
 void generate_IF_GREATER(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
 }
 void generate_JUMP(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
 }
 void generate_CALL(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
     //TODO edw prepei na einai me to onoma tis func apo ton pinaka
 }
 void generate_PARAM(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
 }
 void generate_RETURN(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
     //TODO DEN EINAII SWOSTO
 }
 void generate_GETRETVAL(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres); //TODO idia fasi me panw
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result ); //TODO idia fasi me panw
 }
 void generate_FUNCSTART(quad q){
     printf("FUNCSTART\n");
 }
 void generate_FUNCEND(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    make_operand(q.arg1 , vmarg1);
-    make_operand(q.arg2 , vmarg2);
-    make_operand(q.result , vmres);
+    vmarg1 = make_operand(q.arg1);
+    vmarg2 = make_operand(q.arg2 );
+    vmres = make_operand(q.result );
     
 }
 void generate_TABLECREATE(quad q){generate_single_quad(newtable_v, &q);}
@@ -162,10 +162,11 @@ void generate_TABLESETELEM(quad q){generate_single_quad(tablesetelem_v, &q);}
 void generate(){
     init_instructions();
     init_const_arrays();
-    cyn();
-    printf("gia dew kai to total->%d\n", total);
     for (int i = 0; i < currQuad; ++i)
     {
+        mag();
+        printf("--%d--quadsop\n" , quads[i].op);
+        wht();
         (*generators[quads[i].op])(quads[i]);
     }
 }
@@ -173,18 +174,26 @@ void generate(){
 void generate_single_quad(vmop op , quad *q){
     instr i ;
     i.op = op;
-    red();
+   
 
-    make_operand(q->arg1 , i.arg1);
+    i.arg1 = make_operand(q->arg1);
     grn();
-    // printf("arg2\n");
-    make_operand(q->arg2 , &i.arg2);
-    // printf("res\n");
-    make_operand(q->result , &i.res);
-    cyn();
-    printf("res.val -> %d\n" , i.res->val);
-     printf("res.type -> %d\n" , i.res->type);
+    // printf("arg1.val -> %d\n" , i.arg1->val);
+    // printf("arg1.type -> %d\n" , i.arg1->type);
+
+    i.arg2 = make_operand(q->arg2);
+    red();
+    // if(i.arg2){
+    //     printf("arg2.val -> %d\n" , i.arg2->val);
+    //     printf("arg2.type -> %d\n" , i.arg2->type);
+    // }
+
+    i.res = make_operand(q->result );
+    // cyn();
+    // printf("res.val -> %d\n" , i.res->val);
+    // printf("res.type -> %d\n" , i.res->type);
     wht();
+    
     emit_instruction(i);
 }
 
@@ -226,8 +235,22 @@ void print_instructions()
     printf("-----------instructions (target CODE) -----------------\n");
     for (i = 0; i < current_instraction; i++)
     {
-        if (!instructions[i].res)
-            printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n", i, instructions[i].op, instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
+
+        if(instructions[i].arg1 == NULL) {
+            instructions[i].arg1 = malloc(sizeof(vmarg));
+            instructions[i].arg1->val = -1;
+        }
+        if(instructions[i].arg2 == NULL) {
+            instructions[i].arg2 = malloc(sizeof(vmarg));
+            instructions[i].arg2->val = -1;
+        }
+        if(instructions[i].res == NULL) {
+            instructions[i].res = malloc(sizeof(vmarg));
+            instructions[i].res->val = -1;
+        }
+       
+        // if (instructions[i].) 
+            printf("%d:|%s|\t|%d|\t|%d|\t|%d|\n", i, get_opcode_expr_string(instructions[i].op), instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
     }
     print_const_arrays();
 }
@@ -260,12 +283,12 @@ void print_const_arrays()
     wht();
 }
 
-void make_operand(expr *e, vmarg *arg)
+vmarg* make_operand(expr *e)
 {
-
+    vmarg* arg = malloc(sizeof(vmarg));
     if(e == NULL) {
         arg = NULL;
-        return;
+        return NULL ;
     }
     printf("gia des to type %d\n" , e->type);
     expr_t expressionType = e->type;
@@ -302,7 +325,6 @@ void make_operand(expr *e, vmarg *arg)
         printf("%d\n" , e->numConst);
         wht();
         arg->val = consts_add_numconst(e->numConst);
-        printf("arg->val = %d\n" , arg->val);
         break;
     case constbool_:
         arg->type = constbool_;
@@ -331,6 +353,7 @@ void make_operand(expr *e, vmarg *arg)
         assert(0);
         break;
     }
+    return arg;
 }
 
 void init_const_arrays()
@@ -349,7 +372,6 @@ void init_const_arrays()
 
 int consts_add_numconst(int val)
 {
-    printf("eimai edw gia to numConst %d\n" , val);
     numConsts[numConstSize] = val;
     numConstSize++;
     return numConstSize - 1;
@@ -398,7 +420,88 @@ void emit_instruction(instr i){
     return;
 }
 
-
+char* get_string_vmopcode(vmop op)
+{ red();
+    printf("vmop -> %d\n" , op);
+    switch (op)
+    {
+    case 0:
+        return "assign";
+        break;
+    case add_v:
+        return "add";
+        break;
+    case sub_v:
+        return "sub";
+        break;
+    case mul_v:
+        return "mul";
+        break;
+    case div_v:
+        return "div";
+        break;
+    case mod_v:
+        return "mod";
+        break;
+    case uminus_v:
+        return "uminus";
+        break;
+    case callfunc_v:
+        return "callFunc";
+        break;
+    case enterfunc_v:
+        return "enterFunc";
+        break;
+    case exitfunc_v:
+        return "exitfunc";
+        break;
+    case and_v:
+        return "and";
+        break;
+    case or_v:
+        return "or";
+        break;
+    case not_v:
+        return "not";
+        break;
+    case jump_v:
+        return "jump";
+        break;
+    case jeq_v:
+        return "jeq";
+        break;
+    case jne_v:
+        return "jne";
+        break;
+    case jgt_v:
+        return "jgt";
+        break;
+    case jge_v:
+        return "jge";
+        break;
+    case jle_v:
+        return "jle";
+        break;
+    case newtable_v:
+        return "newTable";
+        break;
+    case tablegetelem_v:
+        return "tablegetelement";
+        break;
+    case tablesetelem_v:
+        return "teblesetelement";
+        break;
+    case pusharg_v:
+        return "pusharg";
+        break;
+    case nop_v:
+        return "nop";
+        break;
+    default:
+        assert(0);
+        break;
+    }
+}
 // static void avm_initstack(void)
 // {
 //     unsigned i;

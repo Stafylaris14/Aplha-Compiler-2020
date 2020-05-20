@@ -174,7 +174,7 @@ void print_const_arrays();
 
 
 
-void make_operand(expr *e, vmarg *argumnent);
+vmarg* make_operand(expr *e);
 
 void init_const_arrays();
 
@@ -189,6 +189,9 @@ userFunc *newUserFunction(int address, int localsize, char *name);
 
 int consts_add_userFunc(userFunc *func);
 void emit_instruction(instr i);
+
+char* get_string_vmopcode(vmop op);
+
 //
 // avm_memcell stack[AVM_STACKSIZE];
 
