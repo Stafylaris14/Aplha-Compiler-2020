@@ -185,7 +185,7 @@ int consts_add_stringconst(char *str);
 
 int consts_add_namedLibFuncs(char *funcName);
 
-userFunc *newUserFunction(int address, int localsize, char *name);
+int newUserFunction(int address, int localsize, char *name);
 
 int consts_add_userFunc(userFunc *func);
 void emit_instruction(instr i);

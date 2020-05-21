@@ -3,7 +3,7 @@ compiler: parser scanner
 	gcc -c  scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
 	gcc -c  parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
 	gcc -o calc targetCode.o quad.o parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o  
-	
+	./calc Testfile.txt
 
 wall: parser scanner 
 	gcc -Wall -c parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c

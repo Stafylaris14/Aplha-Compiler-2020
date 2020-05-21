@@ -159,6 +159,7 @@ void generate_FUNCEND(quad q){
 void generate_TABLECREATE(quad q){generate_single_quad(newtable_v, &q);}
 void generate_TABLEGETELEM(quad q){generate_single_quad(tablegetelem_v, &q);}
 void generate_TABLESETELEM(quad q){generate_single_quad(tablesetelem_v, &q);}
+
 void generate(){
     init_instructions();
     init_const_arrays();
@@ -174,26 +175,27 @@ void generate(){
 void generate_single_quad(vmop op , quad *q){
     instr i ;
     i.op = op;
-   
-
+    
     i.arg1 = make_operand(q->arg1);
     grn();
-    // printf("arg1.val -> %d\n" , i.arg1->val);
-    // printf("arg1.type -> %d\n" , i.arg1->type);
+     printf("arg1.val -> %d\n" , i.arg1->val);
+     printf("arg1.type -> %d\n" , i.arg1->type);
 
     i.arg2 = make_operand(q->arg2);
     red();
-    // if(i.arg2){
-    //     printf("arg2.val -> %d\n" , i.arg2->val);
-    //     printf("arg2.type -> %d\n" , i.arg2->type);
-    // }
+    if(i.arg2){
+        printf("arg2.val -> %d\n" , i.arg2->val);
+        printf("arg2.type -> %d\n" , i.arg2->type);
+    }
 
-    i.res = make_operand(q->result );
-    // cyn();
-    // printf("res.val -> %d\n" , i.res->val);
-    // printf("res.type -> %d\n" , i.res->type);
+    i.res = make_operand(q->result);
+    cyn();
+    printf("res.val -> %d\n" , i.res->val);
+    printf("res.type -> %d\n" , i.res->type);
     wht();
     
+
+    printf("eimai edw gia to quad %d , \n kai instr \t %d , %d , \n" , q->op , i.res->val ,i.res->type );
     emit_instruction(i);
 }
 
@@ -250,7 +252,7 @@ void print_instructions()
         }
        
         // if (instructions[i].) 
-            printf("%d:|%s|\t|%d|\t|%d|\t|%d|\n", i, get_opcode_expr_string(instructions[i].op), instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
+            printf("%d:|%s|\t|%d|\t|%d|\t|%d|\n", i,  get_string_vmopcode(instructions[i].op), instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
     }
     print_const_arrays();
 }
@@ -290,7 +292,6 @@ vmarg* make_operand(expr *e)
         arg = NULL;
         return NULL ;
     }
-    printf("gia des to type %d\n" , e->type);
     expr_t expressionType = e->type;
     arg = NULL;
     arg = malloc(sizeof(vmarg));
@@ -321,9 +322,6 @@ vmarg* make_operand(expr *e)
     }
     case constnum_:
         arg->type = number_a;
-        red();
-        printf("%d\n" , e->numConst);
-        wht();
         arg->val = consts_add_numconst(e->numConst);
         break;
     case constbool_:
@@ -347,13 +345,36 @@ vmarg* make_operand(expr *e)
         arg->type = nill_a;
         break;
     case  assignexp_:
-        printf("eimai gia to assignexpr\n");
+        arg->val = e->sym->offset; 
+        switch (e->sym->scope_spase)
+        {
+        case program_variable:
+            arg->type = global_a;
+            break;
+        case function_local:
+            arg->type = local_a;
+            break;
+        case formal_argument:
+            arg->type = formal_a;
+            break;
+        default:
+            assert(0);
+        }
+        printf("vgia apo to assign\n");
+        //printf("eimai gia to assignexpr\n");
          break;
     default:
         assert(0);
         break;
     }
     return arg;
+}
+
+vmarg* make_operand_constNum(int val)
+{
+    vmarg* tmp = malloc(sizeof(vmarg));
+    tmp->type = number_a;
+    tmp->val = val;
 }
 
 void init_const_arrays()
@@ -372,6 +393,12 @@ void init_const_arrays()
 
 int consts_add_numconst(int val)
 {
+
+    int i;
+    for (i = 0; i < numConstSize; i ++)
+    {
+        if(numConsts[i] == val) return i;
+    }
     numConsts[numConstSize] = val;
     numConstSize++;
     return numConstSize - 1;
@@ -379,6 +406,8 @@ int consts_add_numconst(int val)
 
 int consts_add_stringconst(char *str)
 {
+    for(int i = 0; i < stringConstSize; i++)
+        if(!strcmp(stringConsts[i] , str))return i;
     stringConsts[stringConstSize] = strdup(str);
     stringConstSize++;
     return stringConstSize - 1;
@@ -386,21 +415,27 @@ int consts_add_stringconst(char *str)
 
 int consts_add_namedLibFuncs(char *funcName)
 {
+     for(int i = 0; i < namedLibFuncsSize; i++)
+        if(!strcmp(namedLibFuncs[i] , funcName))return i;
     namedLibFuncs[namedLibFuncsSize] = funcName;
     namedLibFuncsSize++;
     return namedLibFuncsSize - 1;
 }
 
 //to address einai to quad pou 3ekinaei h sinartisi kai to localsize einai to plithos tws formal arguments
-userFunc *newUserFunction(int address, int localsize, char *name)
+int newUserFunction(int address, int localsize, char *name)
 {
+    for(int i = 0; i < namedLibFuncsSize; i++)
+        if(!strcmp(namedLibFuncs[i] , name))return i;
     userFunc *tmp = malloc(sizeof(userFunc));
     tmp->address = address;
     tmp->localsize = localsize;
-
     tmp->id = strdup(name);
 
-    return tmp;
+    userFuncs[userFuncSize] = tmp;
+    userFuncSize++;
+
+    return userFuncSize-1;
 }
 
 int consts_add_userFunc(userFunc *func)
@@ -416,13 +451,15 @@ void emit_instruction(instr i){
     if(current_instraction >= total_instraction_size )
         expand_instructions();
     instructions[current_instraction] = i;
+    red();
+    // printf("eimai mesa gia sto emit gia %d , %d\n" , instructions[current_instraction].res->type ,instructions[current_instraction].res->val );
+    wht();
     current_instraction++;
     return;
 }
 
 char* get_string_vmopcode(vmop op)
-{ red();
-    printf("vmop -> %d\n" , op);
+{ 
     switch (op)
     {
     case 0:
@@ -502,6 +539,11 @@ char* get_string_vmopcode(vmop op)
         break;
     }
 }
+
+
+
+
+
 // static void avm_initstack(void)
 // {
 //     unsigned i;
