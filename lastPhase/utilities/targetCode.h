@@ -160,9 +160,11 @@ extern void generate_TABLESETELEM(quad q);
 
 void generate_single_quad(vmop op , quad *q);
 
+void generate_single_relational(vmop op , quad *q);
+
+int get_next_instr_label();
+
 void generate();
-
-
 
 void expand_instructions();
 
@@ -175,6 +177,8 @@ void print_const_arrays();
 
 
 vmarg* make_operand(expr *e);
+
+// vmarg make_operand_returnval(vmarg *a);
 
 void init_const_arrays();
 

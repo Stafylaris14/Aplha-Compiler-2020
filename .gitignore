@@ -44,3 +44,5 @@ lastPhase/parser.c
 lastPhase/parser.h
 
 lastPhase/scanner.c
+
+lastPhase/.vscode/

@@ -2,7 +2,7 @@
 #include "../dataStructs/linkedList.h"
 
 int total_instraction_size = 0; 
-int current_instraction = 0;
+int current_instraction = 1;
 instr *instructions = (instr *)0;
 extern int currQuad;
 
@@ -77,61 +77,26 @@ void generate_NOT(quad q){
     vmres = make_operand(q.result );
     //TODO
 }
-void generate_IF_EQ(quad q){
-        vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-}
-void generate_IF_NOTEQ(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-}
-void generate_IF_LESSEQ(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-}
-void generate_IF_GREATEREQ(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-}
-void generate_IF_LESS(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-// TODO
-}
-void generate_IF_GREATER(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-}
-void generate_JUMP(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-}
+void generate_IF_EQ(quad q){generate_single_relational(jeq_v,&q);}
+void generate_IF_NOTEQ(quad q){generate_single_relational(jne_v , &q);}
+void generate_IF_LESSEQ(quad q){generate_single_relational(jle_v , &q);}
+void generate_IF_GREATEREQ(quad q){generate_single_relational(jge_v , &q);}
+void generate_IF_LESS(quad q){generate_single_relational(jle_v , &q);}
+void generate_IF_GREATER(quad q){generate_single_relational(jgt_v , &q);}
+void generate_JUMP(quad q){generate_single_relational(jump_v , &q);}
 void generate_CALL(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
+    instr i;
+    q.next_instr_label = get_next_instr_label();
+    i.op = callfunc_v;
+    i.arg1 = make_operand(q.arg1);
+    emit_instruction(i);
     //TODO edw prepei na einai me to onoma tis func apo ton pinaka
 }
 void generate_PARAM(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
+    q.next_instr_label = get_next_instr_label();
+    instr i;
+    i.op = pusharg_v;
+    make_operand(q.arg1);
 }
 void generate_RETURN(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
@@ -141,10 +106,12 @@ void generate_RETURN(quad q){
     //TODO DEN EINAII SWOSTO
 }
 void generate_GETRETVAL(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result ); //TODO idia fasi me panw
+    q.next_instr_label = get_next_instr_label();
+    instr i; 
+    i.op = assign_v;
+    i.res = make_operand(q.result);
+    // i.arg1 = make_operand_returnval(i.arg1);
+    emit_instruction(i);
 }
 void generate_FUNCSTART(quad q){
     printf("FUNCSTART\n");
@@ -165,9 +132,6 @@ void generate(){
     init_const_arrays();
     for (int i = 0; i < currQuad; ++i)
     {
-        mag();
-        printf("--%d--quadsop\n" , quads[i].op);
-        wht();
         (*generators[quads[i].op])(quads[i]);
     }
 }
@@ -177,27 +141,43 @@ void generate_single_quad(vmop op , quad *q){
     i.op = op;
     
     i.arg1 = make_operand(q->arg1);
-    grn();
-     printf("arg1.val -> %d\n" , i.arg1->val);
-     printf("arg1.type -> %d\n" , i.arg1->type);
+    // grn();
+    //  printf("arg1.val -> %d\n" , i.arg1->val);
+    //  printf("arg1.type -> %d\n" , i.arg1->type);
 
     i.arg2 = make_operand(q->arg2);
-    red();
-    if(i.arg2){
-        printf("arg2.val -> %d\n" , i.arg2->val);
-        printf("arg2.type -> %d\n" , i.arg2->type);
-    }
+    // red();
+    // if(i.arg2){
+    //     printf("arg2.val -> %d\n" , i.arg2->val);
+    //     printf("arg2.type -> %d\n" , i.arg2->type);
+    // }
 
     i.res = make_operand(q->result);
-    cyn();
-    printf("res.val -> %d\n" , i.res->val);
-    printf("res.type -> %d\n" , i.res->type);
-    wht();
+    // cyn();
+    // printf("res.val -> %d\n" , i.res->val);
+    // printf("res.type -> %d\n" , i.res->type);
+    // wht();
     
 
-    printf("eimai edw gia to quad %d , \n kai instr \t %d , %d , \n" , q->op , i.res->val ,i.res->type );
+   // printf("eimai edw gia to quad %d , \n kai instr \t %d , %d , \n" , q->op , i.res->val ,i.res->type );
     emit_instruction(i);
 }
+
+void generate_single_relational(vmop op , quad *q)
+{
+    int label_q = q->label;
+    instr  i ;
+    i.arg1 = make_operand(q->arg1);
+    i.arg2 = make_operand(q->arg2);
+    i.res = malloc(sizeof(vmarg));
+    i.res->val = label_q;
+    i.res->type = label_a;
+    i.op = op;
+    emit_instruction(i);
+
+}
+
+int get_next_instr_label(){return 1+current_instraction;}
 
 void expand_instructions(){
     assert(I_CURRENT_SIZE == current_instraction);
@@ -250,9 +230,10 @@ void print_instructions()
             instructions[i].res = malloc(sizeof(vmarg));
             instructions[i].res->val = -1;
         }
+        // printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n", i,  instructions[i].op, instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
        
         // if (instructions[i].) 
-            printf("%d:|%s|\t|%d|\t|%d|\t|%d|\n", i,  get_string_vmopcode(instructions[i].op), instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
+        printf("%d:|%s|\t|%d|\t|%d|\t|%d|\n", 1+i,  get_string_vmopcode(instructions[i].op), instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
     }
     print_const_arrays();
 }
@@ -360,7 +341,6 @@ vmarg* make_operand(expr *e)
         default:
             assert(0);
         }
-        printf("vgia apo to assign\n");
         //printf("eimai gia to assignexpr\n");
          break;
     default:
@@ -376,6 +356,13 @@ vmarg* make_operand_constNum(int val)
     tmp->type = number_a;
     tmp->val = val;
 }
+
+// vmarg make_operand_returnval(vmarg a)
+// {
+//     vmarg a1 = a;
+//     a1.type = retval_a;
+//     return a1;
+// }
 
 void init_const_arrays()
 {
@@ -460,6 +447,9 @@ void emit_instruction(instr i){
 
 char* get_string_vmopcode(vmop op)
 { 
+    // red();
+    // printf("op------------------------------------------>%d\n" , op);
+    // wht();
     switch (op)
     {
     case 0:
@@ -505,19 +495,19 @@ char* get_string_vmopcode(vmop op)
         return "jump";
         break;
     case jeq_v:
-        return "jeq";
+        return "jeq\t";
         break;
     case jne_v:
-        return "jne";
+        return "jne\t";
         break;
     case jgt_v:
-        return "jgt";
+        return "jgt\t";
         break;
     case jge_v:
-        return "jge";
+        return "jge\t";
         break;
     case jle_v:
-        return "jle";
+        return "jle\t";
         break;
     case newtable_v:
         return "newTable";

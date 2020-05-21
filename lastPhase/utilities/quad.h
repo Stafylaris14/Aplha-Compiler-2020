@@ -79,6 +79,7 @@ typedef struct expression
 typedef struct Quad
 {
     /* enum  opcode  */
+    int next_instr_label;
     iopcode op;
     expr *result;
     expr *arg1;
