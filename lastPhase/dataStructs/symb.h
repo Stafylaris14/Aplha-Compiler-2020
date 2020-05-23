@@ -27,6 +27,8 @@ typedef struct Item
     struct Item *sameScope; /* dixnei sto epomeno me to idio scope */
     int lineno;
     formal *formalArg;
+    int formal_count;
+    int iaddress;
     struct Item *next;
 } item;
 

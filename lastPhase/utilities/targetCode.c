@@ -16,8 +16,8 @@ struct userFunc *userFuncs[CONST_ARR_SIZE];
 int userFuncSize = 0;
 generator_func_t generators[] = {
     generate_ASSIGN,
-    generate_SUB,
     generate_ADD,
+    generate_SUB,
     generate_MUL,
     generate_DIV,
     generate_MOD,
@@ -116,6 +116,7 @@ void generate_GETRETVAL(quad q){
 }
 void generate_FUNCSTART(quad q){
     printf("FUNCSTART\n");
+    generate_single_quad(FUNCSTART , &q);
 }
 void generate_FUNCEND(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
@@ -258,18 +259,22 @@ void print_const_arrays()
     printf("-----NAMED LIB FUNCTIONS -----\n");
     for (i = 0; i < namedLibFuncsSize; i++)
     {
+        if(namedLibFuncs[i])
         printf("%d: %s\n", i, namedLibFuncs[i]);
     }
     printf("-----USER FUNCTIONS -----\n");
     for (i = 0; i < userFuncSize; i++)
     {
-        printf("%d: %s\n", i, userFuncs[i]->id);
+        if(userFuncs[i])
+        printf("%d: name = %s , localsize = %d , address = %d\n", i, userFuncs[i]->id , userFuncs[i]->localsize , userFuncs[i]->address);
     }
     wht();
+    
 }
-
+// EDW EINAI-----------------------------------------------------------------------------
 vmarg* make_operand(expr *e)
 {
+    
     vmarg* arg = malloc(sizeof(vmarg));
     if(e == NULL) {
         arg = NULL;
@@ -307,9 +312,6 @@ vmarg* make_operand(expr *e)
     }
     case constnum_:
         arg->type = number_a;
-        grn();
-        printf("[%d]einai to numconst\n" , e->numConst);
-        wht();
         arg->val = consts_add_numconst(e->numConst);
         break;
     case constbool_:
@@ -322,6 +324,7 @@ vmarg* make_operand(expr *e)
         break;
     case pfunc_:
         arg->type = userFunc_a;
+        arg->val = consts_add_userFunc(e);
         //arg->val= e->sym-> TODO thelei to taddress leei pou einai mesa sto symbol
         // TODO ????????
         break;
@@ -432,9 +435,16 @@ int newUserFunction(int address, int localsize, char *name)
     return userFuncSize-1;
 }
 
-int consts_add_userFunc(userFunc *func)
+int consts_add_userFunc(expr *e)
 {
-    userFuncs[userFuncSize] = func;
+    // printf("eimai edw sto functions user %s\n" , func->id);
+    // userFuncs[userFuncSize] = func;
+    userFunc* function = malloc(sizeof(userFunc));
+    function->id = strdup(e->sym->name);
+    // function->address = ;
+    function->localsize = e->sym->formal_count;
+    function->address =e->sym->iaddress; 
+    userFuncs[userFuncSize] = function;
     userFuncSize++;
     return userFuncSize - 1;
 }

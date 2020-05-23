@@ -164,6 +164,7 @@ item *newItem(char *name, char *type, int scope, double lineno)
     tmp->next = NULL;
     tmp->sameScope = NULL;
     tmp->formalArg = NULL;
+    tmp->formal_count = 0;
     tmp->offset = -1;
     return tmp;
 }

@@ -8,7 +8,7 @@
 #define I_EXPAND 1024
 #define I_CURRENT_SIZE current_instraction * sizeof(instr)
 #define I_NEW_SIZE (I_SIZE * sizeof(instr) + I_CURRENT_SIZE)
-
+#define __DEBUG instr *INSTRUCTION_DEBUG = NULL;printf("%d" , INSTRUCTION_DEBUG->res->val);
 
 
 //
@@ -191,7 +191,7 @@ int consts_add_namedLibFuncs(char *funcName);
 
 int newUserFunction(int address, int localsize, char *name);
 
-int consts_add_userFunc(userFunc *func);
+int consts_add_userFunc(expr *e);
 void emit_instruction(instr i);
 
 char* get_string_vmopcode(vmop op);

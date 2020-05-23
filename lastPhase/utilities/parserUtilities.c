@@ -327,7 +327,7 @@ void insert_formal_arg(char *functionName, char *name)
   if (!tmp)
     return;
   formal *formals = tmp->formalArg;
-
+  tmp->formal_count++;
   if (formals == NULL)
   {
 
