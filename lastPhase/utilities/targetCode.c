@@ -40,7 +40,8 @@ generator_func_t generators[] = {
     generate_FUNCEND,
     generate_TABLECREATE,
     generate_TABLEGETELEM,
-    generate_TABLESETELEM
+    generate_TABLESETELEM,
+    // generate_NOP
 };
 
 
@@ -126,7 +127,7 @@ void generate_FUNCEND(quad q){
 void generate_TABLECREATE(quad q){generate_single_quad(newtable_v, &q);}
 void generate_TABLEGETELEM(quad q){generate_single_quad(tablegetelem_v, &q);}
 void generate_TABLESETELEM(quad q){generate_single_quad(tablesetelem_v, &q);}
-
+// void generate_NOP(quad q){return;}
 void generate(){
     init_instructions();
     init_const_arrays();
@@ -215,6 +216,7 @@ void print_instructions()
     int i;
     cyn();
     printf("-----------instructions (target CODE) -----------------\n");
+    printf("i:|opcode|\t|res|\t|arg1|\t |arg2|\n");
     for (i = 0; i < current_instraction; i++)
     {
 
@@ -233,7 +235,7 @@ void print_instructions()
         // printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n", i,  instructions[i].op, instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
        
         // if (instructions[i].) 
-        printf("%d:|%s|\t|%d|\t|%d|\t|%d|\n", 1+i,  get_string_vmopcode(instructions[i].op), instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
+        printf("%d:|%s|\t|%d , %d|\t|%d , %d|\t|%d , %d|\n", 1+i,  get_string_vmopcode(instructions[i].op), instructions[i].res->val,instructions[i].res->type, instructions[i].arg1->val,instructions[i].arg1->type ,instructions[i].arg2->val , instructions[i].arg2->type);
     }
     print_const_arrays();
 }
@@ -286,6 +288,7 @@ vmarg* make_operand(expr *e)
     case tableitem_:
     {
         arg->val = e->sym->offset; //na to to offset
+        red();
         switch (e->sym->scope_spase)
         {
         case program_variable:
@@ -300,9 +303,13 @@ vmarg* make_operand(expr *e)
         default:
             assert(0);
         }
+        break;
     }
     case constnum_:
         arg->type = number_a;
+        grn();
+        printf("[%d]einai to numconst\n" , e->numConst);
+        wht();
         arg->val = consts_add_numconst(e->numConst);
         break;
     case constbool_:

@@ -14,6 +14,7 @@
 
 extern int yylineno;
 extern int scopeCounter;
+extern int offset;
 
 unsigned int total = 0;
 
@@ -335,6 +336,8 @@ item *tmp_item()
     char *str = malloc(35 + tmp_count);
     sprintf(str, "^%d", tmp_count);
     tmp = newItem(str, "local Expression", scopeCounter, yylineno);
+    offset++;
+    tmp->offset = offset;
     tmp_count++;
     return tmp;
 }
