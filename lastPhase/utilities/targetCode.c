@@ -52,11 +52,14 @@ void generate_MUL(quad q){generate_single_quad(mul_v, &q);}
 void generate_DIV(quad q){generate_single_quad(div_v, &q);}
 void generate_MOD(quad q){generate_single_quad(mod_v, &q);}
 void generate_UMINUS(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-    //TODO na to dw to uminus
+    instr i;
+    i.op = mul_v;
+    i.arg1 = make_operand(q.arg1);
+    i.res = make_operand(q.result);
+    i.arg2 = malloc(sizeof(vmarg));
+    i.arg2->type = number_a;
+    i.arg2->val = -1;
+    emit_instruction(i);
 }
 void generate_AND(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
@@ -128,7 +131,6 @@ void generate_RETURN(quad q){
     i.res = make_operand_returnval();
     i.arg1 = make_operand(q.arg1);
     emit_instruction(i);
-
 }
 void generate_GETRETVAL(quad q){
     q.next_instr_label = get_next_instr_label();
@@ -149,9 +151,7 @@ void generate_FUNCSTART(quad q){
     emit_instruction(i);
 }
 void generate_FUNCEND(quad q){
-    instr i;
-        printf("gia kapoio logo einai adeia\n");
-    
+    instr i;    
     i.res = make_operand(q.arg1);
     i.op = exitfunc_v;
     emit_instruction(i);
