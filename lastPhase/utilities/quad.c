@@ -70,7 +70,6 @@ void print_quads()
         if (quads != NULL)
         {
 
-            if(quads[i].op == RETURN) printf("eimai edw sto printWuads kai to b einai %d type\n" ,quads[i].arg1->type);
             a1 = malloc(sizeof(char) * 200);
             a2 = malloc(sizeof(char) * 200);
             a3 = malloc(sizeof(char) * 200);
@@ -656,7 +655,7 @@ expr *lvalue_expr(item *sym)
         e->type = var_;
         break;
     case function_local:
-        e->type = var_;
+        e->type = pfunc_;
         break;
     case formal_argument:
         e->type = var_;

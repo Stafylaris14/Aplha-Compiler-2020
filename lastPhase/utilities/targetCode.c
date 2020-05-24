@@ -106,7 +106,9 @@ void generate_IF_GREATEREQ(quad q){generate_single_relational(jge_v , &q);}
 void generate_IF_LESS(quad q){generate_single_relational(jle_v , &q);}
 void generate_IF_GREATER(quad q){generate_single_relational(jgt_v , &q);}
 void generate_JUMP(quad q){generate_single_relational(jump_v , &q);}
-void generate_CALL(quad q){
+void generate_CALL(quad q)
+{
+    print_quad(q);
     instr i;
     q.next_instr_label = get_next_instr_label();
     i.op = callfunc_v;
@@ -121,11 +123,12 @@ void generate_PARAM(quad q){
     emit_instruction(i);
 }
 void generate_RETURN(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-    //TODO DEN EINAII SWOSTO
+    instr i ;
+    i.op = assign_v;
+    i.res = make_operand_returnval();
+    i.arg1 = make_operand(q.arg1);
+    emit_instruction(i);
+
 }
 void generate_GETRETVAL(quad q){
     q.next_instr_label = get_next_instr_label();
@@ -137,18 +140,19 @@ void generate_GETRETVAL(quad q){
     emit_instruction(i);
 }
 void generate_FUNCSTART(quad q){
-    printf("FUNCSTART\n");
+    // printf("FUNCSTART\n");
     // generate_single_quad(enterfunc_v , &q);
     instr i;
     i.res = make_operand(q.arg1);
-    i.arg1 = NULL;
     i.arg2 = NULL;
     i.op = enterfunc_v;
     emit_instruction(i);
 }
 void generate_FUNCEND(quad q){
     instr i;
-    i.arg1 = make_operand(q.arg1);
+        printf("gia kapoio logo einai adeia\n");
+    
+    i.res = make_operand(q.arg1);
     i.op = exitfunc_v;
     emit_instruction(i);
 }
@@ -267,18 +271,18 @@ void print_instructions()
         printf("%d:" , i);
         printf("%s\t\t" , get_string_vmopcode(instructions[i].op));
          if(instructions[i].res->type != -1)
-            printf("%d(%s)%d\t\t" , instructions[i].res->type , get_string_vmargtype(instructions[i].res) , instructions[i].res->val);
+            printf("%d(%s)%d\t\t" , instructions[i].res->val , get_string_vmargtype(instructions[i].res) , instructions[i].res->type);
         else
             printf("\t\t\t");
         if(instructions[i].arg1->type != -1)
-            printf("%d(%s)%d\t\t" , instructions[i].arg1->type , get_string_vmargtype(instructions[i].arg1) , instructions[i].arg1->val);
+            printf("%d(%s)%d\t\t" , instructions[i].arg1->val , get_string_vmargtype(instructions[i].arg1) , instructions[i].arg1->type);
         else
             printf("\t\t\t");
         if(instructions[i].arg2->type != -1)
-            printf("%d(%s)%d\t\t" , instructions[i].arg2->type , get_string_vmargtype(instructions[i].arg2) , instructions[i].arg2->val);
+            printf("%d(%s)%d\t\t" , instructions[i].arg2->val , get_string_vmargtype(instructions[i].arg2) , instructions[i].arg2->type);
         else
             printf("\t\t\t");
-        printf("------------------------------------------\n");
+        
         printf("\n");
 
         // printf("%d:|%s|\t|%d(%s)|\t|%d , (%s)|\t|%d , (%s)|\n",
@@ -291,6 +295,7 @@ void print_instructions()
         // instructions[i].arg2->val,
         // get_string_vmargtype(instructions[i].arg2));
     }
+    printf("eimai edw gia to curr einai %d\n" ,current_instraction );
     print_const_arrays();
 }
 
@@ -670,6 +675,35 @@ void write_bin()
         fwrite(userFuncs[i] , sizeof(userFunc) , 1 , fp);
     fclose(fp);
 }
+
+// util
+void print_quad(quad q)
+{
+    red();
+    printf("-----------------------------------\n");
+    printf("|%d|\t\t\n" ,q.op);
+    if(q.result)
+    {
+        printf("res ->type -> |%d|\n" , q.result->type);
+        if((q.result->sym))
+            printf("res ->ssym-> %s\n" , q.result->sym->name);
+    }
+     if(q.arg1)
+    {
+        printf("arg1->type -> |%d|\n" , q.arg1->type);
+        if((q.arg1->sym))
+            printf("arg1->sym-> %s\n" , q.arg1->sym->name);
+    }
+    if(q.arg2)
+    {
+        printf("arg2->stype -> |%d|\n" , q.arg2->type);
+        if((q.arg2->sym))
+            printf("sym-> %s\n" , q.arg2->sym->name);
+    }
+    printf("-----------------------------------\n");
+    wht();
+}
+
 
 
 

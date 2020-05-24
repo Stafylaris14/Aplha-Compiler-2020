@@ -23,6 +23,8 @@ typedef struct avm_memcell avm_memcell; //na ta 3anadwwwww
 typedef struct avm_table_bucket avm_table_bucket;
 
 
+
+
 typedef enum vmopcode
 {
   assign_v,
@@ -174,8 +176,6 @@ void print_instructions();
 
 void print_const_arrays();
 
-
-
 vmarg* make_operand(expr *e);
 
 vmarg* make_operand_boolean(int val);
@@ -196,13 +196,19 @@ int consts_add_namedLibFuncs(char *funcName);
 int newUserFunction(int address, int localsize, char *name);
 
 int consts_add_userFunc(expr *e);
+
 void emit_instruction(instr i);
 
 char* get_string_vmopcode(vmop op);
 
 char* get_string_vmargtype(vmarg *v);
 
+void print_quad(quad q);
+
 void write_bin();
+
+
+
 //
 // avm_memcell stack[AVM_STACKSIZE];
 
