@@ -1,2 +1,4 @@
 function a(b){
-return b;}
+    x = 1;
+ function d (c){}
+}

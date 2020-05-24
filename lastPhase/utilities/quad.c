@@ -656,7 +656,7 @@ expr *lvalue_expr(item *sym)
         e->type = var_;
         break;
     case function_local:
-        e->type = pfunc_;
+        e->type = var_;
         break;
     case formal_argument:
         e->type = var_;
