@@ -245,30 +245,44 @@ void print_instructions()
         if(instructions[i].arg1 == NULL || instructions[i].arg1->type < 0 || instructions[i].arg1->type > 10) {
             instructions[i].arg1 = malloc(sizeof(vmarg));
             instructions[i].arg1->val = -1;
-            instructions[i].arg1->type = 7;
+            instructions[i].arg1->type = -1;
         }
         if(instructions[i].arg2 == NULL||instructions[i].arg2->type < 0|| instructions[i].arg2->type > 10) {
             instructions[i].arg2 = malloc(sizeof(vmarg));
             instructions[i].arg2->val = -1;
-            instructions[i].arg2->type = 7;
+            instructions[i].arg2->type = -1;
         }
         if(instructions[i].res == NULL || instructions[i].res->type < 0 || instructions[i].res->type > 10) {
             instructions[i].res = malloc(sizeof(vmarg));
             instructions[i].res->val = -1;
-            instructions[i].res->type = 7;
+            instructions[i].res->type = -1;
         }
-        // printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n", i,  instructions[i].op, instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
        
-        // if (instructions[i].) 
-        printf("%d:|%s|\t|%d(%s)|\t|%d , (%s)|\t|%d , (%s)|\n",
-         1+i,
-        get_string_vmopcode(instructions[i].op),
-        instructions[i].res->val,
-        get_string_vmargtype(instructions[i].res),
-        instructions[i].arg1->val,
-        get_string_vmargtype(instructions[i].arg1),
-        instructions[i].arg2->val,
-        get_string_vmargtype(instructions[i].arg2));
+        printf("%d:" , i);
+        printf("%s\t\t" , get_string_vmopcode(instructions[i].op));
+         if(instructions[i].res->type != -1)
+            printf("%d(%s)%d\t\t" , instructions[i].res->type , get_string_vmargtype(instructions[i].res) , instructions[i].res->val);
+        else
+            printf("\t\t\t");
+        if(instructions[i].arg1->type != -1)
+            printf("%d(%s)%d\t\t" , instructions[i].arg1->type , get_string_vmargtype(instructions[i].arg1) , instructions[i].arg1->val);
+        else
+            printf("\t\t\t");
+        if(instructions[i].arg2->type != -1)
+            printf("%d(%s)%d\t\t" , instructions[i].arg2->type , get_string_vmargtype(instructions[i].arg2) , instructions[i].arg2->val);
+        else
+            printf("\t\t\t");
+        printf("\n");
+
+        // printf("%d:|%s|\t|%d(%s)|\t|%d , (%s)|\t|%d , (%s)|\n",
+        //  1+i,
+        // get_string_vmopcode(instructions[i].op),
+        // instructions[i].res->val,
+        // get_string_vmargtype(instructions[i].res),
+        // instructions[i].arg1->val,
+        // get_string_vmargtype(instructions[i].arg1),
+        // instructions[i].arg2->val,
+        // get_string_vmargtype(instructions[i].arg2));
     }
     print_const_arrays();
 }
@@ -520,7 +534,7 @@ char* get_string_vmopcode(vmop op)
         return "assign";
         break;
     case add_v:
-        return "add";
+        return "add\t";
         break;
     case sub_v:
         return "sub";
@@ -556,7 +570,7 @@ char* get_string_vmopcode(vmop op)
         return "not";
         break;
     case jump_v:
-        return "jump";
+        return "jump\t";
         break;
     case jeq_v:
         return "jeq\t";
@@ -621,7 +635,7 @@ char* get_string_vmargtype(vmarg *v)
     case retval_a:
         return "return val";
     default:
-        assert(0);
+        return " ";
         break;
     }
     return "something";
