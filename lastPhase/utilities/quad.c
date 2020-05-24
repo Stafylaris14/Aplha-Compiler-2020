@@ -640,7 +640,16 @@ expr *member_item(expr *lv, char *name)
 expr *lvalue_expr(item *sym)
 {
     assert(sym);
+    grn();
     expr *e = (expr *)malloc(sizeof(expr));
+    enum Scope_spase sp = get_scope_spase(sym);
+    if(isLibraryFunction(sym->name))
+    {
+        sp = -1;
+    }
+    printf("eimai edw sta palia\n");
+    printf("to onoma einai ->%s\n" , sym->name);
+    printf("to type einai -> %s\n" , sym->type);
     // e->contlist = NULL;
     // e->breaklist = NULL;
     // e->falselist = NULL;
@@ -648,7 +657,6 @@ expr *lvalue_expr(item *sym)
     memset(e, 0, sizeof(expr));
     e->next = (expr *)0;
     e->sym = sym;
-    enum Scope_spase sp = get_scope_spase(sym);
     switch (sp)
     {
     case program_variable:
@@ -662,7 +670,7 @@ expr *lvalue_expr(item *sym)
         break;
     default:
         e->type = lfunc_;
-        assert(0);
+        break;
     }
     return e;
 }

@@ -62,10 +62,10 @@ void generate_UMINUS(quad q){
     emit_instruction(i);
 }
 void generate_AND(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1); 
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );    
+    // vmarg *vmarg1 ,*vmarg2 , *vmres; 
+    // vmarg1 = make_operand(q.arg1); 
+    // vmarg2 = make_operand(q.arg2 );
+    // vmres = make_operand(q.result );    
 }
 void generate_OR(quad q){
    
@@ -115,6 +115,7 @@ void generate_CALL(quad q)
     instr i;
     q.next_instr_label = get_next_instr_label();
     i.op = callfunc_v;
+    print_quad(q);
     i.arg1 = make_operand(q.arg1);
     emit_instruction(i);
 }
@@ -390,6 +391,7 @@ vmarg* make_operand(expr *e)
         // TODO ????????
         break;
     case lfunc_:
+        printf("mpika edw!\n");
         arg->type = libFunc_a;
         arg->val = consts_add_namedLibFuncs(e->sym->name);
         break;

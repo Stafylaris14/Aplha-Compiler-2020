@@ -1,1 +1,1 @@
-y  = -x-a-b;
+print(x);
