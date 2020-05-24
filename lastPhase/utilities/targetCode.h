@@ -178,7 +178,11 @@ void print_const_arrays();
 
 vmarg* make_operand(expr *e);
 
-// vmarg make_operand_returnval(vmarg *a);
+vmarg* make_operand_boolean(int val);
+
+vmarg* make_operand_constNum(int val);
+
+vmarg *make_operand_returnval();
 
 void init_const_arrays();
 
@@ -196,6 +200,9 @@ void emit_instruction(instr i);
 
 char* get_string_vmopcode(vmop op);
 
+char* get_string_vmargtype(vmarg *v);
+
+void write_bin();
 //
 // avm_memcell stack[AVM_STACKSIZE];
 

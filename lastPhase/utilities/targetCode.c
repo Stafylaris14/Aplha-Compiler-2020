@@ -65,18 +65,39 @@ void generate_AND(quad q){
     vmres = make_operand(q.result );    
 }
 void generate_OR(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
+   
+
     // _TODO
 }
 void generate_NOT(quad q){
-        vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-    //TODO
+    // instr i;
+
+
+    // i.op = jeq_v;
+    // i.arg1 = make_operand(q.arg1);
+    // i.arg2 =  make_operand_boolean(0);
+    // i.res->val = get_next_instr_label()+3;
+    // i.res->type = label_a;
+    // emit_instruction(i);
+
+    // i.op = assign_v;
+    // i.arg1 = make_operand_boolean(0);
+    // i.arg2 = NULL;
+    // i.res = make_operand(q.result);
+    // emit_instruction(i);
+
+    // i.op = jump_v;
+    // i.arg1 = NULL;
+    // i.arg2 = NULL;
+    // i.res->type =label_a;
+    // i.res->val = get_next_instr_label()+2;
+    // emit_instruction(i);
+
+    // i.op = assign_v;
+    // i.arg1 = make_operand_boolean(1);
+    // i.arg2 = NULL;
+    // i.res = make_operand(q.result);
+    // emit_instruction(i); 
 }
 void generate_IF_EQ(quad q){generate_single_relational(jeq_v,&q);}
 void generate_IF_NOTEQ(quad q){generate_single_relational(jne_v , &q);}
@@ -91,13 +112,13 @@ void generate_CALL(quad q){
     i.op = callfunc_v;
     i.arg1 = make_operand(q.arg1);
     emit_instruction(i);
-    //TODO edw prepei na einai me to onoma tis func apo ton pinaka
 }
 void generate_PARAM(quad q){
+    instr i ;
     q.next_instr_label = get_next_instr_label();
-    instr i;
+    i.arg1 = make_operand(q.arg1);
     i.op = pusharg_v;
-    make_operand(q.arg1);
+    emit_instruction(i);
 }
 void generate_RETURN(quad q){
     vmarg *vmarg1 ,*vmarg2 , *vmres; 
@@ -110,20 +131,20 @@ void generate_GETRETVAL(quad q){
     q.next_instr_label = get_next_instr_label();
     instr i; 
     i.op = assign_v;
-    i.res = make_operand(q.result);
-    // i.arg1 = make_operand_returnval(i.arg1);
+    i.res = make_operand(q.arg1);
+    // if(q.arg1 == NULL) printf("einai NULL\n");
+    // i.arg1 = make_operand_returnval(q.arg1);
     emit_instruction(i);
 }
 void generate_FUNCSTART(quad q){
     printf("FUNCSTART\n");
-    generate_single_quad(FUNCSTART , &q);
+    generate_single_quad(enterfunc_v , &q);
 }
 void generate_FUNCEND(quad q){
-    vmarg *vmarg1 ,*vmarg2 , *vmres; 
-    vmarg1 = make_operand(q.arg1);
-    vmarg2 = make_operand(q.arg2 );
-    vmres = make_operand(q.result );
-    
+    instr i;
+    i.arg1 = make_operand(q.arg1);
+    i.op = exitfunc_v;
+    emit_instruction(i);
 }
 void generate_TABLECREATE(quad q){generate_single_quad(newtable_v, &q);}
 void generate_TABLEGETELEM(quad q){generate_single_quad(tablegetelem_v, &q);}
@@ -217,26 +238,37 @@ void print_instructions()
     int i;
     cyn();
     printf("-----------instructions (target CODE) -----------------\n");
-    printf("i:|opcode|\t|res|\t|arg1|\t |arg2|\n");
+    printf("i:|opcode|\t|res|\t|arg1|\t |arg2|\n\n\n");
     for (i = 0; i < current_instraction; i++)
     {
 
-        if(instructions[i].arg1 == NULL) {
+        if(instructions[i].arg1 == NULL || instructions[i].arg1->type < 0 || instructions[i].arg1->type > 10) {
             instructions[i].arg1 = malloc(sizeof(vmarg));
             instructions[i].arg1->val = -1;
+            instructions[i].arg1->type = 7;
         }
-        if(instructions[i].arg2 == NULL) {
+        if(instructions[i].arg2 == NULL||instructions[i].arg2->type < 0|| instructions[i].arg2->type > 10) {
             instructions[i].arg2 = malloc(sizeof(vmarg));
             instructions[i].arg2->val = -1;
+            instructions[i].arg2->type = 7;
         }
-        if(instructions[i].res == NULL) {
+        if(instructions[i].res == NULL || instructions[i].res->type < 0 || instructions[i].res->type > 10) {
             instructions[i].res = malloc(sizeof(vmarg));
             instructions[i].res->val = -1;
+            instructions[i].res->type = 7;
         }
         // printf("%d:|%d|\t|%d|\t|%d|\t|%d|\n", i,  instructions[i].op, instructions[i].res->val, instructions[i].arg1->val, instructions[i].arg2->val);
        
         // if (instructions[i].) 
-        printf("%d:|%s|\t|%d , %d|\t|%d , %d|\t|%d , %d|\n", 1+i,  get_string_vmopcode(instructions[i].op), instructions[i].res->val,instructions[i].res->type, instructions[i].arg1->val,instructions[i].arg1->type ,instructions[i].arg2->val , instructions[i].arg2->type);
+        printf("%d:|%s|\t|%d(%s)|\t|%d , (%s)|\t|%d , (%s)|\n",
+         1+i,
+        get_string_vmopcode(instructions[i].op),
+        instructions[i].res->val,
+        get_string_vmargtype(instructions[i].res),
+        instructions[i].arg1->val,
+        get_string_vmargtype(instructions[i].arg1),
+        instructions[i].arg2->val,
+        get_string_vmargtype(instructions[i].arg2));
     }
     print_const_arrays();
 }
@@ -293,7 +325,6 @@ vmarg* make_operand(expr *e)
     case tableitem_:
     {
         arg->val = e->sym->offset; //na to to offset
-        red();
         switch (e->sym->scope_spase)
         {
         case program_variable:
@@ -367,12 +398,22 @@ vmarg* make_operand_constNum(int val)
     tmp->val = val;
 }
 
-// vmarg make_operand_returnval(vmarg a)
-// {
-//     vmarg a1 = a;
-//     a1.type = retval_a;
-//     return a1;
-// }
+vmarg* make_operand_boolean(int val)
+{
+    if (val != 0 || val!=1)assert(0);
+    vmarg* new = malloc(sizeof(vmarg));
+    new->type = bool_a;
+    new->val = val;
+    return new;
+}
+
+vmarg *make_operand_returnval()
+{
+    vmarg* a1 = malloc(sizeof(vmarg));
+    a1->type = retval_a;
+    a1->val = -1;
+    return a1;
+}
 
 void init_const_arrays()
 {
@@ -423,7 +464,10 @@ int consts_add_namedLibFuncs(char *funcName)
 int newUserFunction(int address, int localsize, char *name)
 {
     for(int i = 0; i < namedLibFuncsSize; i++)
-        if(!strcmp(namedLibFuncs[i] , name))return i;
+        if(!strcmp(namedLibFuncs[i] , name)){
+            printf("mpika edw!\n");
+            return i;
+        }
     userFunc *tmp = malloc(sizeof(userFunc));
     tmp->address = address;
     tmp->localsize = localsize;
@@ -439,6 +483,9 @@ int consts_add_userFunc(expr *e)
 {
     // printf("eimai edw sto functions user %s\n" , func->id);
     // userFuncs[userFuncSize] = func;
+    for (int i = 0; i < userFuncSize; i++)
+        if(!strcmp(e->sym->name , userFuncs[i]->id)) return i;
+    
     userFunc* function = malloc(sizeof(userFunc));
     function->id = strdup(e->sym->name);
     // function->address = ;
@@ -547,7 +594,57 @@ char* get_string_vmopcode(vmop op)
     }
 }
 
+char* get_string_vmargtype(vmarg *v)
+{
+    switch (v->type)
+    {
+    case label_a:
+        return "label";
+    case  global_a:
+        return "global";
+    case formal_a:
+        return "formal";
+    case local_a:
+        return "local";
+    case number_a:
+        return "number";
+    case string_a:
+        return "string";
+    case bool_a:
+        return "bool";
+    case nill_a:
+        return "nill";
+    case userFunc_a:
+        return "userFunctin";
+    case libFunc_a:
+        return "libfunction";
+    case retval_a:
+        return "return val";
+    default:
+        assert(0);
+        break;
+    }
+    return "something";
+}
 
+void write_bin()
+{
+    FILE *fp;
+    fp = fopen("instructions" , "wb+");
+    // instr
+    for(int i =0 ; i < current_instraction; i++)
+        fwrite(&instructions[i] , sizeof(instr) ,1, fp);
+    // consts
+    for(int i =0 ; i< numConstSize;i++)
+        fwrite(&numConsts[i] ,sizeof(numConsts[i]) , 1 , fp );
+    for(int i = 0; i < stringConstSize; i++)
+        fwrite(stringConsts[i] ,sizeof(char*) , 1 , fp );
+    for(int i = 0; i < namedLibFuncsSize; i ++)
+        fwrite(namedLibFuncs[i] , sizeof(char*) ,1 , fp);
+    for(int i = 0; i < userFuncSize; i++)
+        fwrite(userFuncs[i] , sizeof(userFunc) , 1 , fp);
+    fclose(fp);
+}
 
 
 

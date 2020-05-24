@@ -951,5 +951,6 @@ int main(int argc, char** argv)
     
     print_quads();
     generate();
+    write_bin();
     print_instructions();   
 }
