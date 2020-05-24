@@ -3,9 +3,10 @@
 /* #include "../dataStructs/sym.h" */
 #include "parserUtilities.h"
 
+
 typedef enum Iopcode
 {
-    ASSIGN,
+    ASSIGN = 0,
     ADD,
     SUB,
     MUL,
@@ -78,6 +79,8 @@ typedef struct expression
 typedef struct Quad
 {
     /* enum  opcode  */
+   
+    int next_instr_label;
     iopcode op;
     expr *result;
     expr *arg1;
@@ -85,6 +88,8 @@ typedef struct Quad
     int label; /* ???????? */
     int lineno;
 } quad;
+
+// quad *quads;
 
 typedef struct for_call
 {

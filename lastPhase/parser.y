@@ -1,6 +1,7 @@
 %{
 
-#include "utilities/quad.h"
+//#include "utilities/quad.h"
+#include "utilities/targetcode.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 
@@ -25,6 +26,7 @@ int assign_flag = 0;
 stack1 *loopcounterstack; //krataei poses anakikloseis exoun anoi3ei
 /* iopcode op; */
 
+extern int currQuad;
 
 
 expr *result;
@@ -701,6 +703,7 @@ Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend {
         backpatch($4->returnlist, nextquad()+1);
         expr*temp = newexpr(pfunc_);
         temp->sym = $1;
+        temp->sym->iaddress = currQuad;
         emit(FUNCEND,temp,NULL,NULL,-1);
         patchlabel($1->jump,nextquad()+1);
         $$ = $1;
@@ -943,9 +946,11 @@ int main(int argc, char** argv)
     loopcounterstack = arxikopoisi();
     yyparse();
     //printSymTable();
-    //printHash();
+    printHash();
     //printScopeList();
     
     print_quads();
-   
+    generate();
+    write_bin();
+    print_instructions();   
 }

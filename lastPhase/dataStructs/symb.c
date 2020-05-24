@@ -164,6 +164,7 @@ item *newItem(char *name, char *type, int scope, double lineno)
     tmp->next = NULL;
     tmp->sameScope = NULL;
     tmp->formalArg = NULL;
+    tmp->formal_count = 0;
     tmp->offset = -1;
     return tmp;
 }
@@ -236,7 +237,7 @@ void printHash()
         {
             fprintf(stderr, "   |  %s  ", tmp->name);
             mag();
-            fprintf(stderr, "%s|", tmp->type);
+            fprintf(stderr, "%d|", tmp->scope_spase);
             tmp = tmp->next;
             grn();
         }
@@ -254,10 +255,10 @@ void getoffset()
 sc_spase get_scope_spase(item *new)
 {
     sc_spase s;
-    if (functionFlag != 0)
+    if (!strcmp(new->type, "User Function"))
         s = function_local;
-    else if (!strcmp(new->type, "formal argument"))
-        s = formal_argument;
+    else if (!strcmp(new->type, "library function"))
+        s = program_variable;
     else
         s = program_variable;
     return s;

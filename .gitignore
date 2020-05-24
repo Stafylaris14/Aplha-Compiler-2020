@@ -37,6 +37,14 @@ phase3/a.out.dSYM/
 
 phase3/.vscode/
 
-lastPhase/instructions
+lastPhase/calc
+
+lastPhase/parser.c
+
+lastPhase/parser.h
+
+lastPhase/scanner.c
 
 lastPhase/.vscode/
+
+lastPhase/instructions

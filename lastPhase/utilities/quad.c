@@ -14,9 +14,11 @@
 
 extern int yylineno;
 extern int scopeCounter;
+extern int offset;
 
-quad *quads = (quad *)0;
 unsigned int total = 0;
+
+quad* quads = (quad *)0;
 unsigned int currQuad = 0;
 int tmp_count = 0;
 
@@ -67,6 +69,7 @@ void print_quads()
     {
         if (quads != NULL)
         {
+
             a1 = malloc(sizeof(char) * 200);
             a2 = malloc(sizeof(char) * 200);
             a3 = malloc(sizeof(char) * 200);
@@ -334,6 +337,8 @@ item *tmp_item()
     char *str = malloc(35 + tmp_count);
     sprintf(str, "^%d", tmp_count);
     tmp = newItem(str, "local Expression", scopeCounter, yylineno);
+    offset++;
+    tmp->offset = offset;
     tmp_count++;
     return tmp;
 }
@@ -635,7 +640,16 @@ expr *member_item(expr *lv, char *name)
 expr *lvalue_expr(item *sym)
 {
     assert(sym);
+    grn();
     expr *e = (expr *)malloc(sizeof(expr));
+    enum Scope_spase sp = get_scope_spase(sym);
+    if(isLibraryFunction(sym->name))
+    {
+        sp = -1;
+    }
+    printf("eimai edw sta palia\n");
+    printf("to onoma einai ->%s\n" , sym->name);
+    printf("to type einai -> %s\n" , sym->type);
     // e->contlist = NULL;
     // e->breaklist = NULL;
     // e->falselist = NULL;
@@ -643,7 +657,6 @@ expr *lvalue_expr(item *sym)
     memset(e, 0, sizeof(expr));
     e->next = (expr *)0;
     e->sym = sym;
-    enum Scope_spase sp = get_scope_spase(sym);
     switch (sp)
     {
     case program_variable:
@@ -657,7 +670,7 @@ expr *lvalue_expr(item *sym)
         break;
     default:
         e->type = lfunc_;
-        assert(0);
+        break;
     }
     return e;
 }
@@ -842,10 +855,10 @@ for_call *insert_call(expr *elist, unsigned char method, char *name)
 
 zavo *new_list(int i)
 {
-    zavo *quads = malloc(sizeof(zavo));
-    quads->label = i;
-    quads->next = NULL;
-    return quads;
+    zavo *Quads = malloc(sizeof(zavo));
+    Quads->label = i;
+    Quads->next = NULL;
+    return Quads;
 }
 
 zavo *insert_before_zavo(zavo *head, int i)
