@@ -946,7 +946,7 @@ int main(int argc, char** argv)
     loopcounterstack = arxikopoisi();
     yyparse();
     //printSymTable();
-    //printHash();
+    printHash();
     //printScopeList();
     
     print_quads();

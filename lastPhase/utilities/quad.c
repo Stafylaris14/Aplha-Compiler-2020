@@ -69,6 +69,8 @@ void print_quads()
     {
         if (quads != NULL)
         {
+
+            if(quads[i].op == RETURN) printf("eimai edw sto printWuads kai to b einai %d type\n" ,quads[i].arg1->type);
             a1 = malloc(sizeof(char) * 200);
             a2 = malloc(sizeof(char) * 200);
             a3 = malloc(sizeof(char) * 200);

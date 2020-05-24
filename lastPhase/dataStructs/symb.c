@@ -237,7 +237,7 @@ void printHash()
         {
             fprintf(stderr, "   |  %s  ", tmp->name);
             mag();
-            fprintf(stderr, "%s|", tmp->type);
+            fprintf(stderr, "%d|", tmp->scope_spase);
             tmp = tmp->next;
             grn();
         }

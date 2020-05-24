@@ -138,7 +138,13 @@ void generate_GETRETVAL(quad q){
 }
 void generate_FUNCSTART(quad q){
     printf("FUNCSTART\n");
-    generate_single_quad(enterfunc_v , &q);
+    // generate_single_quad(enterfunc_v , &q);
+    instr i;
+    i.res = make_operand(q.arg1);
+    i.arg1 = NULL;
+    i.arg2 = NULL;
+    i.op = enterfunc_v;
+    emit_instruction(i);
 }
 void generate_FUNCEND(quad q){
     instr i;
@@ -272,6 +278,7 @@ void print_instructions()
             printf("%d(%s)%d\t\t" , instructions[i].arg2->type , get_string_vmargtype(instructions[i].arg2) , instructions[i].arg2->val);
         else
             printf("\t\t\t");
+        printf("------------------------------------------\n");
         printf("\n");
 
         // printf("%d:|%s|\t|%d(%s)|\t|%d , (%s)|\t|%d , (%s)|\n",
@@ -330,12 +337,13 @@ vmarg* make_operand(expr *e)
     arg = NULL;
     arg = malloc(sizeof(vmarg));
     if(!arg) exit(-1);
+    
     switch (expressionType)
     {
     case boolexpr_:
     case arthmexp_:
     case newtable_:
-    case var_:
+    case var_: 
     case tableitem_:
     {
         arg->val = e->sym->offset; //na to to offset
@@ -368,6 +376,9 @@ vmarg* make_operand(expr *e)
         arg->val = consts_add_stringconst(e->stringConst);
         break;
     case pfunc_:
+        if(!strcmp(e->sym->name , "b")) {
+            printf("%d einai to type kai %d to scopescepasd\n\n" ,e->type , e->sym->scope_spase );
+        }
         arg->type = userFunc_a;
         arg->val = consts_add_userFunc(e);
         //arg->val= e->sym-> TODO thelei to taddress leei pou einai mesa sto symbol
@@ -504,7 +515,7 @@ int consts_add_userFunc(expr *e)
     function->id = strdup(e->sym->name);
     // function->address = ;
     function->localsize = e->sym->formal_count;
-    function->address =e->sym->iaddress; 
+    function->address =current_instraction; 
     userFuncs[userFuncSize] = function;
     userFuncSize++;
     return userFuncSize - 1;
