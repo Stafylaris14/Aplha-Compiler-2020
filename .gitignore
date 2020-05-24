@@ -36,3 +36,7 @@ phase3/scanner.c
 phase3/a.out.dSYM/
 
 phase3/.vscode/
+
+lastPhase/instructions
+
+lastPhase/.vscode/
