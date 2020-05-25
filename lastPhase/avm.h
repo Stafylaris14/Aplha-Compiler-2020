@@ -105,3 +105,52 @@ avm_table *avm_tablenew(void);
 void avm_tablebucketsdestroy(avm_table_bucket **p);
 
 void avm_tabledestroy(avm_table *t);
+
+void execute_cycle(void);
+
+void avm_callsaveenvironment(void);
+
+void execute_funcexit(instruction* unused);
+
+library_func_t avm_getlibraryfunc(char* id);
+
+void avm_calllibfunc(char* id);
+
+unsigned avm_totalactuals(void);
+
+avm_memcell* avm_getactual(unsigned i);
+
+void libfunc_print(void);
+
+void avm_registerlibfunc(char* id,library_func_t addr);
+
+void libfunc_typeof(void);
+
+void libfunc_totalarguments(void);
+
+
+double add_impl(double x,double y);
+
+double sub_impl(double x,double y);
+
+double mul_impl(double x,double y);
+
+double div_impl(double x,double y);
+
+double mod_impl(double x,double y);
+
+void execute_arithmetic(instruction *instr);
+
+unsigned char avm_tobool(avm_memcell* m);
+
+void execute_jeq(instruction* instr);
+
+void execute_newtable(instruction* instr);
+
+avm_memcell* avm_tablegetelem();
+
+void avm_tablesetelem();
+
+void execute_tablegetelem(instruction* instr);
+
+void execute_tablesetelem(instruction* instr);
