@@ -164,7 +164,8 @@ void generate_TABLESETELEM(quad q){generate_single_quad(tablesetelem_v, &q);}
 void generate(){
     init_instructions();
     init_const_arrays();
-    for (int i = 0; i < currQuad; ++i)
+    int i;
+    for (i = 0; i < currQuad; ++i)
     {
         (*generators[quads[i].op])(quads[i]);
     }
@@ -452,8 +453,8 @@ void init_const_arrays()
     numConsts = malloc(sizeof(int) * CONST_ARR_SIZE);
     stringConsts = malloc(CONST_ARR_SIZE);
     namedLibFuncs = malloc(sizeof(struct userFunc) * CONST_ARR_SIZE);
-
-    for (int i = 0; i < CONST_ARR_SIZE; i++)
+    int i;
+    for (i = 0; i < CONST_ARR_SIZE; i++)
     {
         // numConsts[i] = NULL;
         stringConsts[i] = NULL;
@@ -476,7 +477,8 @@ int consts_add_numconst(int val)
 
 int consts_add_stringconst(char *str)
 {
-    for(int i = 0; i < stringConstSize; i++)
+    int i;
+    for(i = 0; i < stringConstSize; i++)
         if(!strcmp(stringConsts[i] , str))return i;
     stringConsts[stringConstSize] = strdup(str);
     stringConstSize++;
@@ -485,7 +487,8 @@ int consts_add_stringconst(char *str)
 
 int consts_add_namedLibFuncs(char *funcName)
 {
-     for(int i = 0; i < namedLibFuncsSize; i++)
+    int i;
+     for(i = 0; i < namedLibFuncsSize; i++)
         if(!strcmp(namedLibFuncs[i] , funcName))return i;
     namedLibFuncs[namedLibFuncsSize] = funcName;
     namedLibFuncsSize++;
@@ -495,7 +498,8 @@ int consts_add_namedLibFuncs(char *funcName)
 //to address einai to quad pou 3ekinaei h sinartisi kai to localsize einai to plithos tws formal arguments
 int newUserFunction(int address, int localsize, char *name)
 {
-    for(int i = 0; i < namedLibFuncsSize; i++)
+    int i;
+    for(i = 0; i < namedLibFuncsSize; i++)
         if(!strcmp(namedLibFuncs[i] , name)){
             printf("mpika edw!\n");
             return i;
@@ -515,7 +519,8 @@ int consts_add_userFunc(expr *e)
 {
     // printf("eimai edw sto functions user %s\n" , func->id);
     // userFuncs[userFuncSize] = func;
-    for (int i = 0; i < userFuncSize; i++)
+    int i;
+    for (i = 0; i < userFuncSize; i++)
         if(!strcmp(e->sym->name , userFuncs[i]->id)) return i;
     
     userFunc* function = malloc(sizeof(userFunc));
@@ -664,16 +669,17 @@ void write_bin()
     FILE *fp;
     fp = fopen("instructions" , "wb+");
     // instr
-    for(int i =0 ; i < current_instraction; i++)
+    int i;
+    for(i =0 ; i < current_instraction; i++)
         fwrite(&instructions[i] , sizeof(instr) ,1, fp);
     // consts
-    for(int i =0 ; i< numConstSize;i++)
+    for(i =0 ; i< numConstSize;i++)
         fwrite(&numConsts[i] ,sizeof(numConsts[i]) , 1 , fp );
-    for(int i = 0; i < stringConstSize; i++)
+    for(i = 0; i < stringConstSize; i++)
         fwrite(stringConsts[i] ,sizeof(char*) , 1 , fp );
-    for(int i = 0; i < namedLibFuncsSize; i ++)
+    for(i = 0; i < namedLibFuncsSize; i ++)
         fwrite(namedLibFuncs[i] , sizeof(char*) ,1 , fp);
-    for(int i = 0; i < userFuncSize; i++)
+    for(i = 0; i < userFuncSize; i++)
         fwrite(userFuncs[i] , sizeof(userFunc) , 1 , fp);
     fclose(fp);
 }
@@ -708,69 +714,3 @@ void print_quad(quad q)
 
 
 
-
-// static void avm_initstack(void)
-// {
-//     unsigned i;
-//     for (i = 0; i < AVM_STACKSIZE; i++)
-//     {
-//         AVM_WIPEOUT(stack[i]);
-//         stack[i].type = undef_m;
-//     }
-// }
-
-// void avm_tableincrefcounter(avm_table *t)
-// {
-//     ++t->refCounter;
-// }
-
-// void avm_tabledecrefcounter(avm_table *t)
-// {
-//     assert(t->refCounter > 0);
-//     if (!--t->refCounter)
-//         avm_tabledestroy(t);
-// }
-
-// void avm_tablebucketsinit(avm_table_bucket **p)
-// {
-//     unsigned i;
-//     for (i = 0; i < AVM_TABLE_HASHSIZE; i++)
-//         p[i] = (avm_table_bucket *)0;
-// }
-
-// avm_table *avm_tablenew(void)
-// {
-//     avm_table *t = (avm_table *)malloc(sizeof(avm_table));
-//     AVM_WIPEOUT(*t);
-
-//     t->refCounter = t->total = 0;
-//     avm_tablebucketsinit(t->numIndexed);
-//     avm_tablebucketsinit(t->strIndexed);
-
-//     return t;
-// }
-
-// void avm_tablebucketsdestroy(avm_table_bucket **p)
-// {
-//     unsigned i;
-//     for (i = 0; i < AVM_TABLE_HASHSIZE; ++i, ++p)
-//     {
-//         avm_table_bucket *b;
-//         for (*b = *p; b;) //den exw idea! TODO
-//         {
-//             avm_table_bucket *del = b;
-//             b = b->next;
-//             avm_memcellclear(&del->key);
-//             avm_memcellclear(&del->value);
-//             free(del);
-//         }
-//         p[i] = (avm_table_bucket *)0;
-//     }
-// }
-
-// void avm_tabledestroy(avm_table *t)
-// {
-//     avm_tablebucketsdestroy(t->strIndexed);
-//     avm_tablebucketsdestroy(t->numIndexed);
-//     free(t);
-// }
