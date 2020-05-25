@@ -38,7 +38,7 @@ execute_func_t executeFuncs[] = {
     execute_TABLESETELEM,
 };
 
-typedef struct avm_table
+typedef struct avm_table 
 {
   unsigned refCounter;
   avm_table_bucket *strIndexed[AVM_TABLE_HASHSIZE];
@@ -73,12 +73,18 @@ typedef struct avm_memcell
     } data;
 } avm_memcell;
 
-typedef struct avm_table_bucket
+typedef struct avm_table_bucket 
 {
   avm_memcell key;
   avm_memcell value;
   avm_table_bucket *next;
 }avm_table_bucket;
+
+
+
+
+
+
 ///////////translation////////////////
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg);
 
@@ -147,10 +153,13 @@ void execute_jeq(instruction* instr);
 
 void execute_newtable(instruction* instr);
 
-avm_memcell* avm_tablegetelem();
+avm_memcell* avm_tablegetelem(avm_memcell *key);
 
-void avm_tablesetelem();
+void avm_tablesetelem(avm_memcell *key,avm_memcell *value);
 
 void execute_tablegetelem(instruction* instr);
 
 void execute_tablesetelem(instruction* instr);
+
+
+void avm_memcellclear(avm_memcell* m);//8elei ilopoihsh

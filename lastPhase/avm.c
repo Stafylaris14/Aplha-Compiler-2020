@@ -1,14 +1,18 @@
 #include "avm.h"
 
+#define AVM_STACKSIZE 4096
+#define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
+#define AVM_TABLE_HASHSIZE 211
 
-  extern int *numConsts;
-  extern int numConstSize ;
-  extern char **stringConsts;
-  extern int stringConstSize;
-  extern char **namedLibFuncs;
-  extern int namedLibFuncsSize;
-  extern struct userFunc *userFuncs[CONST_ARR_SIZE];
-  extern int userFuncSize ;
+extern int *numConsts;
+extern int numConstSize ;
+extern char **stringConsts;
+extern int stringConstSize;
+extern char **namedLibFuncs;
+extern int namedLibFuncsSize;
+extern struct userFunc *userFuncs[CONST_ARR_SIZE];
+extern int userFuncSize ;
+
 
 unsigned char executionFinished = 0 ;
 unsigned pc = 0;
@@ -40,6 +44,16 @@ unsigned char libfunc_tobool(avm_memcell* m){return 1;}
 unsigned char nil_tobool(avm_memcell* m){return 0;}
 unsigned char undef_tobool(avm_memcell* m){assert(0); return 0;}
 
+
+//mallon 8eloun arxikopoiiishhhhhhh
+
+unsigned totalStringConsts;
+char** nameLibfuncs ;
+unsigned totalNameLibfuncs ;
+unsigned totalUserFuncs ;
+
+
+
 tobool_func_t toboolFuncs[]={
   number_tobool,
   string_tobool,
@@ -51,6 +65,7 @@ tobool_func_t toboolFuncs[]={
   undef_tobool
 };
 
+avm_memcell stack[AVM_STACKSIZE];
 
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
 {
@@ -356,12 +371,12 @@ void execute_newtable(instruction* instr){
 
 
 
-avm_memcell* avm_tablegetelem(){
+avm_memcell* avm_tablegetelem(avm_memcell *key){
     //den 3erw ti fasei prepei na to doume
 
 }
 
-void avm_tablesetelem(){
+void avm_tablesetelem(avm_memcell *key,avm_memcell *value){
 
     //den 3erw ti fasei prepei na to doume
 }
@@ -408,4 +423,12 @@ void execute_tablesetelem(instruction* instr){
   else{
     avm_tablesetelem(t->data.tableVal,i,c);
   }
+}
+
+
+
+void avm_memcellclear(avm_memcell* m){
+    
+    //8elei ilopoihsh
+
 }
