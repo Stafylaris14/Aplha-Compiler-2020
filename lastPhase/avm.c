@@ -155,6 +155,7 @@ void execute_funcexit(instruction* unused){
 
 library_func_t avm_getlibraryfunc(char* id){
  //aplo hasing leei ftia3imooooooooooooooooooo
+ printf("ftia3imoooooo\n");
 }
 
 void avm_calllibfunc(char* id){
@@ -193,6 +194,7 @@ void libfunc_print(void){
 
 void avm_registerlibfunc(char* id,library_func_t addr){
   //kanei add ftia3imooooooooooooooooooooooo
+  printf("ftia3imoooooo\n");
 }
 
 
@@ -373,11 +375,12 @@ void execute_newtable(instruction* instr){
 
 avm_memcell* avm_tablegetelem(avm_memcell *key){
     //den 3erw ti fasei prepei na to doume
+    printf("ftia3imoooooo\n");
 
 }
 
 void avm_tablesetelem(avm_memcell *key,avm_memcell *value){
-
+printf("ftia3imoooooo\n");
     //den 3erw ti fasei prepei na to doume
 }
 
@@ -430,5 +433,131 @@ void execute_tablesetelem(instruction* instr){
 void avm_memcellclear(avm_memcell* m){
     
     //8elei ilopoihsh
+    printf("ftia3imoooooo\n");
 
 }
+
+//diale3i paragogi telikou kwdika //////////////////
+
+
+unsigned consts_newstring(char* s){
+    //8elei ftia3imo
+    printf("ftia3imoooooo\n");
+}
+
+
+unsigned consts_newnumber(double n){
+    //fti3imoo
+    printf("ftia3imoooooo\n");
+}
+
+
+unsigned libfuncs_newused(char* s){
+       printf("ftia3imoooooo\n");
+     //ftia3imoo
+}
+
+unsigned userfuncs_newfunc(item* sym){
+    printf("ftia3imoooooo\n");
+     //ftia3imoo
+}
+
+void make_operand(expr* e,vmarg* arg){
+  printf("8elei ftia3imoooo\n");
+  if(!e) return;
+  //8elei kapoio elenxo mallon
+  switch(e->type){
+    case var_e : {
+    break;}
+    case tableitem_e:{
+          break;}
+    case arithexpr_e:{break;}
+    case boolexpr_e: {break;}
+    case newtable_e: {
+        assert(e->sym);
+        arg->val = e->sym->offset;
+        switch (e->sym->space) {
+          case programvar : arg->type = global_a; break;
+          case functionlocal : arg->type = local_a; break;
+          case formalarg : arg->type = formal_a; break;
+          default: assert(0);
+        }
+        break;
+    }
+    //8elei k alla case edw mallon
+    /*Constants*/
+    case constbool_e: {
+      arg->val = e->boolConst;
+      arg->type = bool_a; break;
+      }
+    case conststring_e : {
+      arg->val = consts_newstring(e->strConst);
+      arg->type = string_a; break;
+    }
+    case constnum_e: {
+      arg->val = consts_newnumber(e->numConst);
+      arg->type = number_a; break;
+    }
+    //edw k allo case mallon
+    case nil_e: arg->type = nil_a; break;
+    /*Functions*/
+    case programfunc_e: {
+      arg->type = userfunc_a;
+      arg->val = userfuncs_newfunc(e->sym);
+      //8elei kati g to name mallon
+      break;
+    }
+    case libraryfunc_e: {
+      arg->type = libfunc_a;
+      arg->val = libfuncs_newused(e->sym->name);
+      //mallon 8elei katig name edw
+      break;
+    }
+    default : assert(0);
+  }
+}
+
+
+void make_numberoperand(vmarg* arg,double val){
+  arg->val = consts_newnumber(val);
+  arg->type = number_a;
+}
+void make_booloperand(vmarg* arg,unsigned val){
+  arg->val = val;
+  arg->type = bool_a;
+}
+void make_retvaloperand(vmarg* arg){
+  arg->type = retval_a;
+}
+
+
+incomplete_jump* ij_head = (incomplete_jump*) 0;
+
+unsigned ij_total = 0;
+
+void add_incomplete_jump(unsigned instrNo,unsigned iaddress);
+
+void telos_generate(vmopcode op,quad *quad){
+    printf('8elei dtia3imoooo\n');
+    instruction *t;
+    t->opcode = op;
+
+  make_operand(quad->arg1,t->arg1);
+  make_operand(quad->arg2,t->arg2);
+  make_operand(quad->result,t->result);
+  quad->taddress = nextinstructionlabel();//mallon dn xreiazete
+}
+
+
+void generate_ADD(quad* quad){telos_generate(add,quad);}
+void generate_SUB(quad* quad){telos_generate(sub,quad);}
+void generate_MUL(quad* quad){telos_generate(mul,quad);}
+void generate_DIV(quad* quad){telos_generate(div,quad);}
+void generate_MOD(quad* quad){telos_generate(mod,quad);}
+void generate_NEWTABLE(quad* quad){telos_generate(newtable,quad);}
+void generate_TABLEGETELM(quad* quad){telos_generate(tablegetelem,quad);}
+void generate_TABLESETELM(quad* quad){telos_generate(tablesetelem,quad);}
+void generate_ASSIGN(quad* quad){telos_generate(assign,quad);}
+void generate_NOP(quad* quad){telos_generate(nop,quad);}
+
+//prepeu na einai malakiew ta parapanw na ta exeiw kanei esy sti 4a fasi

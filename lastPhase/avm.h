@@ -81,6 +81,11 @@ typedef struct avm_table_bucket
 }avm_table_bucket;
 
 
+typedef struct incomplete_jump{
+    unsigned instrNo; //The jump instruction number.
+    unsigned iaddress; //the i-code jump-target address.
+    struct incomplete_jump* next; //A trivial linked list.
+}incomplete_jump;
 
 
 
@@ -163,3 +168,38 @@ void execute_tablesetelem(instruction* instr);
 
 
 void avm_memcellclear(avm_memcell* m);//8elei ilopoihsh
+
+
+
+unsigned consts_newstring(char* s);
+
+unsigned consts_newnumber(double n);
+
+
+unsigned libfuncs_newused(char* s);
+
+unsigned userfuncs_newfunc(SymbolTableEntry* sym);
+
+void make_operand(expr* e,vmarg* arg);
+
+void make_numberoperand(vmarg* arg,double val);
+
+void make_booloperand(vmarg* arg,unsigned val);
+
+
+void make_retvaloperand(vmarg* arg);
+
+void telos_generate(vmopcode op,quad *quad);
+
+
+void generate_ADD(quad* q);
+void generate_SUB(quad* q);
+void generate_MUL(quad* q);
+void generate_DIV(quad* q);
+void generate_MOD(quad* q);
+
+void generate_NEWTABLE(quad* quad);
+void generate_TABLEGETELM(quad* quad);
+void generate_TABLESETELM(quad* quad);
+void generate_ASSIGN(quad* quad);
+void generate_NOP(quad* quad);
