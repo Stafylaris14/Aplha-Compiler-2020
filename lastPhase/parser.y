@@ -1,7 +1,7 @@
 %{
 
 //#include "utilities/quad.h"
-#include "utilities/targetcode.h"
+#include "avm.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 

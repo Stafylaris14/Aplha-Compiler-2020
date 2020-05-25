@@ -98,17 +98,6 @@ typedef struct avm_table
   unsigned total;
 } avm_table;
 
-typedef enum avm_memcell_t
-{
-  number_m,
-  string_m,
-  bool_m,
-  table_m,
-  userfunc_m,
-  libfunc_m,
-  nil_m,
-  undef_m
-} avm_memcell_t;
 
 struct avm_memcell
 {
