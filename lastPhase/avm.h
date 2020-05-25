@@ -3,6 +3,11 @@
 // executers
 
 typedef void (*execute_func_t)(instr);
+
+
+// typedef struct avm_memcell avm_memcell; //na ta 3anadwwwww
+// typedef struct avm_table_bucket avm_table_bucket;
+
 execute_func_t executeFuncs[] = {
 
     execute_ASSIGN,
@@ -68,12 +73,12 @@ typedef struct avm_memcell
     } data;
 } avm_memcell;
 
-struct avm_table_bucket
+typedef struct avm_table_bucket
 {
   avm_memcell key;
   avm_memcell value;
   avm_table_bucket *next;
-};
+}avm_table_bucket;
 ///////////translation////////////////
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg);
 
