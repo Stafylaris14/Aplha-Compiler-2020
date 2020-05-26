@@ -8,6 +8,14 @@ typedef void (*execute_func_t)(instr);
 // typedef struct avm_memcell avm_memcell; //na ta 3anadwwwww
 // typedef struct avm_table_bucket avm_table_bucket;
 
+#define AVM_STACKSIZE 4096
+#define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
+#define AVM_TABLE_HASHSIZE 211
+
+//top , topsp gia tin stiva
+unsigned top , topsp;
+
+
 execute_func_t executeFuncs[] = {
 
     execute_ASSIGN,
@@ -47,7 +55,7 @@ typedef struct avm_table
 } avm_table;
 
 
-
+//apothikevei times 
 typedef enum avm_memcell_t
 {
     number_m,
@@ -72,6 +80,13 @@ typedef struct avm_memcell
         char *libFuncVal;
     } data;
 } avm_memcell;
+
+//gia tis times kai return val
+avm_memcell ax,bx,cx;
+avm_memcell retval;
+
+//einai i stiva me ta memcells 
+avm_memcell avm_stack[AVM_STACKSIZE];
 
 typedef struct avm_table_bucket 
 {
@@ -121,7 +136,7 @@ void execute_cycle(void);
 
 void avm_callsaveenvironment(void);
 
-void execute_funcexit(instruction* unused);
+void execute_funcexit(instr* unused);
 
 library_func_t avm_getlibraryfunc(char* id);
 
@@ -150,21 +165,21 @@ double div_impl(double x,double y);
 
 double mod_impl(double x,double y);
 
-void execute_arithmetic(instruction *instr);
+void execute_arithmetic(instr *instr);
 
 unsigned char avm_tobool(avm_memcell* m);
 
-void execute_jeq(instruction* instr);
+void execute_jeq(instr* instr);
 
-void execute_newtable(instruction* instr);
+void execute_newtable(instr* instr);
 
 avm_memcell* avm_tablegetelem(avm_memcell *key);
 
 void avm_tablesetelem(avm_memcell *key,avm_memcell *value);
 
-void execute_tablegetelem(instruction* instr);
+void execute_tablegetelem(instr* instr);
 
-void execute_tablesetelem(instruction* instr);
+void execute_tablesetelem(instr* instr);
 
 
 void avm_memcellclear(avm_memcell* m);//8elei ilopoihsh
@@ -176,30 +191,30 @@ unsigned consts_newstring(char* s);
 unsigned consts_newnumber(double n);
 
 
-unsigned libfuncs_newused(char* s);
+// unsigned libfuncs_newused(char* s);
 
-unsigned userfuncs_newfunc(SymbolTableEntry* sym);
+// unsigned userfuncs_newfunc(item* sym);
 
-void make_operand(expr* e,vmarg* arg);
+// void make_operand(expr* e,vmarg* arg);
 
-void make_numberoperand(vmarg* arg,double val);
+// void make_numberoperand(vmarg* arg,double val);
 
-void make_booloperand(vmarg* arg,unsigned val);
-
-
-void make_retvaloperand(vmarg* arg);
-
-void telos_generate(vmopcode op,quad *quad);
+// void make_booloperand(vmarg* arg,unsigned val);
 
 
-void generate_ADD(quad* q);
-void generate_SUB(quad* q);
-void generate_MUL(quad* q);
-void generate_DIV(quad* q);
-void generate_MOD(quad* q);
+// void make_retvaloperand(vmarg* arg);
 
-void generate_NEWTABLE(quad* quad);
-void generate_TABLEGETELM(quad* quad);
-void generate_TABLESETELM(quad* quad);
-void generate_ASSIGN(quad* quad);
-void generate_NOP(quad* quad);
+// void telos_generate(vmop op,quad *quad);
+
+
+// void generate_ADD(quad* q);
+// void generate_SUB(quad* q);
+// void generate_MUL(quad* q);
+// void generate_DIV(quad* q);
+// void generate_MOD(quad* q);
+
+// void generate_NEWTABLE(quad* quad);
+// void generate_TABLEGETELM(quad* quad);
+// void generate_TABLESETELM(quad* quad);
+// void generate_ASSIGN(quad* quad);
+// void generate_NOP(quad* quad);

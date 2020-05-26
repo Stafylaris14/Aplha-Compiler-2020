@@ -1,8 +1,5 @@
 #include "avm.h"
 
-#define AVM_STACKSIZE 4096
-#define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
-#define AVM_TABLE_HASHSIZE 211
 
 extern int *numConsts;
 extern int numConstSize ;
@@ -18,7 +15,7 @@ unsigned char executionFinished = 0 ;
 unsigned pc = 0;
 unsigned currLine = 0;
 unsigned codeSize = 0;
-instruction *code = (instruction*)0;
+instr*code = (instr*)0;
 #define AVM_ENDING_PC codeSize
 
 unsigned totalActuals = 0;
@@ -120,12 +117,12 @@ char* consts_get_libFunction(int index)
         return;
     }else {
         assert(pc<AVM_ENDING_PC);
-        instruction* instr = code+ pc;
+        instr* instr = code+ pc;
         assert(instr->opcode>=0 && instr->opcode<= AVM_MAX_INSTRUCTIONS);
         if(instr->srcLine)
             currLine=instr->srcLine;
         unsigned oldPC = pc;
-        (*executeFuncs[instr->opcode])(instr);
+        (*executeFuncs[instr->op])(instr);
         if(pc == oldPC)
             ++pc;
     }
@@ -141,7 +138,7 @@ void avm_callsaveenvironment(void){
 }
 
 
-void execute_funcexit(instruction* unused){
+void execute_funcexit(instr* unused){
   unsigned oldTop= top;
   top= avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
   pc= avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
@@ -168,7 +165,7 @@ void avm_calllibfunc(char* id){
     totalActuals = 0;
     (*f)();
     if(!executionFinished)
-      execute_funcexit((instruction*) 0);
+      execute_funcexit((instr*) 0);
   }
 }
 
@@ -215,7 +212,7 @@ void libfunc_totalarguments(void){
   
   if(!p_topsp){
     avm_error("'totalarguments'called outside a function!");
-    retval.type = nil_m;
+    retval.type = nill_m;
   }else{
       retval.type = number_m;
       retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
@@ -246,8 +243,8 @@ arithmetic_func_t arithmeticFuncs[]={ //na balo sto header
   mod_impl
 };
 
-void execute_arithmetic(instruction *instr){
-  avm_memcell* lv = avm_translate_operand(instr->result,(avm_memcell*) 0);
+void execute_arithmetic(instr*instr){
+  avm_memcell* lv = avm_translate_operand(instr->res,(avm_memcell*) 0);
   avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
   
@@ -314,8 +311,8 @@ void avm_tablebucketsdestroy(avm_table_bucket **p)
     unsigned i;
     for (i = 0; i < AVM_TABLE_HASHSIZE; ++i, ++p)
     {
-        avm_table_bucket *b;
-        for (*b = *p; b;) //den exw idea! TODO
+        avm_table_bucket *b = *p;
+        for (*b ; b;) //den exw idea! TODO
         {
             avm_table_bucket *del = b;
             b = b->next;
@@ -334,7 +331,7 @@ void avm_tabledestroy(avm_table *t)
     free(t);
 }
 
-void execute_jeq(instruction* instr){
+void execute_jeq(instr* instr){
   
   assert(instr->result->type == label_a);
   
@@ -345,8 +342,8 @@ void execute_jeq(instruction* instr){
   
   if(rv1->type == undef_m || rv2->type == undef_m){
     avm_error("'undef'involved in equality!");
-  }else if (rv1->type == nil_m || rv2->type == nil_m){
-    result = rv1->type == nil_m && rv2->type == nil_m;
+  }else if (rv1->type == nill_m || rv2->type == nill_m){
+    result = rv1->type == nill_m && rv2->type == nill_m;
   }else if(rv1->type == bool_m || rv2->type == bool_m){
     result = (avm_tobool(rv1)==avm_tobool(rv2));
   }else
@@ -356,11 +353,11 @@ void execute_jeq(instruction* instr){
     printf("8elei elenxousssssssss\n");
   }
   if(!executionFinished && result)
-    pc=instr->result.val;
+    pc=instr->res.val;
 }
 
-void execute_newtable(instruction* instr){
-  avm_memcell* lv = avm_translate_operand(instr->result,(avm_memcell*) 0);
+void execute_newtable(instr* instr){
+  avm_memcell* lv = avm_translate_operand(instr->res,(avm_memcell*) 0);
   
   assert(lv && (&stack[top] <= lv && &stack[top] > lv || lv==&retval));
   
@@ -384,9 +381,9 @@ printf("ftia3imoooooo\n");
     //den 3erw ti fasei prepei na to doume
 }
 
-void execute_tablegetelem(instruction* instr){
+void execute_tablegetelem(instr* instr){
   
-  avm_memcell* lv = avm_translate_operand(instr->result , (avm_memcell*) 0);
+  avm_memcell* lv = avm_translate_operand(instr->res , (avm_memcell*) 0);
   avm_memcell* t = avm_translate_operand(instr->arg1 , (avm_memcell*) 0);
   avm_memcell* i = avm_translate_operand(instr->arg2 , &ax);
   
@@ -395,7 +392,7 @@ void execute_tablegetelem(instruction* instr){
   assert(i);
   
   avm_memcellclear(lv);
-  lv->type = nil_m;
+  lv->type = nill_m;
   
   if(t->type != table_m){
     avm_error("illegal use of type %s as table!",typeStrings[t->type]);
@@ -413,8 +410,8 @@ void execute_tablegetelem(instruction* instr){
   }
 }
 
-void execute_tablesetelem(instruction* instr){
-  avm_memcell* t = avm_translate_operand(instr->result , (avm_memcell*) 0);
+void execute_tablesetelem(instr* instr){
+  avm_memcell* t = avm_translate_operand(instr->res , (avm_memcell*) 0);
   avm_memcell* i = avm_translate_operand(instr->arg1 , &ax);
   avm_memcell* c = avm_translate_operand(instr->arg2 , &bx);
   
@@ -440,124 +437,124 @@ void avm_memcellclear(avm_memcell* m){
 //diale3i paragogi telikou kwdika //////////////////
 
 
-unsigned consts_newstring(char* s){
-    //8elei ftia3imo
-    printf("ftia3imoooooo\n");
-}
+// unsigned consts_newstring(char* s){
+//     //8elei ftia3imo
+//     printf("ftia3imoooooo\n");
+// }
 
 
-unsigned consts_newnumber(double n){
-    //fti3imoo
-    printf("ftia3imoooooo\n");
-}
+// unsigned consts_newnumber(double n){
+//     //fti3imoo
+//     printf("ftia3imoooooo\n");
+// }
 
 
-unsigned libfuncs_newused(char* s){
-       printf("ftia3imoooooo\n");
-     //ftia3imoo
-}
+// unsigned libfuncs_newused(char* s){
+//        printf("ftia3imoooooo\n");
+//      //ftia3imoo
+// }
 
-unsigned userfuncs_newfunc(item* sym){
-    printf("ftia3imoooooo\n");
-     //ftia3imoo
-}
+// unsigned userfuncs_newfunc(item* sym){
+//     printf("ftia3imoooooo\n");
+//      //ftia3imoo
+// }
 
-void make_operand(expr* e,vmarg* arg){
-  printf("8elei ftia3imoooo\n");
-  if(!e) return;
-  //8elei kapoio elenxo mallon
-  switch(e->type){
-    case var_e : {
-    break;}
-    case tableitem_e:{
-          break;}
-    case arithexpr_e:{break;}
-    case boolexpr_e: {break;}
-    case newtable_e: {
-        assert(e->sym);
-        arg->val = e->sym->offset;
-        switch (e->sym->space) {
-          case programvar : arg->type = global_a; break;
-          case functionlocal : arg->type = local_a; break;
-          case formalarg : arg->type = formal_a; break;
-          default: assert(0);
-        }
-        break;
-    }
-    //8elei k alla case edw mallon
-    /*Constants*/
-    case constbool_e: {
-      arg->val = e->boolConst;
-      arg->type = bool_a; break;
-      }
-    case conststring_e : {
-      arg->val = consts_newstring(e->strConst);
-      arg->type = string_a; break;
-    }
-    case constnum_e: {
-      arg->val = consts_newnumber(e->numConst);
-      arg->type = number_a; break;
-    }
-    //edw k allo case mallon
-    case nil_e: arg->type = nil_a; break;
-    /*Functions*/
-    case programfunc_e: {
-      arg->type = userfunc_a;
-      arg->val = userfuncs_newfunc(e->sym);
-      //8elei kati g to name mallon
-      break;
-    }
-    case libraryfunc_e: {
-      arg->type = libfunc_a;
-      arg->val = libfuncs_newused(e->sym->name);
-      //mallon 8elei katig name edw
-      break;
-    }
-    default : assert(0);
-  }
-}
-
-
-void make_numberoperand(vmarg* arg,double val){
-  arg->val = consts_newnumber(val);
-  arg->type = number_a;
-}
-void make_booloperand(vmarg* arg,unsigned val){
-  arg->val = val;
-  arg->type = bool_a;
-}
-void make_retvaloperand(vmarg* arg){
-  arg->type = retval_a;
-}
+// void make_operand(expr* e,vmarg* arg){
+//   printf("8elei ftia3imoooo\n");
+//   if(!e) return;
+//   //8elei kapoio elenxo mallon
+//   switch(e->type){
+//     case var_ : {
+//     break;}
+//     case tableitem_:{
+//           break;}
+//     case arthmexp_:{break;}
+//     case boolexpr_: {break;}
+//     case newtable_: {
+//         assert(e->sym);
+//         arg->val = e->sym->offset;
+//         switch (e->sym->scope_spase) {
+//           case program_variable : arg->type = global_a; break;
+//           case function_local : arg->type = local_a; break;
+//           case formal_argument : arg->type = formal_a; break;
+//           default: assert(0);
+//         }
+//         break;
+//     }
+//     //8elei k alla case edw mallon
+//     /*Constants*/
+//     case constbool_: {
+//       arg->val = e->boolConst;
+//       arg->type = bool_a; break;
+//       }
+//     case conststring_ : {
+//       arg->val = consts_newstring(e->strConst);
+//       arg->type = string_a; break;
+//     }
+//     case constnum_: {
+//       arg->val = consts_newnumber(e->numConst);
+//       arg->type = number_a; break;
+//     }
+//     //edw k allo case mallon
+//     case nill_: arg->type = nil_a; break;
+//     /*Functions*/
+//     case programfunc_e: {
+//       arg->type = userfunc_a;
+//       arg->val = userfuncs_newfunc(e->sym);
+//       //8elei kati g to name mallon
+//       break;
+//     }
+//     case libraryfunc_e: {
+//       arg->type = libfunc_a;
+//       arg->val = libfuncs_newused(e->sym->name);
+//       //mallon 8elei katig name edw
+//       break;
+//     }
+//     default : assert(0);
+//   }
+// }
 
 
-incomplete_jump* ij_head = (incomplete_jump*) 0;
-
-unsigned ij_total = 0;
-
-void add_incomplete_jump(unsigned instrNo,unsigned iaddress);
-
-void telos_generate(vmopcode op,quad *quad){
-    printf('8elei dtia3imoooo\n');
-    instruction *t;
-    t->opcode = op;
-
-  make_operand(quad->arg1,t->arg1);
-  make_operand(quad->arg2,t->arg2);
-  make_operand(quad->result,t->result);
-  quad->taddress = nextinstructionlabel();//mallon dn xreiazete
-}
+// void make_numberoperand(vmarg* arg,double val){
+//   arg->val = consts_newnumber(val);
+//   arg->type = number_a;
+// }
+// void make_booloperand(vmarg* arg,unsigned val){
+//   arg->val = val;
+//   arg->type = bool_a;
+// }
+// void make_retvaloperand(vmarg* arg){
+//   arg->type = retval_a;
+// }
 
 
-void generate_ADD(quad* quad){telos_generate(add,quad);}
-void generate_SUB(quad* quad){telos_generate(sub,quad);}
-void generate_MUL(quad* quad){telos_generate(mul,quad);}
-void generate_DIV(quad* quad){telos_generate(div,quad);}
-void generate_MOD(quad* quad){telos_generate(mod,quad);}
-void generate_NEWTABLE(quad* quad){telos_generate(newtable,quad);}
-void generate_TABLEGETELM(quad* quad){telos_generate(tablegetelem,quad);}
-void generate_TABLESETELM(quad* quad){telos_generate(tablesetelem,quad);}
-void generate_ASSIGN(quad* quad){telos_generate(assign,quad);}
-void generate_NOP(quad* quad){telos_generate(nop,quad);}
+// incomplete_jump* ij_head = (incomplete_jump*) 0;
+
+// unsigned ij_total = 0;
+
+// void add_incomplete_jump(unsigned instrNo,unsigned iaddress);
+
+// void telos_generate(vmop op,quad *quad){
+//     printf('8elei dtia3imoooo\n');
+//     instr*t;
+//     t->op = op;
+
+//   make_operand(quad->arg1,t->arg1);
+//   make_operand(quad->arg2,t->arg2);
+//   make_operand(quad->result,t->res);
+//   quad->next_instr_label = nextinstructionlabel();//mallon dn xreiazete
+// }
+
+
+// void generate_ADD(quad* quad){telos_generate(add,quad);}
+// void generate_SUB(quad* quad){telos_generate(sub,quad);}
+// void generate_MUL(quad* quad){telos_generate(mul,quad);}
+// void generate_DIV(quad* quad){telos_generate(div,quad);}
+// void generate_MOD(quad* quad){telos_generate(mod,quad);}
+// void generate_NEWTABLE(quad* quad){telos_generate(newtable,quad);}
+// void generate_TABLEGETELM(quad* quad){telos_generate(tablegetelem,quad);}
+// void generate_TABLESETELM(quad* quad){telos_generate(tablesetelem,quad);}
+// void generate_ASSIGN(quad* quad){telos_generate(assign,quad);}
+// void generate_NOP(quad* quad){telos_generate(nop,quad);}
 
 //prepeu na einai malakiew ta parapanw na ta exeiw kanei esy sti 4a fasi

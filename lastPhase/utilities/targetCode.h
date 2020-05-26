@@ -72,6 +72,7 @@ typedef struct vmarg
 
 typedef struct instruction
 {
+  int srcLine;
   vmop op;
   vmarg *arg1;
   vmarg *arg2;
