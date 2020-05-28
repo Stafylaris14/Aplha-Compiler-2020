@@ -33,7 +33,7 @@ typedef void (*library_func_t) (void);
 #define AVM_SAVEDTOP_OFFSET +2
 #define AVM_SAVEDTOPSP_OFFSET +1
 
-extern userfunc* avm_getfuncinfo(unsigned address);
+extern userFunc* avm_getfuncinfo(unsigned address);
 
 typedef double(*arithmetic_func_t)(double x,double y);
 
@@ -97,7 +97,7 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
     default:
         assert(0);
         break;
-    }instr
+    }
 }
 
 //GET CONSTS
@@ -131,7 +131,7 @@ char* consts_get_libFunction(int index)
     }else {
         assert(pc<AVM_ENDING_PC);
         instr* instr = code+ pc;
-        assert(instr->opcode>=0 && instr->opcode<= AVM_MAX_INSTRUCTIONS);
+        assert(instr->op>=0 && instr->op<= AVM_MAX_INSTRUCTIONS);
         if(instr->srcLine)
             currLine=instr->srcLine;
         unsigned oldPC = pc;
@@ -274,7 +274,7 @@ void execute_arithmetic(instr*instr){
     avm_error("not a number in arithmetic!\n");
     executionFinished = 1;
   }else{
-      arithmetic_func_t op = arithmeticFuncs[instr->opcode - add_v];
+      arithmetic_func_t op = arithmeticFuncs[instr->op - add_v];
       avm_memcellclear(lv);
       lv->type = number_m;
       lv->data.numVal = (*op)(rv1->data.numVal , rv2->data.numVal);
@@ -352,7 +352,7 @@ void avm_tabledestroy(avm_table *t)
 
 void execute_jeq(instr* instr){
 
-  assert(instr->result->type == label_a);
+  assert(instr->res->type == label_a);
 
   avm_memcell* rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell* rv2 = avm_translate_operand(instr->arg2, &bx);
@@ -372,7 +372,7 @@ void execute_jeq(instr* instr){
     printf("8elei elenxousssssssss\n");
   }
   if(!executionFinished && result)
-    pc=instr->res.val;
+    pc=instr->res->val;
 }
 
 void execute_newtable(instr* instr){
@@ -422,7 +422,8 @@ void execute_tablegetelem(instr* instr){
     }else{
       char* ts = avm_tostring(t);
       char* is = avm_tostring(i);
-      avm_warning("%s[%s] not found ! ",ts ,is);
+      char* warn = sprintf("%s[%s] not found ! ",ts ,is);
+      avm_warning(warn);
        free(ts);
        free(is);
     }
@@ -606,10 +607,10 @@ void avm_assign(avm_memcell* lv, avm_memcell* rv){
 
 
 void execute_assign(instr* instr){
-  avm_memcell* lv = avm_translate_operand(instr->result , (avm_memcell*)0);
+  avm_memcell* lv = avm_translate_operand(instr->res , (avm_memcell*)0);
   avm_memcell* rv = avm_translate_operand(instr->arg1 , &ax);
   //na dw ligo to assert
-  assert(lv && ((&stack[N-1] >= lv && lv > &stack[top])  || lv == &retval));
+  assert(lv && ((&stack[AVM_STACKENV_SIZE] >= lv && lv > &stack[top])  || lv == &retval));
   assert(rv);
 
   avm_assign(lv,rv);
@@ -659,14 +660,14 @@ void execute_call(instr* instr){
     case userfunc_m:{
       pc = func->data.funcVal;
       assert(pc < AVM_ENDING_PC);
-      assert(code[pc].opcode== funcenter_v);
+      assert(code[pc].op== enterfunc_v);
       break;
     }
     case string_m :
         avm_calllibfunc(func->data.strVal);
         break;
     case libfunc_m:
-        avm_calllibfunc(func->data.libfuncVal);
+        avm_calllibfunc(func->data.libFuncVal);
         break;
     default:{
       char* s = avm_tostring(func);
@@ -687,9 +688,9 @@ void execute_funcenter(instr* instr){
   assert(func);
 
   totalActuals = 0;
-  userfunc* funcInfo = avm_getfuncinfo(pc);
+  userFunc* funcInfo = avm_getfuncinfo(pc);
   topsp = top;
-  top = top - funcInfo->localSize;
+  top = top - funcInfo->localsize;
 }
 
 
@@ -716,10 +717,10 @@ void execute_funcexit(instr* unused){
 
 void avm_calllibfunc(char* funcName){
 
-  library_func_t f= avm_getlibraryfunc(id);
+  library_func_t f= avm_getlibraryfunc(funcName);
 
   if(!f){
-    avm_error("unsupported lib func %s called ! ",id);
+    avm_error("unsupported lib func %s called ! ",funcName);
     executionFinished = 1;
   }
   else{

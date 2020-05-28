@@ -7,11 +7,11 @@ typedef void (*execute_func_t)(instr);
 
 // typedef struct avm_memcell avm_memcell; //na ta 3anadwwwww
 // typedef struct avm_table_bucket avm_table_bucket;
-
+#define AVM_STACKENV_SIZE 4
 #define AVM_STACKSIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
-
+#define AVM_MAX_INSTRUCTIONS 10 //den xerw!!
 //top , topsp gia tin stiva
 unsigned top , topsp;
 
