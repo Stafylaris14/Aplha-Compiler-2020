@@ -46,7 +46,7 @@ execute_func_t executeFuncs[] = {
     execute_TABLESETELEM,
 };
 
-typedef struct avm_table 
+typedef struct avm_table
 {
   unsigned refCounter;
   avm_table_bucket *strIndexed[AVM_TABLE_HASHSIZE];
@@ -55,7 +55,7 @@ typedef struct avm_table
 } avm_table;
 
 
-//apothikevei times 
+//apothikevei times
 typedef enum avm_memcell_t
 {
     number_m,
@@ -85,10 +85,10 @@ typedef struct avm_memcell
 avm_memcell ax,bx,cx;
 avm_memcell retval;
 
-//einai i stiva me ta memcells 
+//einai i stiva me ta memcells
 avm_memcell avm_stack[AVM_STACKSIZE];
 
-typedef struct avm_table_bucket 
+typedef struct avm_table_bucket
 {
   avm_memcell key;
   avm_memcell value;
@@ -103,6 +103,38 @@ typedef struct incomplete_jump{
 }incomplete_jump;
 
 
+
+memclear_func_t memclearFuncs[]={
+  0,
+  memclear_string,
+  0,
+  memclear_table,
+  0,
+  0,
+  0,
+  0
+};
+
+tostring_func_t tostringFuncs[]={
+  number_tostring,
+  string_tostring,
+  bool_tostring,
+  table_tostring,
+  userfunc_tostring,
+  libfunc_tostring,
+  nil_tostring,
+  undef_tostring
+};
+
+char* typeStrings[8] = {"number_m",
+    "string_m",
+    "bool_m",
+    "table_m",
+    "userfunc_m",
+    "libfunc_m",
+    "nil_m",
+    "undef_m"
+};
 
 
 ///////////translation////////////////
@@ -140,7 +172,6 @@ void execute_funcexit(instr* unused);
 
 library_func_t avm_getlibraryfunc(char* id);
 
-void avm_calllibfunc(char* id);
 
 unsigned avm_totalactuals(void);
 
@@ -181,11 +212,6 @@ void execute_tablegetelem(instr* instr);
 
 void execute_tablesetelem(instr* instr);
 
-
-void avm_memcellclear(avm_memcell* m);//8elei ilopoihsh
-
-
-
 unsigned consts_newstring(char* s);
 
 unsigned consts_newnumber(double n);
@@ -218,3 +244,58 @@ unsigned consts_newnumber(double n);
 // void generate_TABLESETELM(quad* quad);
 // void generate_ASSIGN(quad* quad);
 // void generate_NOP(quad* quad);
+
+
+void memclear_string(avm_memcell* m);
+
+
+void memclear_table(avm_memcell* m);
+
+void avm_memcellclear(avm_memcell* m);
+
+void avm_warning(char* format);//8elei k allew metablites mallon
+
+void avm_assign(avm_memcell* lv, avm_memcell* rv);
+
+void avm_error(char* format,...);
+
+char* avm_tostring (avm_memcell* m);
+
+void avm_calllibfunc(char* funcName);
+
+void execute_call(instr* instr);
+
+void avm_dec_top(void);
+
+void avm_push_envvalue(unsigned val);
+
+void execute_funcenter(instr* instr);
+
+unsigned avm_get_envvalue(unsigned i);
+
+unsigned avm_totalactuals(void);
+
+void execute_pusharg(instr* instr);
+
+char* number_tostring(avm_memcell *kati);
+
+char* string_tostring(avm_memcell *kati);
+
+char* bool_tostring(avm_memcell *kati);
+
+char* table_tostring(avm_memcell *kati);
+
+char* userfunc_tostring(avm_memcell* kati);
+
+char* libfunc_tostring(avm_memcell* kati);
+
+char* nil_tostring(avm_memcell* kati);
+
+char* undef_tostring(avm_memcell* kati);
+
+
+void execute_assign(instr* instr);
+
+unsigned char undef_tobool(avm_memcell* m);
+
+void avm_initialize(void);
