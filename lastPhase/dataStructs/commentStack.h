@@ -3,7 +3,7 @@ struct Stack{
     struct Stack* next;
 }typedef stack;
 
- stack* top;
+ stack* top1;
 
 void printStack() ;
 

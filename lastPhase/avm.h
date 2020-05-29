@@ -2,9 +2,6 @@
 
 // executers
 
-typedef void (*execute_func_t)(instr);
-
-
 // typedef struct avm_memcell avm_memcell; //na ta 3anadwwwww
 // typedef struct avm_table_bucket avm_table_bucket;
 #define AVM_STACKENV_SIZE 4
@@ -16,44 +13,36 @@ typedef void (*execute_func_t)(instr);
 unsigned top , topsp;
 
 
-extern void execute_assign(instr *instr);
-extern void execute_add(instr *instr);
-extern void execute_sub(instr *instr);
-extern void execute_mul(instr *instr);
-extern void execute_div(instr *instr);
-extern void execute_mod(instr *instr);
-extern void execute_uminus(instr *instr);
-extern void execute_and(instr *instr);
-extern void execute_or(instr *instr);
-extern void execute_not(instr *instr);
-extern void execute_if_eq(instr *instr);
-extern void execute_if_noteq(instr *instr);
-extern void execute_if_lesseq(instr* instr);
-extern void execute_if_less(instr* instr);
-extern void execute_if_greatereq(instr* instr);
-extern void execute_if_greater(instr* instr);
-extern void execute_jump(instr* instr);
-extern void execute_call(instr* instr);
-extern void execute_param(instr* instr);
-extern void execute_return(instr* instr);
-extern void execute_getretval(instr* instr);
-extern void execute_funcstart(instr* instr);
-extern void execute_funcend(instr* instr);
-extern void execute_tablecreate(instr* instr);
-extern void execute_tablegetelem(instr* instr);
-extern void execute_tablesetelem(instr* instr);
+typedef void (*library_func_t) (void);
 
+typedef struct avm_table avm_table;
 
-
-typedef struct avm_table
-{
-  unsigned refCounter;
-  avm_table_bucket *strIndexed[AVM_TABLE_HASHSIZE];
-  avm_table_bucket *numIndexed[AVM_TABLE_HASHSIZE];
-  unsigned total;
-} avm_table;
-
-
+// extern void execute_assign(instr *instr);
+// extern void execute_add(instr *instr);
+// extern void execute_sub(instr *instr);
+// extern void execute_mul(instr *instr);
+// extern void execute_div(instr *instr);
+// extern void execute_mod(instr *instr);
+// extern void execute_uminus(instr *instr);
+// extern void execute_and(instr *instr);
+// extern void execute_or(instr *instr);
+// extern void execute_not(instr *instr);
+// extern void execute_if_eq(instr *instr);
+// extern void execute_if_noteq(instr *instr);
+// extern void execute_if_lesseq(instr* instr);
+// extern void execute_if_less(instr* instr);
+// extern void execute_if_greatereq(instr* instr);
+// extern void execute_if_greater(instr* instr);
+// extern void execute_jump(instr* instr);
+// extern void execute_call(instr* instr);
+// extern void execute_param(instr* instr);
+// extern void execute_return(instr* instr);
+// extern void execute_getretval(instr* instr);
+// extern void execute_funcstart(instr* instr);
+// extern void execute_funcend(instr* instr);
+// extern void execute_tablecreate(instr* instr);
+// extern void execute_tablegetelem(instr* instr);
+// extern void execute_tablesetelem(instr* instr);
 //apothikevei times
 typedef enum avm_memcell_t
 {
@@ -66,6 +55,8 @@ typedef enum avm_memcell_t
     nill_m,
     undef_m
 } avm_memcell_t;
+
+
 
 typedef struct avm_memcell
 {
@@ -80,6 +71,28 @@ typedef struct avm_memcell
     } data;
 } avm_memcell;
 
+
+
+
+
+typedef struct avm_table_bucket
+{
+  avm_memcell key;
+  avm_memcell value;
+  struct avm_table_bucket *next;
+}avm_table_bucket;
+
+
+struct avm_table
+{
+  unsigned refCounter;
+  avm_table_bucket *strIndexed[AVM_TABLE_HASHSIZE];
+  avm_table_bucket *numIndexed[AVM_TABLE_HASHSIZE];
+  unsigned total;
+} ;
+
+
+
 //gia tis times kai return val
 avm_memcell ax,bx,cx;
 avm_memcell retval;
@@ -87,12 +100,6 @@ avm_memcell retval;
 //einai i stiva me ta memcells
 avm_memcell avm_stack[AVM_STACKSIZE];
 
-typedef struct avm_table_bucket
-{
-  avm_memcell key;
-  avm_memcell value;
-  avm_table_bucket *next;
-}avm_table_bucket;
 
 
 typedef struct incomplete_jump{
@@ -102,38 +109,6 @@ typedef struct incomplete_jump{
 }incomplete_jump;
 
 
-
-memclear_func_t memclearFuncs[]={
-  0,
-  memclear_string,
-  0,
-  memclear_table,
-  0,
-  0,
-  0,
-  0
-};
-
-tostring_func_t tostringFuncs[]={
-  number_tostring,
-  string_tostring,
-  bool_tostring,
-  table_tostring,
-  userfunc_tostring,
-  libfunc_tostring,
-  nil_tostring,
-  undef_tostring
-};
-
-char* typeStrings[8] = {"number_m",
-    "string_m",
-    "bool_m",
-    "table_m",
-    "userfunc_m",
-    "libfunc_m",
-    "nil_m",
-    "undef_m"
-};
 
 
 ///////////translation////////////////
@@ -203,7 +178,7 @@ void execute_jeq(instr* instr);
 
 void execute_newtable(instr* instr);
 
-avm_memcell* avm_tablegetelem(avm_memcell *key);
+avm_memcell* avm_tablegetelem(avm_memcell *key , avm_memcell* i);
 
 void avm_tablesetelem(avm_memcell *key,avm_memcell *value , avm_memcell* curr);
 
@@ -298,3 +273,41 @@ void execute_assign(instr* instr);
 unsigned char undef_tobool(avm_memcell* m);
 
 void avm_initialize(void);
+
+void execute_uminus(instr* instr);
+
+void execute_and(instr* instr);
+
+void execute_or(instr* instr);
+
+void execute_not(instr* instr);
+
+void execute_if_eq(instr* instr);
+
+void execute_if_noteq(instr* instr);
+
+void execute_if_lesseq(instr* instr);
+
+void execute_if_less(instr* instr);
+
+void execute_if_greater(instr* instr);
+
+void execute_if_greatereq(instr* instr);
+
+void execute_jump(instr* instr);
+
+
+void execute_param(instr* instr);
+
+void execute_return(instr* instr);
+
+void execute_getretval(instr* instr);
+
+void execute_funcstart(instr* instr);
+
+void execute_funcend(instr* instr);
+
+void execute_tablecreate(instr* instr);
+
+
+

@@ -1,5 +1,53 @@
 #include "avm.h"
 
+
+char* typeStrings[8] = {"number_m",
+    "string_m",
+    "bool_m",
+    "table_m",
+    "userfunc_m",
+    "libfunc_m",
+    "nil_m",
+    "undef_m"
+};
+
+
+typedef void(*memclear_func_t)(avm_memcell*);
+
+memclear_func_t memclearFuncs[]={
+  0,
+  memclear_string,
+  0,
+  memclear_table,
+  0,
+  0,
+  0,
+  0
+};
+
+#define execute_add execute_arithmetic
+#define execute_sub execute_arithmetic
+#define execute_mul execute_arithmetic
+#define execute_div execute_arithmetic
+#define execute_mod execute_arithmetic
+
+
+typedef char* (*tostring_func_t)(avm_memcell*);
+
+tostring_func_t tostringFuncs[]={
+  number_tostring,
+  string_tostring,
+  bool_tostring,
+  table_tostring,
+  userfunc_tostring,
+  libfunc_tostring,
+  nil_tostring,
+  undef_tostring
+};
+
+
+typedef void (*execute_func_t)(instr*);
+
 execute_func_t executeFuncs[] = {
     execute_assign,
     execute_add,
@@ -52,18 +100,14 @@ unsigned totalActuals = 0;
 
 typedef void (*library_func_t) (void);
 
-#define execute_add execute_arithmetic
-#define execute_sub execute_arithmetic
-#define execute_mul execute_arithmetic
-#define execute_div execute_arithmetic
-#define execute_mod execute_arithmetic
+
 
 #define AVM_NUMACTUALS_OFFSET +4
 #define AVM_SAVEDPC_OFFSET +3
 #define AVM_SAVEDTOP_OFFSET +2
 #define AVM_SAVEDTOPSP_OFFSET +1
 
-extern userFunc* avm_getfuncinfo(unsigned address);
+// extern userFunc* avm_getfuncinfo(unsigned address);
 
 typedef double(*arithmetic_func_t)(double x,double y);
 
@@ -82,7 +126,7 @@ typedef void(*memclear_func_t)(avm_memcell*);
 
 typedef void(*library_func_t)(void);
 
-typedef char* (*tostring_func_t)(avm_memcell*);
+
 
 
 //mallon 8eloun arxikopoiiishhhhhhh
@@ -420,7 +464,7 @@ void execute_newtable(instr* instr){
 
 
 
-avm_memcell* avm_tablegetelem(avm_memcell *key){
+avm_memcell* avm_tablegetelem(avm_memcell *key , avm_memcell* i){
     //den 3erw ti fasei prepei na to doume
     printf("ftia3imoooooo\n");
 
@@ -453,7 +497,8 @@ void execute_tablegetelem(instr* instr){
     }else{
       char* ts = avm_tostring(t);
       char* is = avm_tostring(i);
-      char* warn = sprintf("%s[%s] not found ! ",ts ,is);
+      char* warn ;
+      sprintf(warn,"%s[%s] not found ! ",ts ,is);
       avm_warning(warn);
        free(ts);
        free(is);
@@ -719,7 +764,7 @@ void execute_funcenter(instr* instr){
   assert(func);
 
   totalActuals = 0;
-  userFunc* funcInfo = avm_getfuncinfo(pc);
+  userFunc* funcInfo = consts_get_userfunction(pc);
   topsp = top;
   top = top - funcInfo->localsize;
 }
@@ -816,3 +861,94 @@ void avm_initialize(void){
   //bazoume mallon ola ta libfunc
 
 }
+
+
+
+void execute_uminus(instr* instr){
+
+
+}
+
+void execute_and(instr* instr){
+
+
+}
+
+void execute_or(instr* instr){
+
+
+}
+
+void execute_not(instr* instr){
+
+
+}
+
+void execute_if_eq(instr* instr){
+
+
+}
+
+void execute_if_noteq(instr* instr){
+
+
+}
+
+void execute_if_lesseq(instr* instr){
+
+
+}
+
+void execute_if_less(instr* instr){
+
+
+}
+
+void execute_if_greater(instr* instr){
+
+
+}
+
+void execute_if_greatereq(instr* instr){
+
+
+}
+
+void execute_jump(instr* instr){
+
+
+}
+
+
+
+void execute_param(instr* instr){
+
+
+}
+
+void execute_return(instr* instr){
+
+
+}
+
+void execute_getretval(instr* instr){
+
+
+}
+
+void execute_funcstart(instr* instr){
+
+
+}
+
+void execute_funcend(instr* instr){
+
+
+}
+
+void execute_tablecreate(instr* instr){
+
+
+}
+
+

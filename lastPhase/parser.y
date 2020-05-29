@@ -1,6 +1,6 @@
 %{
 
-//#include "utilities/quad.h"
+//#include "utilities/target.h"
 #include "avm.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
@@ -946,10 +946,10 @@ int main(int argc, char** argv)
     loopcounterstack = arxikopoisi();
     yyparse();
     //printSymTable();
-    printHash();
+    //printHash();
     //printScopeList();
     
-    print_quads();
+    //print_quads();
     generate();
     write_bin();
     print_instructions();   
