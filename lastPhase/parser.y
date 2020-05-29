@@ -950,8 +950,10 @@ int main(int argc, char** argv)
     //printHash();
     printScopeList();
     
-    //print_quads();
+    print_quads();
     generate();
     write_bin();
     print_instructions();   
+    red();
+    read_bin();
 }

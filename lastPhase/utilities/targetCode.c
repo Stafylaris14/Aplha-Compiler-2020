@@ -28,8 +28,8 @@ generator_func_t generators[] = {
     generate_IF_EQ,
     generate_IF_NOTEQ,
     generate_IF_LESSEQ,
-    generate_IF_LESS,
     generate_IF_GREATEREQ,
+    generate_IF_LESS,
     generate_IF_GREATER,
     generate_JUMP,
     generate_CALL,
@@ -670,6 +670,7 @@ void write_bin()
     fp = fopen("instructions" , "wb+");
     // instr
     int i;
+    fwrite(&current_instraction , sizeof(int) , 1 , fp);
     for(i =0 ; i < current_instraction; i++)
         fwrite(&instructions[i] , sizeof(instr) ,1, fp);
     // consts

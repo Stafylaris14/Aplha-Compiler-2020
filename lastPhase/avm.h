@@ -142,7 +142,6 @@ void execute_cycle(void);
 
 void avm_callsaveenvironment(void);
 
-void execute_funcexit(instr* unused);
 
 library_func_t avm_getlibraryfunc(char* id);
 
@@ -174,9 +173,8 @@ void execute_arithmetic(instr *instr);
 
 unsigned char avm_tobool(avm_memcell* m);
 
-void execute_jeq(instr* instr);
 
-void execute_newtable(instr* instr);
+void execute_tablecreate(instr* instr);
 
 avm_memcell* avm_tablegetelem(avm_memcell *key , avm_memcell* i);
 
@@ -189,6 +187,17 @@ void execute_tablesetelem(instr* instr);
 unsigned consts_newstring(char* s);
 
 unsigned consts_newnumber(double n);
+
+
+
+int *const_numbers;
+userFunc **userFunctions;
+// thelei me + kai to offset
+char** const_strings;
+char** library_functions;
+
+
+
 
 
 // unsigned libfuncs_newused(char* s);
@@ -227,7 +236,7 @@ void memclear_table(avm_memcell* m);
 
 void avm_memcellclear(avm_memcell* m);
 
-void avm_warning(char* format);//8elei k allew metablites mallon
+void avm_warning(char* format,...);//8elei k allew metablites mallon
 
 void avm_assign(avm_memcell* lv, avm_memcell* rv);
 
@@ -243,13 +252,11 @@ void avm_dec_top(void);
 
 void avm_push_envvalue(unsigned val);
 
-void execute_funcenter(instr* instr);
-
 unsigned avm_get_envvalue(unsigned i);
 
 unsigned avm_totalactuals(void);
 
-void execute_pusharg(instr* instr);
+void execute_param(instr* instr);
 
 char* number_tostring(avm_memcell *kati);
 
@@ -297,8 +304,6 @@ void execute_if_greatereq(instr* instr);
 void execute_jump(instr* instr);
 
 
-void execute_param(instr* instr);
-
 void execute_return(instr* instr);
 
 void execute_getretval(instr* instr);
@@ -307,7 +312,6 @@ void execute_funcstart(instr* instr);
 
 void execute_funcend(instr* instr);
 
-void execute_tablecreate(instr* instr);
 
-
+void read_bin();
 
