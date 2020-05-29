@@ -1,5 +1,5 @@
 #include "avm.h"
-
+#include "./dataStructs/linkedList.h"
 
 char* typeStrings[8] = {"number_m",
     "string_m",
@@ -167,7 +167,7 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
     case bool_a: reg->type = bool_m; reg->data.numVal =arg->val;return reg;
     case string_a:reg->type = string_m; reg->data.strVal =consts_get_string(arg->val);return reg;
     case userFunc_a: reg->type = userfunc_m; reg->data.funcVal = arg->val;return reg;
-    case libFunc_a: reg->type = libfunc_m; reg->data.libFuncVal = arg->val;return reg;
+    case libFunc_a: reg->type = libfunc_m; reg->data.libFuncVal = consts_get_libFunction(arg->val);return reg;
     default:
         assert(0);
         break;
@@ -250,13 +250,33 @@ void avm_push_envvalue(unsigned val){
 }
 
 
+void print()
+{
+  red();
+  printf("eimai sthn print ths A\n");
+  wht();
+}
 
+void typeof_A()
+{
+  red();
+  printf("eimai sthn typeof ths A\n");
+  wht();
+}
 
+void input_A(){
+   red();
+  printf("eimai sthn input ths A\n");
+  wht();
+}
 
 library_func_t avm_getlibraryfunc(char* id){
  //aplo hasing leei ftia3imooooooooooooooooooo
+  if(!strcmp("print" , id)) return print;
+  if(!strcmp("typeof" , id)) return typeof_A;
+  if(!strcmp("input" , id)) return input_A;
  printf("ftia3imoooooo\n");
- return;
+ return NULL;
 }
 
 
