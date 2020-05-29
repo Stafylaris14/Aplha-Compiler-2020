@@ -11,40 +11,39 @@ typedef void (*execute_func_t)(instr);
 #define AVM_STACKSIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
-#define AVM_MAX_INSTRUCTIONS 10 //den xerw!!
+#define AVM_MAX_INSTRUCTIONS 100 //den xerw!!
 //top , topsp gia tin stiva
 unsigned top , topsp;
 
 
-execute_func_t executeFuncs[] = {
+extern void execute_assign(instr *instr);
+extern void execute_add(instr *instr);
+extern void execute_sub(instr *instr);
+extern void execute_mul(instr *instr);
+extern void execute_div(instr *instr);
+extern void execute_mod(instr *instr);
+extern void execute_uminus(instr *instr);
+extern void execute_and(instr *instr);
+extern void execute_or(instr *instr);
+extern void execute_not(instr *instr);
+extern void execute_if_eq(instr *instr);
+extern void execute_if_noteq(instr *instr);
+extern void execute_if_lesseq(instr* instr);
+extern void execute_if_less(instr* instr);
+extern void execute_if_greatereq(instr* instr);
+extern void execute_if_greater(instr* instr);
+extern void execute_jump(instr* instr);
+extern void execute_call(instr* instr);
+extern void execute_param(instr* instr);
+extern void execute_return(instr* instr);
+extern void execute_getretval(instr* instr);
+extern void execute_funcstart(instr* instr);
+extern void execute_funcend(instr* instr);
+extern void execute_tablecreate(instr* instr);
+extern void execute_tablegetelem(instr* instr);
+extern void execute_tablesetelem(instr* instr);
 
-    execute_ASSIGN,
-    execute_ADD,
-    execute_SUB,
-    execute_MUL,
-    execute_DIV,
-    execute_MOD,
-    execute_UMINUS,
-    execute_AND,
-    execute_OR,
-    execute_NOT,
-    execute_IF_EQ,
-    execute_IF_NOTEQ,
-    execute_IF_LESSEQ,
-    execute_IF_LESS,
-    execute_IF_GREATEREQ,
-    execute_IF_GREATER,
-    execute_JUMP,
-    execute_CALL,
-    execute_PARAM,
-    execute_RETURN,
-    execute_GETRETVAL,
-    execute_FUNCSTART,
-    execute_FUNCEND,
-    execute_TABLECREATE,
-    execute_TABLEGETELEM,
-    execute_TABLESETELEM,
-};
+
 
 typedef struct avm_table
 {
@@ -206,7 +205,7 @@ void execute_newtable(instr* instr);
 
 avm_memcell* avm_tablegetelem(avm_memcell *key);
 
-void avm_tablesetelem(avm_memcell *key,avm_memcell *value);
+void avm_tablesetelem(avm_memcell *key,avm_memcell *value , avm_memcell* curr);
 
 void execute_tablegetelem(instr* instr);
 

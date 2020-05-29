@@ -1,5 +1,35 @@
 #include "avm.h"
 
+execute_func_t executeFuncs[] = {
+    execute_assign,
+    execute_add,
+    execute_sub,
+    execute_mul,
+    execute_div,
+    execute_mod,
+    execute_uminus,
+    execute_and,
+    execute_or,
+    execute_not,
+    execute_if_eq,
+    execute_if_noteq,
+    execute_if_lesseq,
+    execute_if_less,
+    execute_if_greatereq,
+    execute_if_greater,
+    execute_jump,
+    execute_call,
+    execute_param,
+    execute_return,
+    execute_getretval,
+    execute_funcstart,
+    execute_funcend,
+    execute_tablecreate,
+    execute_tablegetelem,
+    execute_tablesetelem,
+};
+
+
 
 extern int *numConsts;
 extern int numConstSize ;
@@ -130,12 +160,12 @@ char* consts_get_libFunction(int index)
         return;
     }else {
         assert(pc<AVM_ENDING_PC);
-        instr* instr = code+ pc;
-        assert(instr->op>=0 && instr->op<= AVM_MAX_INSTRUCTIONS);
-        if(instr->srcLine)
-            currLine=instr->srcLine;
+        instr* instr1 = code+ pc;
+        assert(instr1->op>=0 && instr1->op<= AVM_MAX_INSTRUCTIONS);
+        if(instr1->srcLine)
+            currLine=instr1->srcLine;
         unsigned oldPC = pc;
-        (*executeFuncs[instr->op])(instr);
+        (*executeFuncs[instr1->op])(instr1);
         if(pc == oldPC)
             ++pc;
     }
@@ -182,6 +212,7 @@ void avm_push_envvalue(unsigned val){
 library_func_t avm_getlibraryfunc(char* id){
  //aplo hasing leei ftia3imooooooooooooooooooo
  printf("ftia3imoooooo\n");
+ return;
 }
 
 
@@ -395,7 +426,7 @@ avm_memcell* avm_tablegetelem(avm_memcell *key){
 
 }
 
-void avm_tablesetelem(avm_memcell *key,avm_memcell *value){
+void avm_tablesetelem(avm_memcell *key,avm_memcell *value,avm_memcell* cur){
 printf("ftia3imoooooo\n");
     //den 3erw ti fasei prepei na to doume
 }
@@ -600,10 +631,10 @@ void avm_warning(char* format){
 
 }
 
-void avm_assign(avm_memcell* lv, avm_memcell* rv){
-    printf("8elei ftia3imoooo\n");
+// void avm_assign(avm_memcell* lv, avm_memcell* rv){
+//     printf("8elei ftia3imoooo\n");
 
-}
+// }
 
 
 void execute_assign(instr* instr){
@@ -705,14 +736,14 @@ unsigned avm_get_envvalue(unsigned i){
   return val;
 }
 
-void execute_funcexit(instr* unused){
-  unsigned oldTop = top;
-  top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
-  pc= avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
-  topsp= avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
-  while(oldTop++ <= top)
-    avm_memcellclear(&stack[oldTop]);
-}
+// void execute_funcexit(instr* unused){
+//   unsigned oldTop = top;
+//   top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
+//   pc= avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
+//   topsp= avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
+//   while(oldTop++ <= top)
+//     avm_memcellclear(&stack[oldTop]);
+// }
 
 
 void avm_calllibfunc(char* funcName){
