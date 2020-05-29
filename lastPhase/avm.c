@@ -262,29 +262,15 @@ void print()
   wht();
 }
 
-void typeof_A()
-{
-  red();
-  printf("eimai sthn typeof ths A\n");
-  wht();
-}
-
-void input_A()
-{
-  red();
-  printf("eimai sthn input ths A\n");
-  wht();
-}
-
 library_func_t avm_getlibraryfunc(char *id)
 {
   //aplo hasing leei ftia3imooooooooooooooooooo
   if (!strcmp("print", id))
-    return print;
+    return libfunc_print;
   if (!strcmp("typeof", id))
-    return typeof_A;
-  if (!strcmp("input", id))
-    return input_A;
+    return libfunc_typeof;
+  if (!strcmp("totalarguments", id))
+    return libfunc_totalarguments;
   printf("ftia3imoooooo\n");
   return NULL;
 }
@@ -379,8 +365,8 @@ void execute_arithmetic(instr *instr)
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
-
-  assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval));
+  printf("eimai edw s lew asset\n");
+ // assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval));
   assert(rv1 && rv2);
 
   if (rv1->type != number_m || rv2->type != number_m)
@@ -394,6 +380,7 @@ void execute_arithmetic(instr *instr)
     avm_memcellclear(lv);
     lv->type = number_m;
     lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
+    printf("se blepw %f kai %f apotelesma %f\n",rv1->data.numVal,rv2->data.numVal,lv->data.numVal );
   }
 }
 
@@ -705,6 +692,7 @@ void memclear_string(avm_memcell *m)
   assert(m->data.strVal);
   free(m->data.strVal);
 }
+
 void memclear_table(avm_memcell *m)
 {
   assert(m->data.tableVal);
@@ -722,11 +710,10 @@ void avm_memcellclear(avm_memcell *m)
   }
 }
 
-void avm_warning(char *format,...)
+void avm_warning(char *format, ...)
 {
   //mallon 8elei kwdika na printarei
 }
-
 
 void execute_assign(instr *instr)
 {
@@ -791,6 +778,7 @@ void execute_call(instr *instr)
     avm_calllibfunc(func->data.strVal);
     break;
   case libfunc_m:
+    printf("eimai edw!!!! %s\n" , func->data.libFuncVal);
     avm_calllibfunc(func->data.libFuncVal);
     break;
   default:
@@ -829,7 +817,6 @@ unsigned avm_get_envvalue(unsigned i)
   return val;
 }
 
-
 void avm_calllibfunc(char *funcName)
 {
 
@@ -863,8 +850,8 @@ void execute_param(instr *instr)
 
 char *number_tostring(avm_memcell *kati)
 {
-  char* res = malloc(sizeof(char) * 200);
-  sprintf(res , "%f" , kati->data.numVal);
+  char *res = malloc(sizeof(char) * 200);
+  sprintf(res, "%f", kati->data.numVal);
   return res;
   //8elei ftia3imo
 }
@@ -872,16 +859,18 @@ char *number_tostring(avm_memcell *kati)
 char *string_tostring(avm_memcell *kati)
 {
   //8elei ftia3imo alla mporei k extern
-  char* res = malloc(sizeof(char) * 200);
-  sprintf(res , "%s\n" ,kati->data.strVal );
+  char *res = malloc(sizeof(char) * 200);
+  sprintf(res, "%s\n", kati->data.strVal);
   return res;
 }
 
 char *bool_tostring(avm_memcell *kati)
 {
-  char* res;
-  if(kati->data.boolVal == 1) res = "true";
-  else res = "false";
+  char *res;
+  if (kati->data.boolVal == 1)
+    res = "true";
+  else
+    res = "false";
 
   return res;
   //isow 8elei exter
@@ -889,7 +878,6 @@ char *bool_tostring(avm_memcell *kati)
 
 char *table_tostring(avm_memcell *kati)
 {
-
 }
 
 char *userfunc_tostring(avm_memcell *kati)
@@ -907,7 +895,7 @@ char *undef_tostring(avm_memcell *kati) {}
 void avm_initialize(void)
 {
   avm_initstack();
-  avm_registerlibfunc("print", libfunc_print);
+  // avm_registerlibfunc("print", libfunc_print);
   //bazoume mallon ola ta libfunc
 }
 
@@ -930,7 +918,6 @@ void execute_not(instr *instr)
 {
   printf("not den benw pote\n");
 }
-
 
 void execute_if_noteq(instr *instr)
 {
@@ -956,8 +943,6 @@ void execute_jump(instr *instr)
 {
 }
 
-
-
 void execute_return(instr *instr)
 {
   printf("return den benw pote\n");
@@ -968,60 +953,55 @@ void execute_getretval(instr *instr)
   printf("getretval den benw pote\n");
 }
 
-
-
-
 void read_bin()
 {
 
   FILE *fp = fopen("instructions", "rb");
 
-  fread(&codeSize , sizeof(int) , 1 , fp);
+  fread(&codeSize, sizeof(int), 1, fp);
   char buffer[10];
-  code = malloc(sizeof(instr)* codeSize);
+  code = malloc(sizeof(instr) * codeSize);
   //code
   for (int i = 0; i < codeSize; i++)
   {
     // code[i] = malloc(sizeof(instr));
     fread(&code[i], sizeof(instr), 1, fp);
-    printf("--- code[%d] : %d \n", i , code[i].op);
+    printf("--- code[%d] : %d \n", i, code[i].op);
   }
   // consts
-    // num 
+  // num
   const_numbers = malloc(sizeof(numConstSize));
-  for(int i = 0 ; i < numConstSize; i++)
+  for (int i = 0; i < numConstSize; i++)
   {
-    fread(&const_numbers[i] , sizeof(int), 1 , fp);
+    fread(&const_numbers[i], sizeof(int), 1, fp);
   }
 
-    //strings
-  const_strings = malloc(sizeof(char*)* stringConstSize);
-  for(int i =0; i < stringConstSize; i++)
+  //strings
+  const_strings = malloc(sizeof(char *) * stringConstSize);
+  for (int i = 0; i < stringConstSize; i++)
   {
-    fread(&const_strings[i],sizeof(char*),1,fp);
-  }
-  
-    //lib functions
-  
-  library_functions = malloc(sizeof(char*) * namedLibFuncsSize);
-
-  for(int i =0 ; i< namedLibFuncsSize; i++)
-  {
-    fread(&library_functions , sizeof(char*) , 1 , fp);
+    fread(&const_strings[i], sizeof(char *), 1, fp);
   }
 
-    //userfuncs
+  //lib functions
+
+  library_functions = malloc(sizeof(char *) * namedLibFuncsSize);
+
+  for (int i = 0; i < namedLibFuncsSize; i++)
+  {
+    fread(&library_functions, sizeof(char *), 1, fp);
+  }
+
+  //userfuncs
   userFunctions = malloc(sizeof(userFunc) * userFuncSize);
-  for(int i = 0 ;i < userFuncSize; i++)
-    fread(&userFunctions , sizeof(userFunc) , 1 , fp);
+  for (int i = 0; i < userFuncSize; i++)
+    fread(&userFunctions, sizeof(userFunc), 1, fp);
 
   fclose(fp);
 }
 
-
-
-  // stringConstss = malloc(sizeof(char*) * totalStringConstss);
-  // for(i =0; i < totalStringConstss; i++){
-  //   //fread(&len,sizeof(size_t),1,tester);
-  //   fread(&stringConstss[i],sizeof(char*),1,tester);
-  // }
+// stringConstss = malloc(sizeof(char*) * totalStringConstss);
+// for(i =0; i < totalStringConstss; i++){
+//   //fread(&len,sizeof(size_t),1,tester);
+//   fread(&stringConstss[i],sizeof(char*),1,tester);
+// }

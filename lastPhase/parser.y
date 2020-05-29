@@ -25,7 +25,7 @@ int objectHide = 1;//na min kanei hide an einai se object
 int assign_flag = 0;
 stack1 *loopcounterstack; //krataei poses anakikloseis exoun anoi3ei
 /* iopcode op; */
-
+extern int executionFinished;
 extern int currQuad;
 
 
@@ -956,4 +956,11 @@ int main(int argc, char** argv)
     print_instructions();   
     red();
     read_bin();
+    avm_initialize();
+    printf("vgika apo tin init\n");
+    printf("to executionFinished einai -> %d" , executionFinished);
+    while(!executionFinished)
+    {
+        execute_cycle();
+    }
 }
