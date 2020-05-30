@@ -91,6 +91,10 @@ unsigned totalActuals = 0;
 
 typedef void (*library_func_t)(void);
 
+library_func_t librarys[12]={0};
+number_of_lib = 0;
+
+
 #define AVM_NUMACTUALS_OFFSET +4
 #define AVM_SAVEDPC_OFFSET +3
 #define AVM_SAVEDTOP_OFFSET +2
@@ -255,12 +259,7 @@ void avm_push_envvalue(unsigned val)
   avm_dec_top();
 }
 
-void print()
-{
-  red();
-  printf("eimai sthn print ths A\n");
-  wht();
-}
+
 
 library_func_t avm_getlibraryfunc(char *id)
 {
@@ -271,7 +270,25 @@ library_func_t avm_getlibraryfunc(char *id)
     return libfunc_typeof;
   if (!strcmp("totalarguments", id))
     return libfunc_totalarguments;
-  printf("ftia3imoooooo\n");
+  if (!strcmp("input", id))
+    return libfunc_input;
+  if (!strcmp("objectmemberkeys", id))
+    return libfunc_objectmemberkeys;
+  if (!strcmp("objecttotalmembers", id))
+    return libfunc_objecttotalmembers;
+  if (!strcmp("objectcopy", id))
+    return libfunc_objectcopy;
+  if (!strcmp("argument", id))
+    return libfunc_argument;
+  if (!strcmp("strtonum", id))
+    return libfunc_strtonum;
+  if (!strcmp("sqrt", id))
+    return libfunc_sqrt;
+  if (!strcmp("cos", id))
+    return libfunc_cos;
+  if (!strcmp("sin", id))
+    return libfunc_sin;
+
   return NULL;
 }
 
@@ -293,16 +310,16 @@ void libfunc_print(void)
   for (i = 0; i < n; ++i)
   {
     char *s = avm_tostring(avm_getactual(i));
+    grn();
     puts(s);
+    wht();
     free(s);
   }
 }
 
 void avm_registerlibfunc(char *id, library_func_t addr)
 {
-  //kanei add ftia3imooooooooooooooooooooooo
-
-  printf("ftia3imoooooo\n");
+  librarys[number_of_lib++] = addr;
 }
 
 void libfunc_typeof(void)
@@ -350,6 +367,7 @@ double div_impl(double x, double y)
 double mod_impl(double x, double y)
 {
   printf("tsekarw g error\n");
+  if(y == 0) return 0;
   return ((unsigned)x) % ((unsigned)y);
 }
 
@@ -482,8 +500,17 @@ void execute_if_eq(instr *instr)
     avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
   else
   {
-    //equality check with dispacht kanwwwwwwwwwwwwwwwwwwwwwwww
-    printf("8elei elenxousssssssss\n");
+    if (rv1->type == string_m)
+      result = !strcmp(rv1->data.strVal,rv2->data.strVal);
+    else if(rv1->type == number_m)
+      result= rv1->data.numVal == rv2->data.numVal;
+    else if(rv1->type == userfunc_m)
+      result = rv1->data.funcVal == rv2->data.funcVal;
+    else if(rv1->type == libfunc_m)
+      result = !strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal);
+    else if(rv1->type == table_m)
+      result = rv1->data.tableVal == rv2->data.tableVal;
+    
   }
   if (!executionFinished && result)
     pc = instr->res->val;
@@ -894,8 +921,20 @@ char *undef_tostring(avm_memcell *kati) {}
 
 void avm_initialize(void)
 {
+  //krataw xwro gia tis global
   avm_initstack();
-  // avm_registerlibfunc("print", libfunc_print);
+  avm_registerlibfunc("print", libfunc_print);
+  avm_registerlibfunc("input", libfunc_input);
+  avm_registerlibfunc("objectmemberkeys", libfunc_objectmemberkeys);
+  avm_registerlibfunc("objecttotalmembers", libfunc_objecttotalmembers);
+  avm_registerlibfunc("objectcopy", libfunc_objectcopy);
+  avm_registerlibfunc("totalarguments", libfunc_totalarguments;
+  avm_registerlibfunc("argument", libfunc_argument);
+  avm_registerlibfunc("typeof", libfunc_typeof);
+  avm_registerlibfunc("strtonum", libfunc_strtonum);
+  avm_registerlibfunc("sqrt", libfunc_sqrt);
+  avm_registerlibfunc("cos", libfunc_cos);
+  avm_registerlibfunc("sin", libfunc_sin);
   //bazoume mallon ola ta libfunc
 }
 
@@ -921,26 +960,216 @@ void execute_not(instr *instr)
 
 void execute_if_noteq(instr *instr)
 {
+  assert(instr->res->type == label_a);
+
+  avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
+  avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
+
+  unsigned char result = 0;
+
+  if (rv1->type == undef_m || rv2->type == undef_m)
+  {
+    avm_error("'undef'involved in equality!");
+  }
+  else if (rv1->type == nill_m || rv2->type == nill_m)
+  {
+    result = rv1->type == nill_m && rv2->type == nill_m;
+  }
+  else if (rv1->type == bool_m || rv2->type == bool_m)
+  {
+    result = (avm_tobool(rv1) == avm_tobool(rv2));
+  }
+  else if (rv1->type != rv2->type)
+    avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
+  else
+  {
+    if (rv1->type == string_m)
+      result = strcmp(rv1->data.strVal,rv2->data.strVal);
+    else if(rv1->type == number_m)
+      result= rv1->data.numVal != rv2->data.numVal;
+    else if(rv1->type == userfunc_m)
+      result = rv1->data.funcVal != rv2->data.funcVal;
+    else if(rv1->type == libfunc_m)
+      result = strcmp(rv1->data.,rv2->data.libfuncVal);
+    else if(rv1->type == table_m)
+      result = rv1->data.tableVal != rv2->data.tableVal;
+    
+  }
+  if (!executionFinished && result)
+    pc = instr->res->val;
+
 }
 
 void execute_if_lesseq(instr *instr)
 {
+   assert(instr->res->type == label_a);
+
+  avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
+  avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
+
+  unsigned char result = 0;
+
+  if (rv1->type == undef_m || rv2->type == undef_m)
+  {
+    avm_error("'undef'involved in equality!");
+  }
+  else if (rv1->type == nill_m || rv2->type == nill_m)
+  {
+    result = rv1->type == nill_m && rv2->type == nill_m;
+  }
+  else if (rv1->type == bool_m || rv2->type == bool_m)
+  {
+    result = (avm_tobool(rv1) == avm_tobool(rv2));
+  }
+  else if (rv1->type != rv2->type)
+    avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
+  else
+  {
+    if (rv1->type == string_m)
+      result = strcmp(rv1->data.strVal,rv2->data.strVal) <= 0;
+    else if(rv1->type == number_m)
+      result= rv1->data.numVal <= rv2->data.numVal;
+    else if(rv1->type == userfunc_m)
+      result = rv1->data.funcVal <= rv2->data.funcVal;
+    else if(rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal) <= 0;
+    else if(rv1->type == table_m)
+      result = rv1->data.tableVal <= rv2->data.tableVal;
+    
+  }
+  if (!executionFinished && result)
+    pc = instr->res->val;
 }
 
 void execute_if_less(instr *instr)
 {
+  assert(instr->res->type == label_a);
+
+  avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
+  avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
+
+  unsigned char result = 0;
+
+  if (rv1->type == undef_m || rv2->type == undef_m)
+  {
+    avm_error("'undef'involved in equality!");
+  }
+  else if (rv1->type == nill_m || rv2->type == nill_m)
+  {
+    result = rv1->type == nill_m && rv2->type == nill_m;
+  }
+  else if (rv1->type == bool_m || rv2->type == bool_m)
+  {
+    result = (avm_tobool(rv1) == avm_tobool(rv2));
+  }
+  else if (rv1->type != rv2->type)
+    avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
+  else
+  {
+    if (rv1->type == string_m)
+      result = strcmp(rv1->data.strVal,rv2->data.strVal) < 0;
+    else if(rv1->type == number_m)
+      result= rv1->data.numVal < rv2->data.numVal;
+    else if(rv1->type == userfunc_m)
+      result = rv1->data.funcVal < rv2->data.funcVal;
+    else if(rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal) < 0;
+    else if(rv1->type == table_m)
+      result = rv1->data.tableVal < rv2->data.tableVal;
+    
+  }
+  if (!executionFinished && result)
+    pc = instr->res->val;
 }
 
 void execute_if_greater(instr *instr)
 {
+  assert(instr->res->type == label_a);
+
+  avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
+  avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
+
+  unsigned char result = 0;
+
+  if (rv1->type == undef_m || rv2->type == undef_m)
+  {
+    avm_error("'undef'involved in equality!");
+  }
+  else if (rv1->type == nill_m || rv2->type == nill_m)
+  {
+    result = rv1->type == nill_m && rv2->type == nill_m;
+  }
+  else if (rv1->type == bool_m || rv2->type == bool_m)
+  {
+    result = (avm_tobool(rv1) == avm_tobool(rv2));
+  }
+  else if (rv1->type != rv2->type)
+    avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
+  else
+  {
+    if (rv1->type == string_m)
+      result = strcmp(rv1->data.strVal,rv2->data.strVal) > 0;
+    else if(rv1->type == number_m)
+      result= rv1->data.numVal > rv2->data.numVal;
+    else if(rv1->type == userfunc_m)
+      result = rv1->data.funcVal > rv2->data.funcVal;
+    else if(rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal) > 0;
+    else if(rv1->type == table_m)
+      result = rv1->data.tableVal > rv2->data.tableVal;
+    
+  }
+  if (!executionFinished && result)
+    pc = instr->res->val;
 }
 
 void execute_if_greatereq(instr *instr)
 {
+  assert(instr->res->type == label_a);
+
+  avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
+  avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
+
+  unsigned char result = 0;
+
+  if (rv1->type == undef_m || rv2->type == undef_m)
+  {
+    avm_error("'undef'involved in equality!");
+  }
+  else if (rv1->type == nill_m || rv2->type == nill_m)
+  {
+    result = rv1->type == nill_m && rv2->type == nill_m;
+  }
+  else if (rv1->type == bool_m || rv2->type == bool_m)
+  {
+    result = (avm_tobool(rv1) == avm_tobool(rv2));
+  }
+  else if (rv1->type != rv2->type)
+    avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
+  else
+  {
+    if (rv1->type == string_m)
+      result = strcmp(rv1->data.strVal,rv2->data.strVal) >= 0;
+    else if(rv1->type == number_m)
+      result= rv1->data.numVal >= rv2->data.numVal;
+    else if(rv1->type == userfunc_m)
+      result = rv1->data.funcVal >= rv2->data.funcVal;
+    else if(rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal) >= 0;
+    else if(rv1->type == table_m)
+      result = rv1->data.tableVal >= rv2->data.tableVal;
+    
+  }
+  if (!executionFinished && result)
+    pc = instr->res->val;
+
+
 }
 
 void execute_jump(instr *instr)
 {
+  if (!executionFinished)
+    pc = instr->res->val;
 }
 
 void execute_return(instr *instr)
@@ -1005,3 +1234,50 @@ void read_bin()
 //   //fread(&len,sizeof(size_t),1,tester);
 //   fread(&stringConstss[i],sizeof(char*),1,tester);
 // }
+
+
+void libfunc_input(){
+
+
+}
+
+void libfunc_objectmemberkeys(){
+
+
+  
+}
+
+void libfunc_objecttotalmembers(){
+
+
+
+}
+
+ void libfunc_objectcopy(){
+
+ }
+
+ void libfunc_argument(){
+
+
+ }
+
+ void libfunc_strtonum(){
+
+
+ }
+
+ void libfunc_sqrt(){
+
+
+ }
+
+ void libfunc_cos(){
+
+
+ }
+
+ void libfunc_sin(){
+
+
+ }

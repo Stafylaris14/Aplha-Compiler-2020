@@ -315,3 +315,20 @@ void execute_funcend(instr* instr);
 
 void read_bin();
 
+void libfunc_input();
+
+void libfunc_objectmemberkeys();
+
+void libfunc_objecttotalmembers();
+
+ void libfunc_objectcopy();
+
+ void libfunc_argument();
+
+ void libfunc_strtonum();
+
+ void libfunc_sqrt();
+
+ void libfunc_cos();
+
+ void libfunc_sin();
