@@ -120,8 +120,13 @@ void generate_CALL(quad q)
     emit_instruction(i);
 }
 void generate_PARAM(quad q){
-    instr i ;
+    printf("param\n");
+    print_quad(q);
+    printf("/param , %d \n" , q.arg1->sym->offset);
+    
+    instr i;
     q.next_instr_label = get_next_instr_label();
+
     i.arg1 = make_operand(q.arg1);
     i.op = pusharg_v;
     emit_instruction(i);
@@ -353,7 +358,14 @@ vmarg* make_operand(expr *e)
     case var_: 
     case tableitem_:
     {
-        arg->val = e->sym->offset; //na to to offset
+        arg->val = e->sym->offset;
+        // if(arg->val  < 0){
+        //     item *kati = lookup(e->sym->name);
+        //     if(kati!=NULL)
+        //         arg->val = kati->offset; //na to to offset
+        // }
+      
+        printf("eimai edw stin make op kai to offset einai ->%d\n" , e->sym->offset);
         switch (e->sym->scope_spase)
         {
         case program_variable:
@@ -369,6 +381,7 @@ vmarg* make_operand(expr *e)
             assert(0);
         }
         break;
+        //return arg;
     }
     case constnum_:
         arg->type = number_a;
@@ -383,9 +396,6 @@ vmarg* make_operand(expr *e)
         arg->val = consts_add_stringconst(e->stringConst);
         break;
     case pfunc_:
-        if(!strcmp(e->sym->name , "b")) {
-            printf("%d einai to type kai %d to scopescepasd\n\n" ,e->type , e->sym->scope_spase );
-        }
         arg->type = userFunc_a;
         arg->val = consts_add_userFunc(e);
         //arg->val= e->sym-> TODO thelei to taddress leei pou einai mesa sto symbol
@@ -702,6 +712,7 @@ void print_quad(quad q)
         printf("arg1->type -> |%d|\n" , q.arg1->type);
         if((q.arg1->sym))
             printf("arg1->sym-> %s\n" , q.arg1->sym->name);
+            //printf("arg1->sym->%s\n" , q.arg1->sym->);
     }
     if(q.arg2)
     {

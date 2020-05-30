@@ -10,7 +10,7 @@
 #define AVM_TABLE_HASHSIZE 211
 #define AVM_MAX_INSTRUCTIONS 100 //den xerw!!
 //top , topsp gia tin stiva
-unsigned top , topsp;
+unsigned top  , topsp ;
 
 
 typedef void (*library_func_t) (void);
@@ -107,9 +107,6 @@ typedef struct incomplete_jump{
     unsigned iaddress; //the i-code jump-target address.
     struct incomplete_jump* next; //A trivial linked list.
 }incomplete_jump;
-
-
-
 
 ///////////translation////////////////
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg);

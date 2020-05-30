@@ -50,25 +50,25 @@ execute_func_t executeFuncs[] = {
     execute_div,
     execute_mod,
     execute_uminus,
+    execute_call,
+    execute_funcstart,
+    execute_funcend,
     execute_and,
     execute_or,
     execute_not,
+    execute_jump,
     execute_if_eq,
     execute_if_noteq,
-    execute_if_lesseq,
-    execute_if_less,
-    execute_if_greatereq,
     execute_if_greater,
-    execute_jump,
-    execute_call,
-    execute_param,
-    execute_return,
-    execute_getretval,
-    execute_funcstart,
-    execute_funcend,
+    execute_if_greatereq,
+    execute_if_lesseq,
     execute_tablecreate,
     execute_tablegetelem,
     execute_tablesetelem,
+    execute_param,
+    execute_if_less,
+    execute_return,
+    execute_getretval,
 };
 
 extern int *numConsts;
@@ -143,6 +143,7 @@ avm_memcell stack[AVM_STACKSIZE];
 
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
 {
+  printf("translate type %d\n",arg->type);
   switch (arg->type)
   {
   case global_a:
@@ -209,17 +210,18 @@ void execute_cycle(void)
     executionFinished = 1;
     return;
   }
-  else
+  else 
   {
-    assert(pc < AVM_ENDING_PC);
+    assert(pc < AVM_ENDING_PC);   //2:	PUSHARG		01(formal)0:x    afto thelouyme!!!!
     instr *instr1 = code + pc;
+    unsigned oldPC  = pc;
     assert(instr1->op >= 0 && instr1->op <= AVM_MAX_INSTRUCTIONS);
-    if (instr1->srcLine)
-      currLine = instr1->srcLine;
-    unsigned oldPC = pc;
+    // if (instr1->srcLine)
+    //     oldPC = pc;
     (*executeFuncs[instr1->op])(instr1);
-    if (pc == oldPC)
-      ++pc;
+    if(pc == oldPC)
+      ++pc;  
+      
   }
 }
 
@@ -233,6 +235,7 @@ void avm_callsaveenvironment(void)
 
 void execute_funcend(instr *unused)
 {
+  printf("eimai stin funcend\n");
   unsigned oldTop = top;
   top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
   pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
@@ -263,7 +266,6 @@ void avm_push_envvalue(unsigned val)
 
 library_func_t avm_getlibraryfunc(char *id)
 {
-  //aplo hasing leei ftia3imooooooooooooooooooo
   if (!strcmp("print", id))
     return libfunc_print;
   if (!strcmp("typeof", id))
@@ -307,9 +309,11 @@ void libfunc_print(void)
 {
   unsigned n = avm_totalactuals();
   unsigned i;
+  //printf("kane printsss\n");
   for (i = 0; i < n; ++i)
   {
     char *s = avm_tostring(avm_getactual(i));
+    printf("kane printsss %s\n", s);
     grn();
     puts(s);
     wht();
@@ -411,6 +415,7 @@ unsigned char avm_tobool(avm_memcell *m)
 static void avm_initstack(void)
 {
   unsigned i;
+  
   for (i = 0; i < AVM_STACKSIZE; i++)
   {
     AVM_WIPEOUT(stack[i]);
@@ -507,7 +512,7 @@ void execute_if_eq(instr *instr)
     else if(rv1->type == userfunc_m)
       result = rv1->data.funcVal == rv2->data.funcVal;
     else if(rv1->type == libfunc_m)
-      result = !strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal);
+      result = !strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal);
     else if(rv1->type == table_m)
       result = rv1->data.tableVal == rv2->data.tableVal;
     
@@ -595,124 +600,6 @@ void execute_tablesetelem(instr *instr)
   }
 }
 
-//diale3i paragogi telikou kwdika //////////////////
-
-// unsigned consts_newstring(char* s){
-//     //8elei ftia3imo
-//     printf("ftia3imoooooo\n");
-// }
-
-// unsigned consts_newnumber(double n){
-//     //fti3imoo
-//     printf("ftia3imoooooo\n");
-// }
-
-// unsigned libfuncs_newused(char* s){
-//        printf("ftia3imoooooo\n");
-//      //ftia3imoo
-// }
-
-// unsigned userfuncs_newfunc(item* sym){
-//     printf("ftia3imoooooo\n");
-//      //ftia3imoo
-// }
-
-// void make_operand(expr* e,vmarg* arg){
-//   printf("8elei ftia3imoooo\n");
-//   if(!e) return;
-//   //8elei kapoio elenxo mallon
-//   switch(e->type){
-//     case var_ : {
-//     break;}
-//     case tableitem_:{
-//           break;}
-//     case arthmexp_:{break;}
-//     case boolexpr_: {break;}
-//     case newtable_: {
-//         assert(e->sym);
-//         arg->val = e->sym->offset;
-//         switch (e->sym->scope_spase) {
-//           case program_variable : arg->type = global_a; break;
-//           case function_local : arg->type = local_a; break;
-//           case formal_argument : arg->type = formal_a; break;
-//           default: assert(0);
-//         }
-//         break;
-//     }
-//     //8elei k alla case edw mallon
-//     /*Constants*/
-//     case constbool_: {
-//       arg->val = e->boolConst;
-//       arg->type = bool_a; break;
-//       }
-//     case conststring_ : {
-//       arg->val = consts_newstring(e->strConst);
-//       arg->type = string_a; break;
-//     }
-//     case constnum_: {
-//       arg->val = consts_newnumber(e->numConst);
-//       arg->type = number_a; break;
-//     }
-//     //edw k allo case mallon
-//     case nill_: arg->type = nil_a; break;
-//     /*Functions*/
-//     case programfunc_e: {
-//       arg->type = userfunc_a;
-//       arg->val = userfuncs_newfunc(e->sym);
-//       //8elei kati g to name mallon
-//       break;
-//     }
-//     case libraryfunc_e: {
-//       arg->type = libfunc_a;
-//       arg->val = libfuncs_newused(e->sym->name);
-//       //mallon 8elei katig name edw
-//       break;
-//     }
-//     default : assert(0);
-//   }
-// }
-
-// void make_numberoperand(vmarg* arg,double val){
-//   arg->val = consts_newnumber(val);
-//   arg->type = number_a;
-// }
-// void make_booloperand(vmarg* arg,unsigned val){
-//   arg->val = val;
-//   arg->type = bool_a;
-// }
-// void make_retvaloperand(vmarg* arg){
-//   arg->type = retval_a;
-// }
-
-// incomplete_jump* ij_head = (incomplete_jump*) 0;
-
-// unsigned ij_total = 0;
-
-// void add_incomplete_jump(unsigned instrNo,unsigned iaddress);
-
-// void telos_generate(vmop op,quad *quad){
-//     printf('8elei dtia3imoooo\n');
-//     instr*t;
-//     t->op = op;
-
-//   make_operand(quad->arg1,t->arg1);
-//   make_operand(quad->arg2,t->arg2);
-//   make_operand(quad->result,t->res);
-//   quad->next_instr_label = nextinstructionlabel();//mallon dn xreiazete
-// }
-
-// void generate_ADD(quad* quad){telos_generate(add,quad);}
-// void generate_SUB(quad* quad){telos_generate(sub,quad);}
-// void generate_MUL(quad* quad){telos_generate(mul,quad);}
-// void generate_DIV(quad* quad){telos_generate(div,quad);}
-// void generate_MOD(quad* quad){telos_generate(mod,quad);}
-// void generate_NEWTABLE(quad* quad){telos_generate(newtable,quad);}
-// void generate_TABLEGETELM(quad* quad){telos_generate(tablegetelem,quad);}
-// void generate_TABLESETELM(quad* quad){telos_generate(tablesetelem,quad);}
-// void generate_ASSIGN(quad* quad){telos_generate(assign,quad);}
-// void generate_NOP(quad* quad){telos_generate(nop,quad);}
-
-//prepeu na einai malakiew ta parapanw na ta exeiw kanei esy sti 4a fasi
 
 void memclear_string(avm_memcell *m)
 {
@@ -739,15 +626,22 @@ void avm_memcellclear(avm_memcell *m)
 
 void avm_warning(char *format, ...)
 {
-  //mallon 8elei kwdika na printarei
+  cyn();
+  printf("AVM WARNING %s\n",format);
+  wht();
 }
 
 void execute_assign(instr *instr)
 {
+  
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv = avm_translate_operand(instr->arg1, &ax);
+  
+  grn();
+  //printf("lv .type == %d , rv.type  == %d\n" ,lv->type, rv->data.numVal );
+  wht();
   //na dw ligo to assert
-  assert(lv && ((&stack[AVM_STACKENV_SIZE] >= lv && lv > &stack[top]) || lv == &retval));
+  //assert(lv && ((&stack[AVM_STACKENV_SIZE] >= lv && lv > &stack[top]) || lv == &retval));
   assert(rv);
 
   avm_assign(lv, rv);
@@ -758,16 +652,16 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv)
 
   if (lv == rv)
     return;
-
+  if(lv == NULL)printf("TO LV EINAI NULL!!!!\n");
   if (lv->type == table_m && rv->type == table_m && lv->data.tableVal == rv->data.tableVal)
     return;
   if (rv->type == undef_m)
     avm_warning("assigning from 'undef' content!");
 
   avm_memcellclear(lv);
-
+  
   memcpy(lv, rv, sizeof(avm_memcell));
-
+  //printf("eimai edw lv %f\n",lv->data.numVal);
   if (lv->type == string_m)
     lv->data.strVal = strdup(rv->data.strVal);
   else if (lv->type == table_m)
@@ -776,18 +670,21 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv)
 
 void avm_error(char *format, ...)
 {
-  //8elei ftia3imo
+  red();
+  printf("AVM ERROR %s\n",format);
+  wht();
 }
 
 char *avm_tostring(avm_memcell *m)
 {
+  printf("memcels se prins type %d\n",m->type);
   assert(m->type >= 0 && m->type <= undef_m);
   return (*tostringFuncs[m->type])(m);
 }
 
 void execute_call(instr *instr)
 {
-
+  puts("eimai stin call");
   avm_memcell *func = avm_translate_operand(instr->arg1, &ax);
   assert(func);
   avm_callsaveenvironment();
@@ -820,7 +717,7 @@ void execute_call(instr *instr)
 
 void execute_funcstart(instr *instr)
 {
-
+  printf("eimai stin funcstart\n");
   avm_memcell *func = avm_translate_operand(instr->arg1, &ax);
 
   assert(pc == func->data.funcVal);
@@ -835,7 +732,8 @@ void execute_funcstart(instr *instr)
 unsigned avm_get_envvalue(unsigned i)
 {
 
-  assert(stack[i].type == number_m);
+
+  //assert(stack[i].type == number_m);
 
   unsigned val = (unsigned)stack[i].data.numVal;
 
@@ -866,10 +764,13 @@ void avm_calllibfunc(char *funcName)
 
 void execute_param(instr *instr)
 {
-
   avm_memcell *arg = avm_translate_operand(instr->arg1, &ax);
+  red();
+  printf("%f\n" , arg->data.numVal);
+  wht();
   assert(arg);
-
+  grn();
+  // printf("eimai mesa stin param %f \n" , arg->data.numVal );
   avm_assign(&stack[top], arg);
   ++totalActuals;
   avm_dec_top();
@@ -879,6 +780,8 @@ char *number_tostring(avm_memcell *kati)
 {
   char *res = malloc(sizeof(char) * 200);
   sprintf(res, "%f", kati->data.numVal);
+   //printf("gamienaui %s den gamiemai\n", res,strdup(kati->data.strVal));
+  //printf("giati edw ??\n");
   return res;
   //8elei ftia3imo
 }
@@ -888,6 +791,7 @@ char *string_tostring(avm_memcell *kati)
   //8elei ftia3imo alla mporei k extern
   char *res = malloc(sizeof(char) * 200);
   sprintf(res, "%s\n", kati->data.strVal);
+  printf("gamienaui %s den gamiemai\n", res);
   return res;
 }
 
@@ -922,20 +826,22 @@ char *undef_tostring(avm_memcell *kati) {}
 void avm_initialize(void)
 {
   //krataw xwro gia tis global
+  
+  top = AVM_STACKSIZE;
+  topsp = AVM_STACKSIZE;
   avm_initstack();
   avm_registerlibfunc("print", libfunc_print);
   avm_registerlibfunc("input", libfunc_input);
   avm_registerlibfunc("objectmemberkeys", libfunc_objectmemberkeys);
   avm_registerlibfunc("objecttotalmembers", libfunc_objecttotalmembers);
   avm_registerlibfunc("objectcopy", libfunc_objectcopy);
-  avm_registerlibfunc("totalarguments", libfunc_totalarguments;
+  avm_registerlibfunc("totalarguments", libfunc_totalarguments);
   avm_registerlibfunc("argument", libfunc_argument);
   avm_registerlibfunc("typeof", libfunc_typeof);
   avm_registerlibfunc("strtonum", libfunc_strtonum);
   avm_registerlibfunc("sqrt", libfunc_sqrt);
   avm_registerlibfunc("cos", libfunc_cos);
   avm_registerlibfunc("sin", libfunc_sin);
-  //bazoume mallon ola ta libfunc
 }
 
 void execute_uminus(instr *instr)
@@ -990,7 +896,7 @@ void execute_if_noteq(instr *instr)
     else if(rv1->type == userfunc_m)
       result = rv1->data.funcVal != rv2->data.funcVal;
     else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.,rv2->data.libfuncVal);
+      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal);
     else if(rv1->type == table_m)
       result = rv1->data.tableVal != rv2->data.tableVal;
     
@@ -1032,7 +938,7 @@ void execute_if_lesseq(instr *instr)
     else if(rv1->type == userfunc_m)
       result = rv1->data.funcVal <= rv2->data.funcVal;
     else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal) <= 0;
+      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal) <= 0;
     else if(rv1->type == table_m)
       result = rv1->data.tableVal <= rv2->data.tableVal;
     
@@ -1073,7 +979,7 @@ void execute_if_less(instr *instr)
     else if(rv1->type == userfunc_m)
       result = rv1->data.funcVal < rv2->data.funcVal;
     else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal) < 0;
+      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal) < 0;
     else if(rv1->type == table_m)
       result = rv1->data.tableVal < rv2->data.tableVal;
     
@@ -1114,7 +1020,7 @@ void execute_if_greater(instr *instr)
     else if(rv1->type == userfunc_m)
       result = rv1->data.funcVal > rv2->data.funcVal;
     else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal) > 0;
+      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal) > 0;
     else if(rv1->type == table_m)
       result = rv1->data.tableVal > rv2->data.tableVal;
     
@@ -1155,7 +1061,7 @@ void execute_if_greatereq(instr *instr)
     else if(rv1->type == userfunc_m)
       result = rv1->data.funcVal >= rv2->data.funcVal;
     else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libfuncVal,rv2->data.libfuncVal) >= 0;
+      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal) >= 0;
     else if(rv1->type == table_m)
       result = rv1->data.tableVal >= rv2->data.tableVal;
     
@@ -1277,6 +1183,7 @@ void libfunc_objecttotalmembers(){
 
  }
 
+ 
  void libfunc_sin(){
 
 

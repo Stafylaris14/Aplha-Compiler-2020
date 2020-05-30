@@ -948,17 +948,17 @@ int main(int argc, char** argv)
     
     //printSymTable();
     //printHash();
-    printScopeList();
+    //printScopeList();
     
     print_quads();
     generate();
     write_bin();
     print_instructions();   
-    red();
+    //red();
     read_bin();
     avm_initialize();
-    printf("vgika apo tin init\n");
-    printf("to executionFinished einai -> %d" , executionFinished);
+    //printf("vgika apo tin init\n");
+
     while(!executionFinished)
     {
         execute_cycle();
