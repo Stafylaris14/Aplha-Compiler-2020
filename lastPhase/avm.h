@@ -329,3 +329,5 @@ void libfunc_objecttotalmembers();
  void libfunc_cos();
 
  void libfunc_sin();
+
+void print_stack();

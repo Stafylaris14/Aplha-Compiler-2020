@@ -142,7 +142,7 @@ avm_memcell stack[AVM_STACKSIZE];
 
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
 {
-  printf("translate type %d\n", arg->type);
+  //printf("translate type %d\n", arg->type);
   switch (arg->type)
   {
   case global_a:
@@ -150,7 +150,6 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
   case local_a:
     return &stack[topsp - arg->val];
   case formal_a:
-    printf("type einai %f\n" , stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val].data.numVal);
     // assert(0);
     return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];
   case retval_a:
@@ -161,15 +160,18 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
     return reg;
   case bool_a:
     reg->type = bool_m;
-    reg->data.numVal = arg->val;
+    reg->data.boolVal = arg->val;
     return reg;
   case string_a:
     reg->type = string_m;
     reg->data.strVal = consts_get_string(arg->val);
     return reg;
   case userFunc_a:
+    yel();
     reg->type = userfunc_m;
-    reg->data.funcVal = arg->val;
+    userFunc *t = consts_get_userfunction(arg->val);
+    reg->data.funcVal = t->address;
+    printf("miso %d\n" , t->address);
     return reg;
   case libFunc_a:
     reg->type = libfunc_m;
@@ -204,6 +206,9 @@ char *consts_get_libFunction(int index)
 
 void execute_cycle(void)
 {
+    mag();
+   // printf("to pc einai %d\n" , pc);
+    wht();
   if (executionFinished)
     return;
   else if (pc == AVM_ENDING_PC)
@@ -213,12 +218,17 @@ void execute_cycle(void)
   }
   else
   {
+    // printf("to pc %d kai ending %d\n",pc,AVM_ENDING_PC);
     assert(pc < AVM_ENDING_PC); //2:	PUSHARG		01(formal)0:x    afto thelouyme!!!!
     instr *instr1 = code + pc;
+    cyn();
+   // printf("to opeinai %d\n" , instr1->op);
     unsigned oldPC = pc;
     assert(instr1->op >= 0 && instr1->op <= AVM_MAX_INSTRUCTIONS);
     // if (instr1->srcLine)
     //     oldPC = pc;
+    printf("instruction %d - opcode %d\n", pc,instr1->op);
+    
     (*executeFuncs[instr1->op])(instr1);
     if (pc == oldPC)
       ++pc;
@@ -408,6 +418,7 @@ void execute_arithmetic(instr *instr)
 unsigned char avm_tobool(avm_memcell *m)
 {
   assert(m->type >= 0 && m->type < undef_m);
+
   return (*toboolFuncs[m->type])(m);
 }
 
@@ -480,13 +491,13 @@ void avm_tabledestroy(avm_table *t)
 
 void execute_if_eq(instr *instr)
 {
-
+  puts("eimai if eq");
   assert(instr->res->type == label_a);
 
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
 
-  unsigned char result = 0;
+  int result = 0;
 
   if (rv1->type == undef_m || rv2->type == undef_m)
   {
@@ -498,6 +509,7 @@ void execute_if_eq(instr *instr)
   }
   else if (rv1->type == bool_m || rv2->type == bool_m)
   {
+    printf("av1 %d kai av2 %d\n",rv1->data.boolVal,rv2->data.boolVal);
     result = (avm_tobool(rv1) == avm_tobool(rv2));
   }
   else if (rv1->type != rv2->type)
@@ -515,9 +527,19 @@ void execute_if_eq(instr *instr)
     else if (rv1->type == table_m)
       result = rv1->data.tableVal == rv2->data.tableVal;
   }
-  if (!executionFinished && result)
+  printf("kalimeres me jumo %d kai exe exe %d\n",result,instr->res->val);
+  
+  if(result == 1){
+    printf("allazw pc re manm \n");
     pc = instr->res->val;
-}
+  }
+
+  // if (!executionFinished && result){
+  //   red();
+  //   printf("panta\n");
+  //   pc = instr->res->val;
+  // }
+}//////////////////////////////////////////////////////////////////////////////
 
 void execute_tablecreate(instr *instr)
 {
@@ -600,7 +622,7 @@ void execute_tablesetelem(instr *instr)
 
 void memclear_string(avm_memcell *m)
 {
-  assert(m->data.strVal);
+ // assert(m->data.strVal);
   free(m->data.strVal);
 }
 
@@ -630,12 +652,13 @@ void avm_warning(char *format, ...)
 
 void execute_assign(instr *instr)
 {
+  
 
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv = avm_translate_operand(instr->arg1, &ax);
 
   grn();
-  //printf("lv .type == %d , rv.type  == %d\n" ,lv->type, rv->data.numVal );
+  printf("lv eeeeeeeeeeeeeeeeeeeee .type == %d , rv.type  == %d\n" ,lv->type, rv->data.boolVal );
   wht();
   //na dw ligo to assert
   //assert(lv && ((&stack[AVM_STACKENV_SIZE] >= lv && lv > &stack[top]) || lv == &retval));
@@ -684,22 +707,27 @@ char *avm_tostring(avm_memcell *m)
 
 void execute_call(instr *instr)
 {
-  puts("eimai stin call");
+  // puts("eimai stin call");
   avm_memcell *func = avm_translate_operand(instr->arg1, &ax);
   assert(func);
   avm_callsaveenvironment();
+  
 
   switch (func->type)
   {
   case userfunc_m:
   {
     pc = func->data.funcVal;
+    yel();
+    printf("to func->data.funcVal einai %d\n" , func->data.funcVal);
+    wht();
     assert(pc < AVM_ENDING_PC);
+    yel();
+    printf("%d\n" ,code[pc].op);
     assert(code[pc].op == enterfunc_v);
     break;
   }
   case string_m:
-    printf("eimai edw sto string \n\n\n\n\n");
     avm_calllibfunc(func->data.strVal);
     break;
   case libfunc_m:
@@ -794,7 +822,7 @@ char *string_tostring(avm_memcell *kati)
   //8elei ftia3imo alla mporei k extern
   char *res = malloc(sizeof(char) * 200);
   sprintf(res, "%s\n", kati->data.strVal);
-  printf("gamienaui %s den gamiemai\n", res);
+  // printf("gamienaui %s den gamiemai\n", res);
   return res;
 }
 
@@ -1014,8 +1042,10 @@ void execute_if_greater(instr *instr)
   {
     if (rv1->type == string_m)
       result = strcmp(rv1->data.strVal, rv2->data.strVal) > 0;
-    else if (rv1->type == number_m)
+    else if (rv1->type == number_m){
       result = rv1->data.numVal > rv2->data.numVal;
+   
+    }
     else if (rv1->type == userfunc_m)
       result = rv1->data.funcVal > rv2->data.funcVal;
     else if (rv1->type == libfunc_m)
@@ -1023,8 +1053,16 @@ void execute_if_greater(instr *instr)
     else if (rv1->type == table_m)
       result = rv1->data.tableVal > rv2->data.tableVal;
   }
+    
+  printf("eimai sto greatew kai rv1 type %d kai result (%d) kai jump %d\n",rv1->type,result,instr->res->val);
+  wht();
+  
   if (!executionFinished && result)
+  {
+       red();
+      printf("pernaw edww\n");
     pc = instr->res->val;
+  }
 }
 
 void execute_if_greatereq(instr *instr)
@@ -1033,7 +1071,6 @@ void execute_if_greatereq(instr *instr)
 
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
-
   unsigned char result = 0;
 
   if (rv1->type == undef_m || rv2->type == undef_m)
@@ -1069,8 +1106,14 @@ void execute_if_greatereq(instr *instr)
 
 void execute_jump(instr *instr)
 {
-  if (!executionFinished)
+  if (!executionFinished){
+    grn();
+    //printf("mpika sto exec finished\n");
+  }
+   // printf("to pc einai prin %d\n" , pc);
     pc = instr->res->val;
+    //printf("to pc einai meta %d\n" , pc);
+    wht();
 }
 
 void execute_return(instr *instr)
@@ -1124,8 +1167,11 @@ void read_bin()
 
   //userfuncs
   userFunctions = malloc(sizeof(userFunc) * userFuncSize);
-  for (int i = 0; i < userFuncSize; i++)
+    yel();
+    printf("%d\n" , userFuncSize);
+  for (int i = 0; i < userFuncSize; i++){
     fread(&userFunctions, sizeof(userFunc), 1, fp);
+  }
 
   fclose(fp);
 }
@@ -1170,4 +1216,48 @@ void libfunc_cos()
 
 void libfunc_sin()
 {
+}
+
+
+
+void print_stack(){
+  cyn();
+  printf("----------type---------data\n\n");
+  for(int i = AVM_STACKSIZE; i < AVM_STACKSIZE - pc; i--)
+  {
+    printf("|       %d      " , stack[i].type);
+
+    switch (stack[i].type)
+    {
+    case number_m:
+      printf("%f \n" , stack[i].data.numVal);
+      break;
+    case string_m:
+      printf("%s\n" , stack[i].data.strVal);
+      break;
+    case bool_m:
+      if(stack[i].data.boolVal) printf("true\n");
+      else printf("false\n");
+      break;
+    case table_m:
+      printf("table\n");
+      break;
+    case userfunc_m:
+      printf("userFunc\n");
+      break;
+    case libfunc_m:
+      printf("libfunc\n");
+      break;
+    case nill_m:
+      printf("nilll\n");
+      break;
+    case undef_m:
+      printf("undeff\n");
+      break;
+    default:
+      break;
+    }
+
+  }
+  printf("-------------------------\n");
 }

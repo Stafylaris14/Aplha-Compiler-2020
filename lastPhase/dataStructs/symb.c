@@ -108,6 +108,21 @@ item *lookupScopeAbove(char *name, int scope)
     return NULL;
 }
 
+item *lookupAllscopes(char *name, int scope)
+{
+    int index = scope;
+    item *tmp = NULL;
+    tmp = lookupScope(name, scope);
+    while (scope >= 0)
+    {
+        scope--;
+        if (tmp != NULL)
+            return tmp;
+        tmp = lookupScope(name, scope);
+    }
+    return NULL;
+}
+
 /*lookup in selected scope*/
 item *lookupScope(char *name, int scope)
 {

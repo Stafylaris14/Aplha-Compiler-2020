@@ -2,7 +2,7 @@
 #include "../dataStructs/linkedList.h"
 
 int total_instraction_size = 0; 
-int current_instraction = 1;
+int current_instraction;
 instr *instructions = (instr *)0;
 extern int currQuad;
 
@@ -209,7 +209,7 @@ void generate_single_relational(vmop op , quad *q)
     i.arg1 = make_operand(q->arg1);
     i.arg2 = make_operand(q->arg2);
     i.res = malloc(sizeof(vmarg));
-    i.res->val = label_q;
+    i.res->val = label_q-1;
     i.res->type = label_a;
     i.op = op;
     emit_instruction(i);
@@ -275,7 +275,7 @@ void print_instructions()
         }
        
         printf("%d:" , i);
-        printf("%s\t\t" , get_string_vmopcode(instructions[i].op));
+        printf("%s|%d\t\t" , get_string_vmopcode(instructions[i].op) ,instructions[i].op );
          if(instructions[i].res->type != -1)
             printf("%d(%s)%d\t\t" , instructions[i].res->val , get_string_vmargtype(instructions[i].res) , instructions[i].res->type);
         else
@@ -349,7 +349,7 @@ vmarg* make_operand(expr *e)
     arg = malloc(sizeof(vmarg));
     if(!arg) exit(-1);
     mag();
-    printf("eimai edw sto make op kai to expression type einai %d\n" , expressionType);
+    // printf("\n\n\n\neimai edw sto make op kai to expression type einai %d\n\n\n\n" , expressionType);
     wht();
     switch (expressionType)
     {
@@ -360,7 +360,7 @@ vmarg* make_operand(expr *e)
     case tableitem_:
     {
         arg->val = e->sym->offset;
-        printf("eimai edw stin make op kai to offset einai ->%d\n" , e->sym->offset);
+
         switch (e->sym->scope_spase)
         {
         case program_variable:
@@ -522,7 +522,7 @@ int newUserFunction(int address, int localsize, char *name)
 
 int consts_add_userFunc(expr *e)
 {
-    // printf("eimai edw sto functions user %s\n" , func->id);
+    printf("eimai edw sto functions user %s\n" , e->sym->name);
     // userFuncs[userFuncSize] = func;
     int i;
     for (i = 0; i < userFuncSize; i++)
