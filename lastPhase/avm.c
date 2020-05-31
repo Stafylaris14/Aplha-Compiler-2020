@@ -92,7 +92,7 @@ unsigned totalActuals = 0;
 typedef void (*library_func_t)(void);
 
 library_func_t librarys[12] = {0};
-number_of_lib = 0;
+int number_of_lib = 0;
 
 #define AVM_NUMACTUALS_OFFSET +4
 #define AVM_SAVEDPC_OFFSET +3
@@ -1135,7 +1135,8 @@ void read_bin()
   char buffer[10];
   code = malloc(sizeof(instr) * codeSize);
   //code
-  for (int i = 0; i < codeSize; i++)
+  int i;
+  for (i = 0; i < codeSize; i++)
   {
     // code[i] = malloc(sizeof(instr));
     fread(&code[i], sizeof(instr), 1, fp);
@@ -1144,14 +1145,14 @@ void read_bin()
   // consts
   // num
   const_numbers = malloc(sizeof(numConstSize));
-  for (int i = 0; i < numConstSize; i++)
+  for (i = 0; i < numConstSize; i++)
   {
     fread(&const_numbers[i], sizeof(int), 1, fp);
   }
 
   //strings
   const_strings = malloc(sizeof(char *) * stringConstSize);
-  for (int i = 0; i < stringConstSize; i++)
+  for ( i = 0; i < stringConstSize; i++)
   {
     fread(&const_strings[i], sizeof(char *), 1, fp);
   }
@@ -1160,7 +1161,7 @@ void read_bin()
 
   library_functions = malloc(sizeof(char *) * namedLibFuncsSize);
 
-  for (int i = 0; i < namedLibFuncsSize; i++)
+  for (i = 0; i < namedLibFuncsSize; i++)
   {
     fread(&library_functions, sizeof(char *), 1, fp);
   }
@@ -1169,7 +1170,7 @@ void read_bin()
   userFunctions = malloc(sizeof(userFunc) * userFuncSize);
     yel();
     printf("%d\n" , userFuncSize);
-  for (int i = 0; i < userFuncSize; i++){
+  for (i = 0; i < userFuncSize; i++){
     fread(&userFunctions, sizeof(userFunc), 1, fp);
   }
 
@@ -1223,7 +1224,8 @@ void libfunc_sin()
 void print_stack(){
   cyn();
   printf("----------type---------data\n\n");
-  for(int i = AVM_STACKSIZE; i < AVM_STACKSIZE - pc; i--)
+  int i;
+  for(i = AVM_STACKSIZE; i < AVM_STACKSIZE - pc; i--)
   {
     printf("|       %d      " , stack[i].type);
 

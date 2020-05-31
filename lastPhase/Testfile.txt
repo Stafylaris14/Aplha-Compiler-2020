@@ -1,5 +1,3 @@
 x =2;
-if(x ==1){
-    print("se gamaw apo kolo");
-}
 
+print("emaaaa");
