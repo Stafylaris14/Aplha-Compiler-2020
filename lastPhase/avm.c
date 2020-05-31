@@ -91,9 +91,8 @@ unsigned totalActuals = 0;
 
 typedef void (*library_func_t)(void);
 
-library_func_t librarys[12]={0};
+library_func_t librarys[12] = {0};
 number_of_lib = 0;
-
 
 #define AVM_NUMACTUALS_OFFSET +4
 #define AVM_SAVEDPC_OFFSET +3
@@ -143,7 +142,7 @@ avm_memcell stack[AVM_STACKSIZE];
 
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
 {
-  printf("translate type %d\n",arg->type);
+  printf("translate type %d\n", arg->type);
   switch (arg->type)
   {
   case global_a:
@@ -151,6 +150,8 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
   case local_a:
     return &stack[topsp - arg->val];
   case formal_a:
+    printf("type einai %f\n" , stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val].data.numVal);
+    // assert(0);
     return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];
   case retval_a:
     return &retval;
@@ -210,18 +211,17 @@ void execute_cycle(void)
     executionFinished = 1;
     return;
   }
-  else 
+  else
   {
-    assert(pc < AVM_ENDING_PC);   //2:	PUSHARG		01(formal)0:x    afto thelouyme!!!!
+    assert(pc < AVM_ENDING_PC); //2:	PUSHARG		01(formal)0:x    afto thelouyme!!!!
     instr *instr1 = code + pc;
-    unsigned oldPC  = pc;
+    unsigned oldPC = pc;
     assert(instr1->op >= 0 && instr1->op <= AVM_MAX_INSTRUCTIONS);
     // if (instr1->srcLine)
     //     oldPC = pc;
     (*executeFuncs[instr1->op])(instr1);
-    if(pc == oldPC)
-      ++pc;  
-      
+    if (pc == oldPC)
+      ++pc;
   }
 }
 
@@ -261,8 +261,6 @@ void avm_push_envvalue(unsigned val)
   stack[top].data.numVal = val;
   avm_dec_top();
 }
-
-
 
 library_func_t avm_getlibraryfunc(char *id)
 {
@@ -371,7 +369,8 @@ double div_impl(double x, double y)
 double mod_impl(double x, double y)
 {
   printf("tsekarw g error\n");
-  if(y == 0) return 0;
+  if (y == 0)
+    return 0;
   return ((unsigned)x) % ((unsigned)y);
 }
 
@@ -388,7 +387,7 @@ void execute_arithmetic(instr *instr)
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
   printf("eimai edw s lew asset\n");
- // assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval));
+  // assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval));
   assert(rv1 && rv2);
 
   if (rv1->type != number_m || rv2->type != number_m)
@@ -402,7 +401,7 @@ void execute_arithmetic(instr *instr)
     avm_memcellclear(lv);
     lv->type = number_m;
     lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
-    printf("se blepw %f kai %f apotelesma %f\n",rv1->data.numVal,rv2->data.numVal,lv->data.numVal );
+    printf("se blepw %f kai %f apotelesma %f\n", rv1->data.numVal, rv2->data.numVal, lv->data.numVal);
   }
 }
 
@@ -415,7 +414,7 @@ unsigned char avm_tobool(avm_memcell *m)
 static void avm_initstack(void)
 {
   unsigned i;
-  
+
   for (i = 0; i < AVM_STACKSIZE; i++)
   {
     AVM_WIPEOUT(stack[i]);
@@ -506,16 +505,15 @@ void execute_if_eq(instr *instr)
   else
   {
     if (rv1->type == string_m)
-      result = !strcmp(rv1->data.strVal,rv2->data.strVal);
-    else if(rv1->type == number_m)
-      result= rv1->data.numVal == rv2->data.numVal;
-    else if(rv1->type == userfunc_m)
+      result = !strcmp(rv1->data.strVal, rv2->data.strVal);
+    else if (rv1->type == number_m)
+      result = rv1->data.numVal == rv2->data.numVal;
+    else if (rv1->type == userfunc_m)
       result = rv1->data.funcVal == rv2->data.funcVal;
-    else if(rv1->type == libfunc_m)
-      result = !strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal);
-    else if(rv1->type == table_m)
+    else if (rv1->type == libfunc_m)
+      result = !strcmp(rv1->data.libFuncVal, rv2->data.libFuncVal);
+    else if (rv1->type == table_m)
       result = rv1->data.tableVal == rv2->data.tableVal;
-    
   }
   if (!executionFinished && result)
     pc = instr->res->val;
@@ -600,7 +598,6 @@ void execute_tablesetelem(instr *instr)
   }
 }
 
-
 void memclear_string(avm_memcell *m)
 {
   assert(m->data.strVal);
@@ -627,16 +624,16 @@ void avm_memcellclear(avm_memcell *m)
 void avm_warning(char *format, ...)
 {
   cyn();
-  printf("AVM WARNING %s\n",format);
+  printf("AVM WARNING %s\n", format);
   wht();
 }
 
 void execute_assign(instr *instr)
 {
-  
+
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv = avm_translate_operand(instr->arg1, &ax);
-  
+
   grn();
   //printf("lv .type == %d , rv.type  == %d\n" ,lv->type, rv->data.numVal );
   wht();
@@ -652,14 +649,15 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv)
 
   if (lv == rv)
     return;
-  if(lv == NULL)printf("TO LV EINAI NULL!!!!\n");
+  if (lv == NULL)
+    printf("TO LV EINAI NULL!!!!\n");
   if (lv->type == table_m && rv->type == table_m && lv->data.tableVal == rv->data.tableVal)
     return;
   if (rv->type == undef_m)
     avm_warning("assigning from 'undef' content!");
 
   avm_memcellclear(lv);
-  
+
   memcpy(lv, rv, sizeof(avm_memcell));
   //printf("eimai edw lv %f\n",lv->data.numVal);
   if (lv->type == string_m)
@@ -671,13 +669,15 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv)
 void avm_error(char *format, ...)
 {
   red();
-  printf("AVM ERROR %s\n",format);
+  printf("AVM ERROR %s\n", format);
   wht();
 }
 
 char *avm_tostring(avm_memcell *m)
 {
-  printf("memcels se prins type %d\n",m->type);
+  mag();
+  printf("memcels se prins ------------ type %d\n", m->type);
+  wht();
   assert(m->type >= 0 && m->type <= undef_m);
   return (*tostringFuncs[m->type])(m);
 }
@@ -699,10 +699,11 @@ void execute_call(instr *instr)
     break;
   }
   case string_m:
+    printf("eimai edw sto string \n\n\n\n\n");
     avm_calllibfunc(func->data.strVal);
     break;
   case libfunc_m:
-    printf("eimai edw!!!! %s\n" , func->data.libFuncVal);
+    printf("eimai edw!!!! %s\n", func->data.libFuncVal);
     avm_calllibfunc(func->data.libFuncVal);
     break;
   default:
@@ -731,7 +732,6 @@ void execute_funcstart(instr *instr)
 
 unsigned avm_get_envvalue(unsigned i)
 {
-
 
   //assert(stack[i].type == number_m);
 
@@ -764,9 +764,12 @@ void avm_calllibfunc(char *funcName)
 
 void execute_param(instr *instr)
 {
+  red();
+  printf("eimai stin param kai to type tou instr einia %d\n" , instr->arg1->type);
+  wht();
   avm_memcell *arg = avm_translate_operand(instr->arg1, &ax);
   red();
-  printf("%f\n" , arg->data.numVal);
+  printf("%f\n", arg->data.numVal);
   wht();
   assert(arg);
   grn();
@@ -780,7 +783,7 @@ char *number_tostring(avm_memcell *kati)
 {
   char *res = malloc(sizeof(char) * 200);
   sprintf(res, "%f", kati->data.numVal);
-   //printf("gamienaui %s den gamiemai\n", res,strdup(kati->data.strVal));
+  //printf("gamienaui %s den gamiemai\n", res,strdup(kati->data.strVal));
   //printf("giati edw ??\n");
   return res;
   //8elei ftia3imo
@@ -826,7 +829,7 @@ char *undef_tostring(avm_memcell *kati) {}
 void avm_initialize(void)
 {
   //krataw xwro gia tis global
-  
+
   top = AVM_STACKSIZE;
   topsp = AVM_STACKSIZE;
   avm_initstack();
@@ -890,25 +893,23 @@ void execute_if_noteq(instr *instr)
   else
   {
     if (rv1->type == string_m)
-      result = strcmp(rv1->data.strVal,rv2->data.strVal);
-    else if(rv1->type == number_m)
-      result= rv1->data.numVal != rv2->data.numVal;
-    else if(rv1->type == userfunc_m)
+      result = strcmp(rv1->data.strVal, rv2->data.strVal);
+    else if (rv1->type == number_m)
+      result = rv1->data.numVal != rv2->data.numVal;
+    else if (rv1->type == userfunc_m)
       result = rv1->data.funcVal != rv2->data.funcVal;
-    else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal);
-    else if(rv1->type == table_m)
+    else if (rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libFuncVal, rv2->data.libFuncVal);
+    else if (rv1->type == table_m)
       result = rv1->data.tableVal != rv2->data.tableVal;
-    
   }
   if (!executionFinished && result)
     pc = instr->res->val;
-
 }
 
 void execute_if_lesseq(instr *instr)
 {
-   assert(instr->res->type == label_a);
+  assert(instr->res->type == label_a);
 
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
@@ -932,16 +933,15 @@ void execute_if_lesseq(instr *instr)
   else
   {
     if (rv1->type == string_m)
-      result = strcmp(rv1->data.strVal,rv2->data.strVal) <= 0;
-    else if(rv1->type == number_m)
-      result= rv1->data.numVal <= rv2->data.numVal;
-    else if(rv1->type == userfunc_m)
+      result = strcmp(rv1->data.strVal, rv2->data.strVal) <= 0;
+    else if (rv1->type == number_m)
+      result = rv1->data.numVal <= rv2->data.numVal;
+    else if (rv1->type == userfunc_m)
       result = rv1->data.funcVal <= rv2->data.funcVal;
-    else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal) <= 0;
-    else if(rv1->type == table_m)
+    else if (rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libFuncVal, rv2->data.libFuncVal) <= 0;
+    else if (rv1->type == table_m)
       result = rv1->data.tableVal <= rv2->data.tableVal;
-    
   }
   if (!executionFinished && result)
     pc = instr->res->val;
@@ -973,16 +973,15 @@ void execute_if_less(instr *instr)
   else
   {
     if (rv1->type == string_m)
-      result = strcmp(rv1->data.strVal,rv2->data.strVal) < 0;
-    else if(rv1->type == number_m)
-      result= rv1->data.numVal < rv2->data.numVal;
-    else if(rv1->type == userfunc_m)
+      result = strcmp(rv1->data.strVal, rv2->data.strVal) < 0;
+    else if (rv1->type == number_m)
+      result = rv1->data.numVal < rv2->data.numVal;
+    else if (rv1->type == userfunc_m)
       result = rv1->data.funcVal < rv2->data.funcVal;
-    else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal) < 0;
-    else if(rv1->type == table_m)
+    else if (rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libFuncVal, rv2->data.libFuncVal) < 0;
+    else if (rv1->type == table_m)
       result = rv1->data.tableVal < rv2->data.tableVal;
-    
   }
   if (!executionFinished && result)
     pc = instr->res->val;
@@ -1014,16 +1013,15 @@ void execute_if_greater(instr *instr)
   else
   {
     if (rv1->type == string_m)
-      result = strcmp(rv1->data.strVal,rv2->data.strVal) > 0;
-    else if(rv1->type == number_m)
-      result= rv1->data.numVal > rv2->data.numVal;
-    else if(rv1->type == userfunc_m)
+      result = strcmp(rv1->data.strVal, rv2->data.strVal) > 0;
+    else if (rv1->type == number_m)
+      result = rv1->data.numVal > rv2->data.numVal;
+    else if (rv1->type == userfunc_m)
       result = rv1->data.funcVal > rv2->data.funcVal;
-    else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal) > 0;
-    else if(rv1->type == table_m)
+    else if (rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libFuncVal, rv2->data.libFuncVal) > 0;
+    else if (rv1->type == table_m)
       result = rv1->data.tableVal > rv2->data.tableVal;
-    
   }
   if (!executionFinished && result)
     pc = instr->res->val;
@@ -1055,21 +1053,18 @@ void execute_if_greatereq(instr *instr)
   else
   {
     if (rv1->type == string_m)
-      result = strcmp(rv1->data.strVal,rv2->data.strVal) >= 0;
-    else if(rv1->type == number_m)
-      result= rv1->data.numVal >= rv2->data.numVal;
-    else if(rv1->type == userfunc_m)
+      result = strcmp(rv1->data.strVal, rv2->data.strVal) >= 0;
+    else if (rv1->type == number_m)
+      result = rv1->data.numVal >= rv2->data.numVal;
+    else if (rv1->type == userfunc_m)
       result = rv1->data.funcVal >= rv2->data.funcVal;
-    else if(rv1->type == libfunc_m)
-      result = strcmp(rv1->data.libFuncVal,rv2->data.libFuncVal) >= 0;
-    else if(rv1->type == table_m)
+    else if (rv1->type == libfunc_m)
+      result = strcmp(rv1->data.libFuncVal, rv2->data.libFuncVal) >= 0;
+    else if (rv1->type == table_m)
       result = rv1->data.tableVal >= rv2->data.tableVal;
-    
   }
   if (!executionFinished && result)
     pc = instr->res->val;
-
-
 }
 
 void execute_jump(instr *instr)
@@ -1141,50 +1136,38 @@ void read_bin()
 //   fread(&stringConstss[i],sizeof(char*),1,tester);
 // }
 
-
-void libfunc_input(){
-
-
+void libfunc_input()
+{
 }
 
-void libfunc_objectmemberkeys(){
-
-
-  
+void libfunc_objectmemberkeys()
+{
 }
 
-void libfunc_objecttotalmembers(){
-
-
-
+void libfunc_objecttotalmembers()
+{
 }
 
- void libfunc_objectcopy(){
+void libfunc_objectcopy()
+{
+}
 
- }
+void libfunc_argument()
+{
+}
 
- void libfunc_argument(){
+void libfunc_strtonum()
+{
+}
 
+void libfunc_sqrt()
+{
+}
 
- }
+void libfunc_cos()
+{
+}
 
- void libfunc_strtonum(){
-
-
- }
-
- void libfunc_sqrt(){
-
-
- }
-
- void libfunc_cos(){
-
-
- }
-
- 
- void libfunc_sin(){
-
-
- }
+void libfunc_sin()
+{
+}

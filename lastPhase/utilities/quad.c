@@ -568,11 +568,12 @@ expr *make_call(expr *lv, expr *reversed_elist)
     expr *func = emit_iftableitem(lv);
     while (reversed_elist)
     {
-        if(reversed_elist->sym->offset < 0){
-            item *sagapaw = lookup(reversed_elist->sym->name);      //ERROR
-            assert(sagapaw);
-            reversed_elist->sym->offset = sagapaw->offset;
-        }
+        if(reversed_elist->sym)
+            if(reversed_elist->sym->offset < 0){
+                item *sagapaw = lookup(reversed_elist->sym->name);      //ERROR
+                assert(sagapaw);
+                reversed_elist->sym->offset = sagapaw->offset;
+            }
         //printf("8a se gamiswwwwwww %d kai id %s \n",sagapaw->offset,reversed_elist->sym->name );
         emit(PARAM, reversed_elist, NULL, NULL, -1);
         reversed_elist = reversed_elist->next;
@@ -647,9 +648,6 @@ expr *lvalue_expr(item *sym)
     {
         sp = -1;
     }
-    printf("eimai edw sta palia\n");
-    printf("to onoma einai ->%s\n" , sym->name);
-    printf("to type einai -> %s\n" , sym->type);
     // e->contlist = NULL;
     // e->breaklist = NULL;
     // e->falselist = NULL;

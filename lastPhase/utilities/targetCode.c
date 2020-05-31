@@ -111,22 +111,21 @@ void generate_IF_GREATER(quad q){generate_single_relational(jgt_v , &q);}
 void generate_JUMP(quad q){generate_single_relational(jump_v , &q);}
 void generate_CALL(quad q)
 {
-    print_quad(q);
+    
     instr i;
     q.next_instr_label = get_next_instr_label();
     i.op = callfunc_v;
-    print_quad(q);
+   
     i.arg1 = make_operand(q.arg1);
     emit_instruction(i);
 }
 void generate_PARAM(quad q){
-    printf("param\n");
     print_quad(q);
-    printf("/param , %d \n" , q.arg1->sym->offset);
+    printf("param\n");
     
     instr i;
     q.next_instr_label = get_next_instr_label();
-
+    i.arg2 = NULL;
     i.arg1 = make_operand(q.arg1);
     i.op = pusharg_v;
     emit_instruction(i);
@@ -349,7 +348,9 @@ vmarg* make_operand(expr *e)
     arg = NULL;
     arg = malloc(sizeof(vmarg));
     if(!arg) exit(-1);
-    
+    mag();
+    printf("eimai edw sto make op kai to expression type einai %d\n" , expressionType);
+    wht();
     switch (expressionType)
     {
     case boolexpr_:
@@ -359,12 +360,6 @@ vmarg* make_operand(expr *e)
     case tableitem_:
     {
         arg->val = e->sym->offset;
-        // if(arg->val  < 0){
-        //     item *kati = lookup(e->sym->name);
-        //     if(kati!=NULL)
-        //         arg->val = kati->offset; //na to to offset
-        // }
-      
         printf("eimai edw stin make op kai to offset einai ->%d\n" , e->sym->offset);
         switch (e->sym->scope_spase)
         {
@@ -388,11 +383,11 @@ vmarg* make_operand(expr *e)
         arg->val = consts_add_numconst(e->numConst);
         break;
     case constbool_:
-        arg->type = constbool_;
+        arg->type = bool_a;
         arg->val = e->boolConst;
         break;
     case conststring_:
-        arg->type = conststring_;
+        arg->type = string_a;
         arg->val = consts_add_stringconst(e->stringConst);
         break;
     case pfunc_:
