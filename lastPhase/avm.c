@@ -324,7 +324,8 @@ void libfunc_print(void)
   for (i = 0; i < n; ++i)
   {
     char *s = avm_tostring(avm_getactual(i));
-    //printf("kane printsss %s\n", s);
+
+   printf("kane printsss %f\n", avm_getactual(i));
     grn();
     puts(s);
     wht();
@@ -709,6 +710,7 @@ char *avm_tostring(avm_memcell *m)
   // printf("memcels se prins ------------ type %d\n", m->type);
   // wht();
   assert(m->type >= 0 && m->type <= undef_m);
+  printf("eimai gia na kanw to string type %d\n" , m->type);
   return (*tostringFuncs[m->type])(m);
 }
 
@@ -848,10 +850,18 @@ char *bool_tostring(avm_memcell *kati)
 
 char *table_tostring(avm_memcell *kati)
 {
+  printf("eimai sto table  to stirng\n");
 }
 
 char *userfunc_tostring(avm_memcell *kati)
 {
+  char* s = malloc(sizeof(500));
+  printf("\n\n%d\n\n" , kati->data.funcVal);
+  userFunc* function = consts_get_userfunction_byaddress(kati->data.funcVal);
+
+  sprintf(s , "user function (%s) " , function->id);
+
+  return s;
 }
 
 char *libfunc_tostring(avm_memcell *kati)
@@ -1274,16 +1284,7 @@ void print_stack(){
 
 userFunc* consts_get_userfunction_byaddress(int address)
 {
-//userFunctions
-  int i;
-  printf("1279          %d\n", userFuncSize);
-  userFunc* f ;
-  for(i = 0; i < userFuncSize;i++)
-  {
-    f = userFunctions+i;
-    if(f!=NULL)
-      if(f->address == address) return userFunctions+i;
-  }
-  return NULL;
-
+  int index = code[address].res->val;
+  printf("%d\n" , index);
+  return consts_get_userfunction(index);
 }

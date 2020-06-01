@@ -1,9 +1,7 @@
-x = 1;
-function a(){
-    print(x);
+
+
+function f1()
+{
+
 }
-a();
 
-x++;
-
-a();

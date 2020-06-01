@@ -93,6 +93,7 @@ int accessToFunction(item *new)
         return 1;
     }
     //printf(" proi %s k type %s k scope %d\n",proigoumeno->name,proigoumeno->type,proigoumeno->scope);
+    return 1;
     char *str = returnErrorString("Not access", new->name);
     error(str, yylineno);
   }

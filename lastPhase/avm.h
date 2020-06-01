@@ -332,5 +332,5 @@ void libfunc_objecttotalmembers();
 
 void print_stack();
 
-
 userFunc* consts_get_userfunction_byaddress(int address);
+
