@@ -1,7 +1,10 @@
 
-
-function f1()
-{
-
+function executor (a) {
+    f = (function(a){return(function(a){return(function(a){return(function(a){return a();});});});});
+    print(f(a)(a)(a)(a), "\n");
 }
+
+
+executor(print);
+
 

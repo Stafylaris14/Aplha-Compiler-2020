@@ -312,23 +312,23 @@ void execute_funcend(instr* instr);
 
 void read_bin();
 
-void libfunc_input();
+void libfunc_input(void);
 
-void libfunc_objectmemberkeys();
+void libfunc_objectmemberkeys(void);
 
-void libfunc_objecttotalmembers();
+void libfunc_objecttotalmembers(void);
 
- void libfunc_objectcopy();
+ void libfunc_objectcopy(void);
 
- void libfunc_argument();
+ void libfunc_argument(void);
 
- void libfunc_strtonum();
+ void libfunc_strtonum(void);
 
- void libfunc_sqrt();
+ void libfunc_sqrt(void);
 
- void libfunc_cos();
+ void libfunc_cos(void);
 
- void libfunc_sin();
+ void libfunc_sin(void);
 
 void print_stack();
 

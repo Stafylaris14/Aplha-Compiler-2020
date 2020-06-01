@@ -676,12 +676,22 @@ void write_bin()
 {
     FILE *fp;
     fp = fopen("instructions" , "wb+");
+    size_t size = 0;
     // instr
     int i;
     fwrite(&total_globals , sizeof(int) , 1 , fp);
     fwrite(&current_instraction , sizeof(int) , 1 , fp);
     for(i =0 ; i < current_instraction; i++)
         fwrite(&instructions[i] , sizeof(instr) ,1, fp);
+    //sizes
+    size = sizeof(stringConsts);
+    fwrite(&size , sizeof(size_t) , 1 , fp);
+    size = sizeof(numConsts);
+    fwrite(&size , sizeof(size_t) , 1 , fp);
+    size = sizeof(namedLibFuncs);
+    fwrite(&size , sizeof(size_t) , 1 , fp);
+    size = sizeof(userFuncs);
+    fwrite(&size , sizeof(size_t) , 1 , fp);
     // consts
     for(i =0 ; i< numConstSize;i++)
         fwrite(&numConsts[i] ,sizeof(numConsts[i]) , 1 , fp );

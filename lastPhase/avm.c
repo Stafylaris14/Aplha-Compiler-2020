@@ -1,4 +1,6 @@
 #include "avm.h"
+#include <stdio.h>
+#include <math.h>
 #include "./dataStructs/linkedList.h"
 
 char *typeStrings[8] = {"number_m",
@@ -27,6 +29,7 @@ memclear_func_t memclearFuncs[] = {
 #define execute_mul execute_arithmetic
 #define execute_div execute_arithmetic
 #define execute_mod execute_arithmetic
+#define PI 3.14159265
 
 typedef char *(*tostring_func_t)(avm_memcell *);
 
@@ -220,7 +223,7 @@ void execute_cycle(void)
   else
   {
 
-    // printf("to pc %d kai ending %d\n",pc,AVM_ENDING_PC);
+    printf("to pc %d kai ending %d\n",pc,AVM_ENDING_PC);
     assert(pc < AVM_ENDING_PC); //2:	PUSHARG		01(formal)0:x    afto thelouyme!!!!
     instr *instr1 = code + pc;
     cyn();
@@ -770,13 +773,9 @@ void execute_funcstart(instr *instr)
 
 unsigned avm_get_envvalue(unsigned i)
 {
-
   //assert(stack[i].type == number_m);
-
   unsigned val = (unsigned)stack[i].data.numVal;
-
-  assert(stack[i].data.numVal == ((double)val));
-
+  // assert(stack[i].data.numVal == ((double)val));
   return val;
 }
 
@@ -866,11 +865,29 @@ char *userfunc_tostring(avm_memcell *kati)
 
 char *libfunc_tostring(avm_memcell *kati)
 {
+  char* s = malloc(100);
+
+
+  sprintf(s , "Library Function (%s)" , kati->data.libFuncVal);
+
+  return s;
+
+
 }
 
-char *nil_tostring(avm_memcell *kati) {}
+char *nil_tostring(avm_memcell *kati) {
+  char*s = "Nill";
 
-char *undef_tostring(avm_memcell *kati) {}
+  return s;
+
+}
+
+char *undef_tostring(avm_memcell *kati) {
+
+  char* s="Undefined";
+  return s;
+
+}
 
 void avm_initialize(void)
 {
@@ -1146,6 +1163,7 @@ void execute_getretval(instr *instr)
 
 void read_bin()
 {
+  size_t size;
 
   FILE *fp = fopen("instructions", "rb");
   fread(&total_globs , sizeof(int) , 1 , fp);
@@ -1160,6 +1178,19 @@ void read_bin()
     fread(&code[i], sizeof(instr), 1, fp);
     printf("--- code[%d] : %d \n", i, code[i].op);
   }
+  //sizes
+    //string
+    fread(&size , sizeof(size_t) , 1 , fp);
+    const_strings = malloc(size);
+    //nums
+    fread(&size , sizeof(size_t) , 1 , fp);
+    const_numbers = malloc(size);
+    //libfuncs
+    fread(&size , sizeof(size_t) , 1 , fp);
+    library_functions = malloc(size);
+    //userfunctions
+    fread(&size , sizeof(size_t) , 1 , fp);
+    userFunctions = malloc(size);
   // consts
   // num
   const_numbers = malloc(sizeof(numConstSize));
@@ -1169,7 +1200,7 @@ void read_bin()
   }
 
   //strings
-  const_strings = malloc(sizeof(char *) * stringConstSize);
+  // const_strings = malloc(sizeof(char *) * stringConstSize);
   for ( i = 0; i < stringConstSize; i++)
   {
     fread(&const_strings[i], sizeof(char *), 1, fp);
@@ -1177,7 +1208,6 @@ void read_bin()
 
   //lib functions
 
-  library_functions = malloc(sizeof(char *) * namedLibFuncsSize);
 
   for (i = 0; i < namedLibFuncsSize; i++)
   {
@@ -1185,7 +1215,6 @@ void read_bin()
   }
 
   //userfuncs
-  userFunctions = malloc(sizeof(userFunc) * userFuncSize);
     yel();
     printf("%d\n" , userFuncSize);
   for (i = 0; i < userFuncSize; i++){
@@ -1201,40 +1230,116 @@ void read_bin()
 //   fread(&stringConstss[i],sizeof(char*),1,tester);
 // }
 
-void libfunc_input()
+void libfunc_input(void)
 {
 }
 
-void libfunc_objectmemberkeys()
+void libfunc_objectmemberkeys(void)
 {
 }
 
-void libfunc_objecttotalmembers()
+void libfunc_objecttotalmembers(void)
 {
 }
 
-void libfunc_objectcopy()
+void libfunc_objectcopy(void)
 {
 }
 
-void libfunc_argument()
+void libfunc_argument(void)
 {
+
+  unsigned p_topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
+  avm_memcellclear(&retval);
+  
+  if (!p_topsp)
+  {
+    avm_error("'totalarguments'called outside a function!");
+    retval.type = nill_m;
+  }
+  else
+  {
+    switch(avm_getactual(0)->type){
+      case number_m:
+        retval.type = number_m;
+        retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET +avm_getactual(0)->data.numVal);
+      break;
+      case string_m:
+        retval.type = string_m;
+        retval.data.strVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET +avm_getactual(0)->data.strVal);
+        break;
+    }
+    // retval.type = number_m;
+    // retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET +avm_getactual(0)->data.numVal);
+//    printf("argmument %f\n\n" ,retval.data.numVal );
+  }
 }
 
-void libfunc_strtonum()
+void libfunc_strtonum(void)
 {
+  unsigned n = avm_totalactuals();
+  if (n != 1)
+    avm_error("one argument (not %d) expected in 'cos'!", n);
+  else
+  {
+    avm_memcellclear(&retval);
+    avm_memcell *a = avm_getactual(0);
+    retval.type = number_m;
+    retval.data.numVal = atoi(a->data.strVal);
+    printf("strytonum %f\n\n" ,retval.data.numVal );
+  }
+  
 }
 
-void libfunc_sqrt()
+void libfunc_sqrt(void)
 {
+    unsigned n = avm_totalactuals();
+  if (n != 1)
+    avm_error("one argument (not %d) expected in 'sqrt'!", n);
+  else
+  {
+    avm_memcellclear(&retval);
+    avm_memcell *a = avm_getactual(0);
+    if(a->data.numVal <= 0) 
+    {
+      retval.type = nill_m;
+    }else{
+      retval.type = number_m;
+      retval.data.numVal = sqrt(a->data.numVal);
+      printf("sqr %f\n",retval.data.numVal);
+    }
+  }
 }
 
-void libfunc_cos()
+void libfunc_cos(void)
 {
+  unsigned n = avm_totalactuals();
+  if (n != 1)
+    avm_error("one argument (not %d) expected in 'cos'!", n);
+  else
+  {
+    avm_memcellclear(&retval);
+    avm_memcell *a = avm_getactual(0);
+    retval.type = number_m;
+    retval.data.numVal = cos(a->data.numVal *(PI/180));
+    printf("cosss %f\n",retval.data.numVal);
+  }
 }
+
 
 void libfunc_sin()
 {
+    unsigned n = avm_totalactuals();
+  if (n != 1)
+    avm_error("one argument (not %d) expected in 'sin'!", n);
+  else
+  {
+    avm_memcellclear(&retval);
+    avm_memcell *a = avm_getactual(0);
+    retval.type = number_m;
+    retval.data.numVal = sin(a->data.numVal *(PI/180));
+    printf("sin %f\n",retval.data.numVal);
+  }
 }
 
 
