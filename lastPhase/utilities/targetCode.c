@@ -14,6 +14,7 @@ char **namedLibFuncs;
 int namedLibFuncsSize = 0;
 struct userFunc *userFuncs[CONST_ARR_SIZE];
 int userFuncSize = 0;
+int total_globals=0;
 generator_func_t generators[] = {
     generate_ASSIGN,
     generate_ADD,
@@ -301,7 +302,7 @@ void print_instructions()
         // instructions[i].arg2->val,
         // get_string_vmargtype(instructions[i].arg2));
     }
-    printf("eimai edw gia to curr einai %d\n" ,current_instraction );
+    //printf("eimai edw gia to curr einai %d\n" ,current_instraction );
     print_const_arrays();
 }
 
@@ -309,6 +310,7 @@ void print_const_arrays()
 {
     int i;
     grn();
+    printf("to total globals einia %d\n" , total_globals);
     printf("-----NUM CONSTS -----\n");
     for (i = 0; i < numConstSize; i++)
     {
@@ -365,6 +367,7 @@ vmarg* make_operand(expr *e)
         {
         case program_variable:
             arg->type = global_a;
+            total_globals++;
             break;
         case function_local:
             arg->type = local_a;
@@ -675,6 +678,7 @@ void write_bin()
     fp = fopen("instructions" , "wb+");
     // instr
     int i;
+    fwrite(&total_globals , sizeof(int) , 1 , fp);
     fwrite(&current_instraction , sizeof(int) , 1 , fp);
     for(i =0 ; i < current_instraction; i++)
         fwrite(&instructions[i] , sizeof(instr) ,1, fp);
@@ -718,6 +722,5 @@ void print_quad(quad q)
     printf("-----------------------------------\n");
     wht();
 }
-
 
 

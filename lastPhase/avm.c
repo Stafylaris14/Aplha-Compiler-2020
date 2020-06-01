@@ -142,15 +142,17 @@ avm_memcell stack[AVM_STACKSIZE];
 
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
 {
-  //printf("translate type %d\n", arg->type);
+ // printf("translate type %d\n", arg->type);
   switch (arg->type)
   {
   case global_a:
+    yel();
+   //  printf("edw einai to val %d\n" , arg->val);
+    wht();
     return &stack[AVM_STACKSIZE - 1 - arg->val];
   case local_a:
     return &stack[topsp - arg->val];
   case formal_a:
-    // assert(0);
     return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];
   case retval_a:
     return &retval;
@@ -171,7 +173,6 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
     reg->type = userfunc_m;
     userFunc *t = consts_get_userfunction(arg->val);
     reg->data.funcVal = t->address;
-    printf("miso %d\n" , t->address);
     return reg;
   case libFunc_a:
     reg->type = libfunc_m;
@@ -218,6 +219,7 @@ void execute_cycle(void)
   }
   else
   {
+
     // printf("to pc %d kai ending %d\n",pc,AVM_ENDING_PC);
     assert(pc < AVM_ENDING_PC); //2:	PUSHARG		01(formal)0:x    afto thelouyme!!!!
     instr *instr1 = code + pc;
@@ -227,7 +229,7 @@ void execute_cycle(void)
     assert(instr1->op >= 0 && instr1->op <= AVM_MAX_INSTRUCTIONS);
     // if (instr1->srcLine)
     //     oldPC = pc;
-    printf("instruction %d - opcode %d\n", pc,instr1->op);
+     printf("instruction %d - opcode %d\n", pc,instr1->op);
     
     (*executeFuncs[instr1->op])(instr1);
     if (pc == oldPC)
@@ -245,13 +247,14 @@ void avm_callsaveenvironment(void)
 
 void execute_funcend(instr *unused)
 {
-  printf("eimai stin funcend\n");
+ // printf("eimai stin funcend\n");
   unsigned oldTop = top;
   top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
   pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
   topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
-  while (oldTop++ <= top)
+  while (oldTop++ <= top){
     avm_memcellclear(&stack[oldTop]);
+  }
 }
 
 void avm_dec_top(void)
@@ -321,7 +324,7 @@ void libfunc_print(void)
   for (i = 0; i < n; ++i)
   {
     char *s = avm_tostring(avm_getactual(i));
-    printf("kane printsss %s\n", s);
+    //printf("kane printsss %s\n", s);
     grn();
     puts(s);
     wht();
@@ -396,12 +399,13 @@ void execute_arithmetic(instr *instr)
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
-  printf("eimai edw s lew asset\n");
+ // printf("eimai edw s lew asset\n");
   // assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval));
   assert(rv1 && rv2);
-
+// printf("type gamaw %d kai den gamaw %d\n",rv1->type,rv2->type);
   if (rv1->type != number_m || rv2->type != number_m)
   {
+    
     avm_error("not a number in arithmetic!\n");
     executionFinished = 1;
   }
@@ -411,7 +415,6 @@ void execute_arithmetic(instr *instr)
     avm_memcellclear(lv);
     lv->type = number_m;
     lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
-    printf("se blepw %f kai %f apotelesma %f\n", rv1->data.numVal, rv2->data.numVal, lv->data.numVal);
   }
 }
 
@@ -491,9 +494,8 @@ void avm_tabledestroy(avm_table *t)
 
 void execute_if_eq(instr *instr)
 {
-  puts("eimai if eq");
+  // puts("eimai if eq");
   assert(instr->res->type == label_a);
-
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
 
@@ -501,7 +503,9 @@ void execute_if_eq(instr *instr)
 
   if (rv1->type == undef_m || rv2->type == undef_m)
   {
+    printf("se blepw %f kai %f \n", rv1->data.numVal, rv2->data.numVal);
     avm_error("'undef'involved in equality!");
+    //print_stack();
   }
   else if (rv1->type == nill_m || rv2->type == nill_m)
   {
@@ -509,28 +513,30 @@ void execute_if_eq(instr *instr)
   }
   else if (rv1->type == bool_m || rv2->type == bool_m)
   {
-    printf("av1 %d kai av2 %d\n",rv1->data.boolVal,rv2->data.boolVal);
+    //printf("av1 %d kai av2 %d\n",rv1->data.boolVal,rv2->data.boolVal);
     result = (avm_tobool(rv1) == avm_tobool(rv2));
   }
-  else if (rv1->type != rv2->type)
+  else if (rv1->type != rv2->type){
+    printf("se blepw %d kai %d \n", rv1->type, rv2->type);
     avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
+  }
   else
   {
-    if (rv1->type == string_m)
+    if (rv2->type == string_m)
       result = !strcmp(rv1->data.strVal, rv2->data.strVal);
-    else if (rv1->type == number_m)
+    else if (rv2->type == number_m)
       result = rv1->data.numVal == rv2->data.numVal;
-    else if (rv1->type == userfunc_m)
+    else if (rv2->type == userfunc_m)
       result = rv1->data.funcVal == rv2->data.funcVal;
-    else if (rv1->type == libfunc_m)
+    else if (rv2->type == libfunc_m)
       result = !strcmp(rv1->data.libFuncVal, rv2->data.libFuncVal);
-    else if (rv1->type == table_m)
+    else if (rv2->type == table_m)
       result = rv1->data.tableVal == rv2->data.tableVal;
   }
-  printf("kalimeres me jumo %d kai exe exe %d\n",result,instr->res->val);
+   printf("kalimeres me jumo %d kai exe exe %d\n",result,instr->res->val);
   
   if(result == 1){
-    printf("allazw pc re manm \n");
+   // printf("allazw pc re manm \n");
     pc = instr->res->val;
   }
 
@@ -658,7 +664,7 @@ void execute_assign(instr *instr)
   avm_memcell *rv = avm_translate_operand(instr->arg1, &ax);
 
   grn();
-  printf("lv eeeeeeeeeeeeeeeeeeeee .type == %d , rv.type  == %d\n" ,lv->type, rv->data.boolVal );
+  //printf("lv eeeeeeeeeeeeeeeeeeeee .type == %d , rv.type  == %d\n" ,lv->type, rv->data.boolVal );
   wht();
   //na dw ligo to assert
   //assert(lv && ((&stack[AVM_STACKENV_SIZE] >= lv && lv > &stack[top]) || lv == &retval));
@@ -693,21 +699,23 @@ void avm_error(char *format, ...)
 {
   red();
   printf("AVM ERROR %s\n", format);
+  // print_stack();
   wht();
 }
 
 char *avm_tostring(avm_memcell *m)
 {
-  mag();
-  printf("memcels se prins ------------ type %d\n", m->type);
-  wht();
+  // mag();
+  // printf("memcels se prins ------------ type %d\n", m->type);
+  // wht();
   assert(m->type >= 0 && m->type <= undef_m);
   return (*tostringFuncs[m->type])(m);
 }
 
 void execute_call(instr *instr)
 {
-  // puts("eimai stin call");
+  yel();
+  puts("eimai stin call");
   avm_memcell *func = avm_translate_operand(instr->arg1, &ax);
   assert(func);
   avm_callsaveenvironment();
@@ -715,45 +723,45 @@ void execute_call(instr *instr)
 
   switch (func->type)
   {
-  case userfunc_m:
-  {
-    pc = func->data.funcVal;
-    yel();
-    printf("to func->data.funcVal einai %d\n" , func->data.funcVal);
-    wht();
-    assert(pc < AVM_ENDING_PC);
-    yel();
-    printf("%d\n" ,code[pc].op);
-    assert(code[pc].op == enterfunc_v);
-    break;
-  }
-  case string_m:
-    avm_calllibfunc(func->data.strVal);
-    break;
-  case libfunc_m:
-    printf("eimai edw!!!! %s\n", func->data.libFuncVal);
-    avm_calllibfunc(func->data.libFuncVal);
-    break;
-  default:
-  {
-    char *s = avm_tostring(func);
-    avm_error("call: cannot bind '%s' to function!", s);
-    free(s);
-    executionFinished = 1;
-  }
+    case userfunc_m:
+    {
+      pc = func->data.funcVal;
+      // yel();
+      // printf("to func->data.funcVal einai %d\n" , func->data.funcVal);
+      // wht();
+      assert(pc < AVM_ENDING_PC);
+      yel();
+      // printf("%d\n" ,code[pc].op);
+      assert(code[pc].op == enterfunc_v);
+      break;
+    }
+    case string_m:
+      avm_calllibfunc(func->data.strVal);
+      break;
+    case libfunc_m:
+      printf("eimai edw!!!! %s\n", func->data.libFuncVal);
+      avm_calllibfunc(func->data.libFuncVal);
+      break;
+    default:
+    {
+      char *s = avm_tostring(func);
+      avm_error("call: cannot bind '%s' to function!", s);
+      free(s);
+      executionFinished = 1;
+    }
   }
 }
 
 void execute_funcstart(instr *instr)
 {
   printf("eimai stin funcstart\n");
-  avm_memcell *func = avm_translate_operand(instr->arg1, &ax);
+  avm_memcell *func = avm_translate_operand(instr->res, &ax);
 
   assert(pc == func->data.funcVal);
   assert(func);
 
   totalActuals = 0;
-  userFunc *funcInfo = consts_get_userfunction(pc);
+  userFunc *funcInfo = consts_get_userfunction(instr->res->val);
   topsp = top;
   top = top - funcInfo->localsize;
 }
@@ -792,12 +800,12 @@ void avm_calllibfunc(char *funcName)
 
 void execute_param(instr *instr)
 {
-  red();
-  printf("eimai stin param kai to type tou instr einia %d\n" , instr->arg1->type);
-  wht();
+  // red();
+ // printf("eimai stin param kai to type tou instr einia %d\n" , instr->arg1->type);
+  // wht();
   avm_memcell *arg = avm_translate_operand(instr->arg1, &ax);
-  red();
-  printf("%f\n", arg->data.numVal);
+  // red();
+  // printf("%f\n", arg->data.numVal);
   wht();
   assert(arg);
   grn();
@@ -858,8 +866,8 @@ void avm_initialize(void)
 {
   //krataw xwro gia tis global
 
-  top = AVM_STACKSIZE;
-  topsp = AVM_STACKSIZE;
+  top = AVM_STACKSIZE - total_globs;
+  topsp = AVM_STACKSIZE - total_globs;
   avm_initstack();
   avm_registerlibfunc("print", libfunc_print);
   avm_registerlibfunc("input", libfunc_input);
@@ -1130,7 +1138,7 @@ void read_bin()
 {
 
   FILE *fp = fopen("instructions", "rb");
-
+  fread(&total_globs , sizeof(int) , 1 , fp);
   fread(&codeSize, sizeof(int), 1, fp);
   char buffer[10];
   code = malloc(sizeof(instr) * codeSize);
@@ -1225,9 +1233,9 @@ void print_stack(){
   cyn();
   printf("----------type---------data\n\n");
   int i;
-  for(i = AVM_STACKSIZE; i < AVM_STACKSIZE - pc; i--)
+  for(i = AVM_STACKSIZE; i > 4088; i--)
   {
-    printf("|       %d      " , stack[i].type);
+    printf("[%d]|       %d      " ,i, stack[i].type);
 
     switch (stack[i].type)
     {
@@ -1245,7 +1253,7 @@ void print_stack(){
       printf("table\n");
       break;
     case userfunc_m:
-      printf("userFunc\n");
+      printf(" \n");
       break;
     case libfunc_m:
       printf("libfunc\n");
@@ -1254,7 +1262,7 @@ void print_stack(){
       printf("nilll\n");
       break;
     case undef_m:
-      printf("undeff\n");
+      printf(" \n");
       break;
     default:
       break;
@@ -1262,4 +1270,20 @@ void print_stack(){
 
   }
   printf("-------------------------\n");
+}
+
+userFunc* consts_get_userfunction_byaddress(int address)
+{
+//userFunctions
+  int i;
+  printf("1279          %d\n", userFuncSize);
+  userFunc* f ;
+  for(i = 0; i < userFuncSize;i++)
+  {
+    f = userFunctions+i;
+    if(f!=NULL)
+      if(f->address == address) return userFunctions+i;
+  }
+  return NULL;
+
 }

@@ -11,7 +11,7 @@
 #define AVM_MAX_INSTRUCTIONS 100 //den xerw!!
 //top , topsp gia tin stiva
 unsigned top  , topsp ;
-
+int total_globs;
 
 typedef void (*library_func_t) (void);
 
@@ -331,3 +331,6 @@ void libfunc_objecttotalmembers();
  void libfunc_sin();
 
 void print_stack();
+
+
+userFunc* consts_get_userfunction_byaddress(int address);
