@@ -545,9 +545,16 @@ void execute_if_eq(instr *instr) //dial 15
   // }
 }//////////////////////////////////////////////////////////////////////////////
 
-void execute_tablecreate(instr *instr)
+int hash_int(int val)
 {
   printf("kane create table\n");
+  avm_memcell *lv = avm_translate_operand(instr->arg1, (avm_memcell *)0);
+
+ // assert(lv && (&stack[top] <= lv && &stack[top] > lv || lv == &retval));
+
+void execute_tablecreate(instr *instr) // dial 15
+{
+  printf("eimai sto table\n");
   avm_memcell *lv = avm_translate_operand(instr->arg1, (avm_memcell *)0);
 
  // assert(lv && (&stack[top] <= lv && &stack[top] > lv || lv == &retval));
@@ -660,9 +667,26 @@ void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val)
    table->total = table->total +1;
   printf("ftia3imoooooo\n");
   //den 3erw ti fasei prepei na to doume
+  int index = 0;
+  switch(key->type)
+  {
+    case number_m:
+    index = hash_int(key->data.numVal);
+      table->numIndexed[index] = malloc(sizeof(avm_table_bucket));
+      table->numIndexed[index]->key.data.numVal = key->data.numVal;
+      table->numIndexed[index]->value.data.numVal = val->data.numVal;
+    break;
+    case string_m:
+      index = hash_int(key->data.strVal);    
+      table->strIndexed[index]->key.data.strVal = key->data.strVal;
+      table->strIndexed[index]->value.data.strVal = val->data.strVal;
+    break;
+    default:
+      assert(0);
+  }  
 }
 
-void execute_tablegetelem(instr *instr)
+void execute_tablegetelem(instr *instr) // dial 15
 {
 
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
