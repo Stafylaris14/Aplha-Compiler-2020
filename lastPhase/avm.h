@@ -330,6 +330,4 @@ void print_stack();
 
 userFunc* consts_get_userfunction_byaddress(int address);
 
-int hash_int(int val);
-
-int hash_string (char* val);
+int hash_avm(avm_memcell *key);

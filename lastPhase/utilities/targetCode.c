@@ -132,8 +132,13 @@ void generate_RETURN(quad q){
     instr i ;
     i.op = assign_v;
     i.res = make_operand_returnval();
-    i.arg1 = make_operand(q.arg1);
+    i.arg1 = make_operand(q.result);
+    mag();
+    print_quad(q);
+   // printf("to val arg1 einia %d\n" , q.arg1->sym->);
+    wht();
     emit_instruction(i);
+
 }
 void generate_GETRETVAL(quad q){
     q.next_instr_label = get_next_instr_label();
@@ -353,11 +358,12 @@ vmarg* make_operand(expr *e)
     switch (expressionType)
     {
     case boolexpr_:
-    case arthmexp_:
+    case arthmexp_: 
     case newtable_:
     case var_: 
     case tableitem_:
     {
+        
         arg->val = e->sym->offset;
 
         switch (e->sym->scope_spase)
@@ -375,6 +381,7 @@ vmarg* make_operand(expr *e)
         default:
             assert(0);
         }
+        
         break;
         //return arg;
     }
@@ -397,7 +404,6 @@ vmarg* make_operand(expr *e)
         // TODO ????????
         break;
     case lfunc_:
-        printf("mpika edw!\n");
         arg->type = libFunc_a;
         arg->val = consts_add_namedLibFuncs(e->sym->name);
         break;
@@ -449,7 +455,7 @@ vmarg *make_operand_returnval()
 {
     vmarg* a1 = malloc(sizeof(vmarg));
     a1->type = retval_a;
-    a1->val = -1;
+    //a1->val = -1;
     return a1;
 }
 

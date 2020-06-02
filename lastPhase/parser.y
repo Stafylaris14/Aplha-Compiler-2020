@@ -27,6 +27,7 @@ stack1 *loopcounterstack; //krataei poses anakikloseis exoun anoi3ei
 /* iopcode op; */
 extern int executionFinished;
 extern int currQuad;
+extern int tmp_count;
 
 
 expr *result;
@@ -194,6 +195,7 @@ Stmt: Expression semicolon {
                 backpatch($1->falselist, nextquad());
                 assign_flag = 0;
         }
+        tmp_count = 0;
         $$ = $1;
     } 
     | Ifstmt {$$ = $1;}
@@ -914,7 +916,7 @@ Returnstmt: Return semicolon {libcheck =0;
         } Expression semicolon {libcheck =0;
         returnFlag =0; 
         $$= $3;
-        emit(RETURN, $3, NULL, NULL, -1);
+        emit(RETURN, NULL, NULL, $3, -1);
         emit(JUMP,NULL,NULL,NULL,-1);
         $$->returnlist = new_list(nextquad()-1);
         }
@@ -951,7 +953,7 @@ int main(int argc, char** argv)
     
     //printSymTable();
     //printHash();
-    //printScopeList();
+    printScopeList();
     
     print_quads();
     generate();

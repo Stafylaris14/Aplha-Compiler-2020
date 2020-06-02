@@ -1,4 +1,4 @@
-string = "elllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllla\n";
+x =[2,3] ;
 
-
-print(string);
+y = x[1];
+print(y);
