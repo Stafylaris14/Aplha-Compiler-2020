@@ -7,7 +7,7 @@
 #define AVM_STACKENV_SIZE 4
 #define AVM_STACKSIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
-#define AVM_TABLE_HASHSIZE 211
+#define AVM_TABLE_HASHSIZE 1
 #define AVM_MAX_INSTRUCTIONS 1000 //den xerw!!
 //top , topsp gia tin stiva
 unsigned top  , topsp ;

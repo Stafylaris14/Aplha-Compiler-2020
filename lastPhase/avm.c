@@ -566,15 +566,19 @@ avm_memcell *avm_tablegetelem(avm_table *table ,avm_memcell *key)
 
   if(key->type == number_m)
   {
-    pinakas = table->numIndexed[index];
+     pinakas = table->numIndexed[index];
     if (pinakas == NULL){avm_error("Cannot access to table\n");assert(0);}
-    if(pinakas->key.data.numVal!=key->data.numVal){
+    if(pinakas->key.data.numVal != key->data.numVal){
       avm_table_bucket* tmp  = pinakas;
       // if(tmp == NULL) assert(0);
+      red();
       
       while( tmp!=NULL && tmp->key.data.numVal!=key->data.numVal){
+        printf("eisai g ton poutso %f kai %f \n",tmp->key.data.numVal,key->data.numVal);
         tmp = tmp->next;
       }
+      if(tmp == NULL) assert(0);
+      return &tmp->value;
     }
     return &pinakas->value;
   }else if(key->type == string_m)
@@ -617,11 +621,13 @@ void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val)
         Node->value = *val;
         Node->next = NULL; 
        avm_table_bucket* tmp = pinakas;       
-        while(tmp != NULL){
+        while(tmp->next != NULL){
           tmp = tmp->next;
         }
-        tmp = Node;
+        tmp->next = Node;
+        //pinakas->next = Node;
        // pinakas = Node;
+        //pinakas->next = NULL;
         //       printf("mastoraaaaa %f\n",tmp->value.data.numVal);
         // wht();
     }
