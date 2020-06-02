@@ -146,7 +146,7 @@ avm_memcell stack[AVM_STACKSIZE];
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg) //dial 15
 {
  // printf("translate type %d\n", arg->type);
- if(reg == NULL)reg = malloc(sizeof(avm_memcell));
+//  if(reg == NULL)reg = malloc(sizeof(avm_memcell));
   switch (arg->type)
   {
   case global_a:
@@ -545,16 +545,9 @@ void execute_if_eq(instr *instr) //dial 15
   // }
 }//////////////////////////////////////////////////////////////////////////////
 
-int hash_int(int val)
+void execute_tablecreate(instr *instr)
 {
   printf("kane create table\n");
-  avm_memcell *lv = avm_translate_operand(instr->arg1, (avm_memcell *)0);
-
- // assert(lv && (&stack[top] <= lv && &stack[top] > lv || lv == &retval));
-
-void execute_tablecreate(instr *instr) // dial 15
-{
-  printf("eimai sto table\n");
   avm_memcell *lv = avm_translate_operand(instr->arg1, (avm_memcell *)0);
 
  // assert(lv && (&stack[top] <= lv && &stack[top] > lv || lv == &retval));
@@ -581,7 +574,7 @@ avm_memcell *avm_tablegetelem(avm_table *table ,avm_memcell *key)
       red();
       
       while( tmp!=NULL && tmp->key.data.numVal!=key->data.numVal){
-        printf("eisai g ton poutso %f kai %f \n",tmp->key.data.numVal,key->data.numVal);
+        //printf("eisai g ton poutso %f kai %f \n",tmp->key.data.numVal,key->data.numVal);
         tmp = tmp->next;
       }
       if(tmp == NULL) assert(0);
@@ -667,26 +660,9 @@ void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val)
    table->total = table->total +1;
   printf("ftia3imoooooo\n");
   //den 3erw ti fasei prepei na to doume
-  int index = 0;
-  switch(key->type)
-  {
-    case number_m:
-    index = hash_int(key->data.numVal);
-      table->numIndexed[index] = malloc(sizeof(avm_table_bucket));
-      table->numIndexed[index]->key.data.numVal = key->data.numVal;
-      table->numIndexed[index]->value.data.numVal = val->data.numVal;
-    break;
-    case string_m:
-      index = hash_int(key->data.strVal);    
-      table->strIndexed[index]->key.data.strVal = key->data.strVal;
-      table->strIndexed[index]->value.data.strVal = val->data.strVal;
-    break;
-    default:
-      assert(0);
-  }  
 }
 
-void execute_tablegetelem(instr *instr) // dial 15
+void execute_tablegetelem(instr *instr)
 {
 
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
