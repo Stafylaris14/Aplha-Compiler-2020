@@ -121,9 +121,6 @@ void generate_CALL(quad q)
     emit_instruction(i);
 }
 void generate_PARAM(quad q){
-    print_quad(q);
-    printf("param\n");
-    
     instr i;
     q.next_instr_label = get_next_instr_label();
     i.arg2 = NULL;

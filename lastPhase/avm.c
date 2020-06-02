@@ -107,14 +107,14 @@ int number_of_lib = 0;
 typedef double (*arithmetic_func_t)(double x, double y);
 
 typedef unsigned char (*tobool_func_t)(avm_memcell *);
-unsigned char number_tobool(avm_memcell *m) { return m->data.numVal != 0; }
-unsigned char string_tobool(avm_memcell *m) { return m->data.strVal[0] != 0; }
-unsigned char bool_tobool(avm_memcell *m) { return m->data.boolVal; }
-unsigned char table_tobool(avm_memcell *m) { return 1; }
-unsigned char userfunc_tobool(avm_memcell *m) { return 1; }
-unsigned char libfunc_tobool(avm_memcell *m) { return 1; }
-unsigned char nil_tobool(avm_memcell *m) { return 0; }
-unsigned char undef_tobool(avm_memcell *m)
+unsigned char number_tobool(avm_memcell *m) { return m->data.numVal != 0; } //dial 15
+unsigned char string_tobool(avm_memcell *m) { return m->data.strVal[0] != 0; }//dial 15
+unsigned char bool_tobool(avm_memcell *m) { return m->data.boolVal; }//dial 15
+unsigned char table_tobool(avm_memcell *m) { return 1; }//dial 15
+unsigned char userfunc_tobool(avm_memcell *m) { return 1; }//dial 15
+unsigned char libfunc_tobool(avm_memcell *m) { return 1; }//dial 15
+unsigned char nil_tobool(avm_memcell *m) { return 0; }//dial 15
+unsigned char undef_tobool(avm_memcell *m) //dial 15
 {
   assert(0);
   return 0;
@@ -131,7 +131,7 @@ char **nameLibfuncs;
 unsigned totalNameLibfuncs;
 unsigned totalUserFuncs;
 
-tobool_func_t toboolFuncs[] = {
+tobool_func_t toboolFuncs[] = { //dial 15
     number_tobool,
     string_tobool,
     bool_tobool,
@@ -143,15 +143,12 @@ tobool_func_t toboolFuncs[] = {
 
 avm_memcell stack[AVM_STACKSIZE];
 
-avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
+avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg) //dial 15
 {
  // printf("translate type %d\n", arg->type);
   switch (arg->type)
   {
   case global_a:
-    yel();
-   //  printf("edw einai to val %d\n" , arg->val);
-    wht();
     return &stack[AVM_STACKSIZE - 1 - arg->val];
   case local_a:
     return &stack[topsp - arg->val];
@@ -172,7 +169,6 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
     reg->data.strVal = consts_get_string(arg->val);
     return reg;
   case userFunc_a:
-    yel();
     reg->type = userfunc_m;
     userFunc *t = consts_get_userfunction(arg->val);
     reg->data.funcVal = t->address;
@@ -188,27 +184,27 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
 }
 
 //GET CONSTS
-int consts_get_number(int index)
+int consts_get_number(int index) //dial 15
 {
   return numConsts[index];
 }
 
-char *consts_get_string(int index)
+char *consts_get_string(int index) //dial 15
 {
   return stringConsts[index];
 }
 
-userFunc *consts_get_userfunction(int index)
+userFunc *consts_get_userfunction(int index) //dial 15
 {
   return userFuncs[index];
 }
 
-char *consts_get_libFunction(int index)
+char *consts_get_libFunction(int index)//dial 15
 {
   return namedLibFuncs[index];
 }
 
-void execute_cycle(void)
+void execute_cycle(void) //dial 15
 {
     mag();
    // printf("to pc einai %d\n" , pc);
@@ -230,8 +226,7 @@ void execute_cycle(void)
    // printf("to opeinai %d\n" , instr1->op);
     unsigned oldPC = pc;
     assert(instr1->op >= 0 && instr1->op <= AVM_MAX_INSTRUCTIONS);
-    // if (instr1->srcLine)
-    //     oldPC = pc;
+
      printf("instruction %d - opcode %d\n", pc,instr1->op);
     
     (*executeFuncs[instr1->op])(instr1);
@@ -240,7 +235,7 @@ void execute_cycle(void)
   }
 }
 
-void avm_callsaveenvironment(void)
+void avm_callsaveenvironment(void) //dial 15
 {
   avm_push_envvalue(totalActuals);
   avm_push_envvalue(pc + 1);
@@ -248,7 +243,7 @@ void avm_callsaveenvironment(void)
   avm_push_envvalue(topsp);
 }
 
-void execute_funcend(instr *unused)
+void execute_funcend(instr *unused) // dial 15
 {
  // printf("eimai stin funcend\n");
   unsigned oldTop = top;
@@ -260,7 +255,7 @@ void execute_funcend(instr *unused)
   }
 }
 
-void avm_dec_top(void)
+void avm_dec_top(void) //dial 15
 {
   if (!top)
   {
@@ -271,14 +266,14 @@ void avm_dec_top(void)
     --top;
 }
 
-void avm_push_envvalue(unsigned val)
+void avm_push_envvalue(unsigned val) //dial 15
 {
   stack[top].type = number_m;
   stack[top].data.numVal = val;
   avm_dec_top();
 }
 
-library_func_t avm_getlibraryfunc(char *id)
+library_func_t avm_getlibraryfunc(char *id) //dial 15
 {
   if (!strcmp("print", id))
     return libfunc_print;
@@ -308,18 +303,18 @@ library_func_t avm_getlibraryfunc(char *id)
   return NULL;
 }
 
-unsigned avm_totalactuals(void)
+unsigned avm_totalactuals(void) //dial 15
 {
   return avm_get_envvalue(topsp + AVM_NUMACTUALS_OFFSET);
 }
 
-avm_memcell *avm_getactual(unsigned i)
+avm_memcell *avm_getactual(unsigned i) // dial 15
 {
   assert(i < avm_totalactuals());
   return &stack[topsp + AVM_STACKENV_SIZE + 1 + i];
 }
 
-void libfunc_print(void)
+void libfunc_print(void) // dial 15
 {
   unsigned n = avm_totalactuals();
   unsigned i;
@@ -336,12 +331,12 @@ void libfunc_print(void)
   }
 }
 
-void avm_registerlibfunc(char *id, library_func_t addr)
+void avm_registerlibfunc(char *id, library_func_t addr) //dial 15 
 {
   librarys[number_of_lib++] = addr;
 }
 
-void libfunc_typeof(void)
+void libfunc_typeof(void) //dial 15
 {
   unsigned n = avm_totalactuals();
   if (n != 1)
@@ -354,7 +349,7 @@ void libfunc_typeof(void)
   }
 }
 
-void libfunc_totalarguments(void)
+void libfunc_totalarguments(void) //dial 15
 {
   unsigned p_topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
   avm_memcellclear(&retval);
@@ -371,19 +366,19 @@ void libfunc_totalarguments(void)
   }
 }
 
-double add_impl(double x, double y) { return x + y; }
+double add_impl(double x, double y) { return x + y; } //front
 
-double sub_impl(double x, double y) { return x - y; }
+double sub_impl(double x, double y) { return x - y; } //front
 
-double mul_impl(double x, double y) { return x * y; }
+double mul_impl(double x, double y) { return x * y; } //front
 
 double div_impl(double x, double y)
 {
-  printf("tsekarw g error\n");
+  printf("tsekarw g error\n"); //front
   return x / y;
 }
 
-double mod_impl(double x, double y)
+double mod_impl(double x, double y) //front
 {
   printf("tsekarw g error\n");
   if (y == 0)
@@ -398,7 +393,7 @@ arithmetic_func_t arithmeticFuncs[] = { //na balo sto header
     div_impl,
     mod_impl};
 
-void execute_arithmetic(instr *instr)
+void execute_arithmetic(instr *instr) // dial 15
 {
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
@@ -422,7 +417,7 @@ void execute_arithmetic(instr *instr)
   }
 }
 
-unsigned char avm_tobool(avm_memcell *m)
+unsigned char avm_tobool(avm_memcell *m) //dial 15
 {
   assert(m->type >= 0 && m->type < undef_m);
 
@@ -440,26 +435,26 @@ static void avm_initstack(void)
   }
 }
 
-void avm_tableincrefcounter(avm_table *t)
+void avm_tableincrefcounter(avm_table *t) //dial 13
 {
   ++t->refCounter;
 }
 
-void avm_tabledecrefcounter(avm_table *t)
+void avm_tabledecrefcounter(avm_table *t) //dial 13
 {
   assert(t->refCounter > 0);
   if (!--t->refCounter)
     avm_tabledestroy(t);
 }
 
-void avm_tablebucketsinit(avm_table_bucket **p)
+void avm_tablebucketsinit(avm_table_bucket **p) //dial 13
 {
   unsigned i;
   for (i = 0; i < AVM_TABLE_HASHSIZE; i++)
     p[i] = (avm_table_bucket *)0;
 }
 
-avm_table *avm_tablenew(void)
+avm_table *avm_tablenew(void) //dia 13
 {
   avm_table *t = (avm_table *)malloc(sizeof(avm_table));
   AVM_WIPEOUT(*t);
@@ -471,7 +466,7 @@ avm_table *avm_tablenew(void)
   return t;
 }
 
-void avm_tablebucketsdestroy(avm_table_bucket **p)
+void avm_tablebucketsdestroy(avm_table_bucket **p) //dial 13
 {
   unsigned i;
   for (i = 0; i < AVM_TABLE_HASHSIZE; ++i, ++p)
@@ -489,14 +484,14 @@ void avm_tablebucketsdestroy(avm_table_bucket **p)
   }
 }
 
-void avm_tabledestroy(avm_table *t)
+void avm_tabledestroy(avm_table *t) //dia 13 
 {
   avm_tablebucketsdestroy(t->strIndexed);
   avm_tablebucketsdestroy(t->numIndexed);
   free(t);
 }
 
-void execute_if_eq(instr *instr)
+void execute_if_eq(instr *instr) //dial 15
 {
   // puts("eimai if eq");
   assert(instr->res->type == label_a);
@@ -507,7 +502,6 @@ void execute_if_eq(instr *instr)
 
   if (rv1->type == undef_m || rv2->type == undef_m)
   {
-    printf("se blepw %f kai %f \n", rv1->data.numVal, rv2->data.numVal);
     avm_error("'undef'involved in equality!");
     //print_stack();
   }
@@ -521,7 +515,6 @@ void execute_if_eq(instr *instr)
     result = (avm_tobool(rv1) == avm_tobool(rv2));
   }
   else if (rv1->type != rv2->type){
-    printf("se blepw %d kai %d \n", rv1->type, rv2->type);
     avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
   }
   else
@@ -596,6 +589,8 @@ void execute_tablegetelem(instr *instr)
   else
   {
     avm_memcell *content = avm_tablegetelem(t->data.tableVal, i);
+    mag();
+    printf("to content type einia %d\n" , content->type);
     if (content)
     {
       avm_assign(lv, content);
@@ -613,7 +608,7 @@ void execute_tablegetelem(instr *instr)
   }
 }
 
-void execute_tablesetelem(instr *instr)
+void execute_tablesetelem(instr *instr) //dial 15
 {
   avm_memcell *t = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *i = avm_translate_operand(instr->arg1, &ax);
@@ -630,19 +625,19 @@ void execute_tablesetelem(instr *instr)
   }
 }
 
-void memclear_string(avm_memcell *m)
+void memclear_string(avm_memcell *m) //dia 15
 {
  // assert(m->data.strVal);
   free(m->data.strVal);
 }
 
-void memclear_table(avm_memcell *m)
+void memclear_table(avm_memcell *m) //dia 15
 {
   assert(m->data.tableVal);
   avm_tabledecrefcounter(m->data.tableVal);
 }
 
-void avm_memcellclear(avm_memcell *m)
+void avm_memcellclear(avm_memcell *m) //dial 15 
 {
   if (m->type != undef_m)
   {
@@ -653,31 +648,27 @@ void avm_memcellclear(avm_memcell *m)
   }
 }
 
-void avm_warning(char *format, ...)
+void avm_warning(char *format, ...) //dial 15
 {
   cyn();
   printf("AVM WARNING %s\n", format);
   wht();
 }
 
-void execute_assign(instr *instr)
+void execute_assign(instr *instr) //dial 15
 {
   
 
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv = avm_translate_operand(instr->arg1, &ax);
 
-  grn();
-  //printf("lv eeeeeeeeeeeeeeeeeeeee .type == %d , rv.type  == %d\n" ,lv->type, rv->data.boolVal );
-  wht();
-  //na dw ligo to assert
   //assert(lv && ((&stack[AVM_STACKENV_SIZE] >= lv && lv > &stack[top]) || lv == &retval));
   assert(rv);
 
   avm_assign(lv, rv);
 }
 
-void avm_assign(avm_memcell *lv, avm_memcell *rv)
+void avm_assign(avm_memcell *lv, avm_memcell *rv) //dial 15
 {
 
   if (lv == rv)
@@ -699,7 +690,7 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv)
     avm_tableincrefcounter(lv->data.tableVal);
 }
 
-void avm_error(char *format, ...)
+void avm_error(char *format, ...) //dial 15
 {
   red();
   printf("AVM ERROR %s\n", format);
@@ -707,17 +698,17 @@ void avm_error(char *format, ...)
   wht();
 }
 
-char *avm_tostring(avm_memcell *m)
+char *avm_tostring(avm_memcell *m) //dial 15
 {
   // mag();
   // printf("memcels se prins ------------ type %d\n", m->type);
   // wht();
-  assert(m->type >= 0 && m->type <= undef_m);
+  // assert(m->type >= 0 && m->type <= undef_m);
   printf("eimai gia na kanw to string type %d\n" , m->type);
   return (*tostringFuncs[m->type])(m);
 }
 
-void execute_call(instr *instr)
+void execute_call(instr *instr) //dial 15
 {
   yel();
   puts("eimai stin call");
@@ -757,7 +748,7 @@ void execute_call(instr *instr)
   }
 }
 
-void execute_funcstart(instr *instr)
+void execute_funcstart(instr *instr) //dial 15
 {
   printf("eimai stin funcstart\n");
   avm_memcell *func = avm_translate_operand(instr->res, &ax);
@@ -771,15 +762,15 @@ void execute_funcstart(instr *instr)
   top = top - funcInfo->localsize;
 }
 
-unsigned avm_get_envvalue(unsigned i)
+unsigned avm_get_envvalue(unsigned i) //dial 15
 {
-  //assert(stack[i].type == number_m);
+  assert(stack[i].type == number_m);
   unsigned val = (unsigned)stack[i].data.numVal;
-  // assert(stack[i].data.numVal == ((double)val));
+  assert(stack[i].data.numVal == ((double)val));
   return val;
 }
 
-void avm_calllibfunc(char *funcName)
+void avm_calllibfunc(char *funcName) //dial 15 
 {
 
   library_func_t f = avm_getlibraryfunc(funcName);
@@ -799,7 +790,7 @@ void avm_calllibfunc(char *funcName)
   }
 }
 
-void execute_param(instr *instr)
+void execute_param(instr *instr) //dial 15
 {
   // red();
  // printf("eimai stin param kai to type tou instr einia %d\n" , instr->arg1->type);
@@ -816,7 +807,7 @@ void execute_param(instr *instr)
   avm_dec_top();
 }
 
-char *number_tostring(avm_memcell *kati)
+char *number_tostring(avm_memcell *kati) //dial 15
 {
   char *res = malloc(sizeof(char) * 200);
   sprintf(res, "%f", kati->data.numVal);
@@ -826,7 +817,7 @@ char *number_tostring(avm_memcell *kati)
   //8elei ftia3imo
 }
 
-char *string_tostring(avm_memcell *kati)
+char *string_tostring(avm_memcell *kati) //dial 15
 {
   //8elei ftia3imo alla mporei k extern
   char *res = malloc(sizeof(char) * 200);
@@ -835,7 +826,7 @@ char *string_tostring(avm_memcell *kati)
   return res;
 }
 
-char *bool_tostring(avm_memcell *kati)
+char *bool_tostring(avm_memcell *kati) //dial 15
 {
   char *res;
   if (kati->data.boolVal == 1)
@@ -847,12 +838,12 @@ char *bool_tostring(avm_memcell *kati)
   //isow 8elei exter
 }
 
-char *table_tostring(avm_memcell *kati)
+char *table_tostring(avm_memcell *kati) // dial 15
 {
   printf("eimai sto table  to stirng\n");
 }
 
-char *userfunc_tostring(avm_memcell *kati)
+char *userfunc_tostring(avm_memcell *kati) // dial 15
 {
   char* s = malloc(sizeof(500));
   printf("\n\n%d\n\n" , kati->data.funcVal);
@@ -863,33 +854,33 @@ char *userfunc_tostring(avm_memcell *kati)
   return s;
 }
 
-char *libfunc_tostring(avm_memcell *kati)
+char *libfunc_tostring(avm_memcell *kati) //dial 15
 {
   char* s = malloc(100);
 
 
-  sprintf(s , "Library Function (%s)" , kati->data.libFuncVal);
+  sprintf(s , "Library Function (%s)" , kati->data.libFuncVal); // dial 15
 
   return s;
 
 
 }
 
-char *nil_tostring(avm_memcell *kati) {
+char *nil_tostring(avm_memcell *kati) { //dial 15
   char*s = "Nill";
 
   return s;
 
 }
 
-char *undef_tostring(avm_memcell *kati) {
+char *undef_tostring(avm_memcell *kati) { //dial 15
 
   char* s="Undefined";
   return s;
 
 }
 
-void avm_initialize(void)
+void avm_initialize(void) // dial 15
 {
   //krataw xwro gia tis global
 
@@ -1326,7 +1317,6 @@ void libfunc_cos(void)
   }
 }
 
-
 void libfunc_sin()
 {
     unsigned n = avm_totalactuals();
@@ -1341,8 +1331,6 @@ void libfunc_sin()
     printf("sin %f\n",retval.data.numVal);
   }
 }
-
-
 
 void print_stack(){
   cyn();

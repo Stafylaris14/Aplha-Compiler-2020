@@ -8,7 +8,7 @@
 #define AVM_STACKSIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_HASHSIZE 211
-#define AVM_MAX_INSTRUCTIONS 100 //den xerw!!
+#define AVM_MAX_INSTRUCTIONS 1000 //den xerw!!
 //top , topsp gia tin stiva
 unsigned top  , topsp ;
 int total_globs;
@@ -44,7 +44,7 @@ typedef struct avm_table avm_table;
 // extern void execute_tablegetelem(instr* instr);
 // extern void execute_tablesetelem(instr* instr);
 //apothikevei times
-typedef enum avm_memcell_t
+typedef enum avm_memcell_t //dia 13
 {
     number_m,
     string_m,
@@ -173,9 +173,9 @@ unsigned char avm_tobool(avm_memcell* m);
 
 void execute_tablecreate(instr* instr);
 
-avm_memcell* avm_tablegetelem(avm_memcell *key , avm_memcell* i);
+avm_memcell *avm_tablegetelem(avm_table *table ,avm_memcell *key);
 
-void avm_tablesetelem(avm_memcell *key,avm_memcell *value , avm_memcell* curr);
+void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val);
 
 void execute_tablegetelem(instr* instr);
 
@@ -228,7 +228,6 @@ char** library_functions;
 
 void memclear_string(avm_memcell* m);
 
-
 void memclear_table(avm_memcell* m);
 
 void avm_memcellclear(avm_memcell* m);
@@ -271,7 +270,6 @@ char* nil_tostring(avm_memcell* kati);
 
 char* undef_tostring(avm_memcell* kati);
 
-
 void execute_assign(instr* instr);
 
 unsigned char undef_tobool(avm_memcell* m);
@@ -300,7 +298,6 @@ void execute_if_greatereq(instr* instr);
 
 void execute_jump(instr* instr);
 
-
 void execute_return(instr* instr);
 
 void execute_getretval(instr* instr);
@@ -308,7 +305,6 @@ void execute_getretval(instr* instr);
 void execute_funcstart(instr* instr);
 
 void execute_funcend(instr* instr);
-
 
 void read_bin();
 
@@ -334,3 +330,6 @@ void print_stack();
 
 userFunc* consts_get_userfunction_byaddress(int address);
 
+int hash_int(int val);
+
+int hash_string (char* val);
