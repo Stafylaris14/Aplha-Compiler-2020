@@ -59,7 +59,7 @@ void generate_UMINUS(quad q){
     i.res = make_operand(q.result);
     i.arg2 = malloc(sizeof(vmarg));
     i.arg2->type = number_a;
-    i.arg2->val = -1;
+    i.arg2->val = consts_add_numconst(-1);
     emit_instruction(i);
 }
 void generate_AND(quad q){

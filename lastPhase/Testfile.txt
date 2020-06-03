@@ -1,6 +1,3 @@
 
-function a(x,y){
-    print(argument(1));
-}
-
-a(1 , "aaaa"); 
+	c = 3 + -2 * -2;
+	print(c);

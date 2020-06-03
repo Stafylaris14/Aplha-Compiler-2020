@@ -416,6 +416,8 @@ void execute_arithmetic(instr *instr) // dial 15
     avm_memcellclear(lv);
     lv->type = number_m;
     lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
+    red();
+    printf("eimai mul apotelesma %f\n",rv2->data.numVal);
   }
 }
 
@@ -1265,6 +1267,8 @@ void read_bin()
   code = malloc(sizeof(instr) * codeSize);
   //code
   int i;
+  red();
+  printf("sto bin cosesize %d kai numConstSize %d stringConstSize %d namedLibFuncsSize %d userFuncSize %d\n",codeSize,numConstSize,stringConstSize,namedLibFuncsSize,userFuncSize);
   for (i = 0; i < codeSize; i++)
   {
     // code[i] = malloc(sizeof(instr));
@@ -1273,43 +1277,33 @@ void read_bin()
   }
   //sizes
     //string
-    fread(&size , sizeof(size_t) , 1 , fp);
-    const_strings = malloc(size);
+    const_strings = malloc(sizeof(char *) * stringConstSize);
     //nums
-    fread(&size , sizeof(size_t) , 1 , fp);
-    const_numbers = malloc(size);
+    const_numbers = malloc(sizeof(numConstSize) * sizeof(double));
     //libfuncs
-    fread(&size , sizeof(size_t) , 1 , fp);
-    library_functions = malloc(size);
+    library_functions = malloc(sizeof(char *) * namedLibFuncsSize);
     //userfunctions
-    fread(&size , sizeof(size_t) , 1 , fp);
-    userFunctions = malloc(size);
+    userFunctions = malloc(sizeof(userFunc) * sizeof(userFuncSize));
+  
   // consts
-  // num
-  const_numbers = malloc(sizeof(numConstSize));
   for (i = 0; i < numConstSize; i++)
   {
-    fread(&const_numbers[i], sizeof(int), 1, fp);
+    fread(&const_numbers[i], sizeof(double), 1, fp);
   }
 
   //strings
-  // const_strings = malloc(sizeof(char *) * stringConstSize);
   for ( i = 0; i < stringConstSize; i++)
   {
     fread(&const_strings[i], sizeof(char *), 1, fp);
   }
 
   //lib functions
-
-
   for (i = 0; i < namedLibFuncsSize; i++)
   {
     fread(&library_functions, sizeof(char *), 1, fp);
   }
 
   //userfuncs
-    yel();
-    printf("%d\n" , userFuncSize);
   for (i = 0; i < userFuncSize; i++){
     fread(&userFunctions, sizeof(userFunc), 1, fp);
   }

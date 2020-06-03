@@ -17,33 +17,6 @@ typedef void (*library_func_t) (void);
 
 typedef struct avm_table avm_table;
 
-// extern void execute_assign(instr *instr);
-// extern void execute_add(instr *instr);
-// extern void execute_sub(instr *instr);
-// extern void execute_mul(instr *instr);
-// extern void execute_div(instr *instr);
-// extern void execute_mod(instr *instr);
-// extern void execute_uminus(instr *instr);
-// extern void execute_and(instr *instr);
-// extern void execute_or(instr *instr);
-// extern void execute_not(instr *instr);
-// extern void execute_if_eq(instr *instr);
-// extern void execute_if_noteq(instr *instr);
-// extern void execute_if_lesseq(instr* instr);
-// extern void execute_if_less(instr* instr);
-// extern void execute_if_greatereq(instr* instr);
-// extern void execute_if_greater(instr* instr);
-// extern void execute_jump(instr* instr);
-// extern void execute_call(instr* instr);
-// extern void execute_param(instr* instr);
-// extern void execute_return(instr* instr);
-// extern void execute_getretval(instr* instr);
-// extern void execute_funcstart(instr* instr);
-// extern void execute_funcend(instr* instr);
-// extern void execute_tablecreate(instr* instr);
-// extern void execute_tablegetelem(instr* instr);
-// extern void execute_tablesetelem(instr* instr);
-//apothikevei times
 typedef enum avm_memcell_t //dia 13
 {
     number_m,
@@ -55,7 +28,6 @@ typedef enum avm_memcell_t //dia 13
     nill_m,
     undef_m
 } avm_memcell_t;
-
 
 
 typedef struct avm_memcell
@@ -70,9 +42,6 @@ typedef struct avm_memcell
         char *libFuncVal;
     } data;
 } avm_memcell;
-
-
-
 
 
 typedef struct avm_table_bucket
@@ -188,42 +157,10 @@ unsigned consts_newnumber(double n);
 
 
 int *const_numbers;
-userFunc **userFunctions;
+userFunc *userFunctions;
 // thelei me + kai to offset
 char** const_strings;
 char** library_functions;
-
-
-
-
-
-// unsigned libfuncs_newused(char* s);
-
-// unsigned userfuncs_newfunc(item* sym);
-
-// void make_operand(expr* e,vmarg* arg);
-
-// void make_numberoperand(vmarg* arg,double val);
-
-// void make_booloperand(vmarg* arg,unsigned val);
-
-
-// void make_retvaloperand(vmarg* arg);
-
-// void telos_generate(vmop op,quad *quad);
-
-
-// void generate_ADD(quad* q);
-// void generate_SUB(quad* q);
-// void generate_MUL(quad* q);
-// void generate_DIV(quad* q);
-// void generate_MOD(quad* q);
-
-// void generate_NEWTABLE(quad* quad);
-// void generate_TABLEGETELM(quad* quad);
-// void generate_TABLESETELM(quad* quad);
-// void generate_ASSIGN(quad* quad);
-// void generate_NOP(quad* quad);
 
 
 void memclear_string(avm_memcell* m);
