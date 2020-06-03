@@ -582,6 +582,7 @@ expr *make_call(expr *lv, expr *reversed_elist)
     expr *result = newexpr(var_);
     result->sym = tmp_item();
     emit(GETRETVAL, result, NULL, NULL, -1);
+    printf("scopeeeeeeeeeeeeeeeeeeeeeee space %d\n",result->sym->scope_spase);
     return result;
 }
 

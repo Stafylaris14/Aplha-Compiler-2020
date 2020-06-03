@@ -123,6 +123,7 @@ void generate_CALL(quad q)
 void generate_PARAM(quad q){
     instr i;
     q.next_instr_label = get_next_instr_label();
+    print_quad(q);
     i.arg2 = NULL;
     i.arg1 = make_operand(q.arg1);
     i.op = pusharg_v;
@@ -134,7 +135,7 @@ void generate_RETURN(quad q){
     i.res = make_operand_returnval();
     i.arg1 = make_operand(q.result);
     mag();
-    print_quad(q);
+    //print_quad(q);
    // printf("to val arg1 einia %d\n" , q.arg1->sym->);
     wht();
     emit_instruction(i);
@@ -145,6 +146,10 @@ void generate_GETRETVAL(quad q){
     instr i; 
     i.op = assign_v;
     i.res = make_operand(q.arg1);
+    i.arg1 = make_operand_returnval();
+    printf("yel\n");
+    //print_quad(q);
+    printf("yel\n");
     // if(q.arg1 == NULL) printf("einai NULL\n");
     // i.arg1 = make_operand_returnval(q.arg1);
     emit_instruction(i);
@@ -376,6 +381,9 @@ vmarg* make_operand(expr *e)
             arg->type = local_a;
             break;
         case formal_argument:
+            yel();
+            printf("----------------------------------------------eimai edw1\n");
+            wht();
             arg->type = formal_a;
             break;
         default:
@@ -724,6 +732,7 @@ void print_quad(quad q)
         printf("arg1->type -> |%d|\n" , q.arg1->type);
         if((q.arg1->sym))
             printf("arg1->sym-> %s\n" , q.arg1->sym->name);
+            // printf("arg1->sym->%d\n" , q.arg1->sym->scope_spase);
             //printf("arg1->sym->%s\n" , q.arg1->sym->);
     }
     if(q.arg2)

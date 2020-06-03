@@ -274,7 +274,9 @@ sc_spase get_scope_spase(item *new)
         s = function_local;
     else if (!strcmp(new->type, "library function"))
         s = program_variable;
-    else
+    else if(!strcmp(new->type, "formal argument")){
+         s = formal_argument;
+    } else
         s = program_variable;
     return s;
 }

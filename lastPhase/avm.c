@@ -150,6 +150,7 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg) //dial 15
   switch (arg->type)
   {
   case global_a:
+  // printf("global %d\n" , stack[AVM_STACKSIZE -1 - arg->val].type );
     return &stack[AVM_STACKSIZE - 1 - arg->val];
   case local_a:
     return &stack[topsp - arg->val];
@@ -246,7 +247,7 @@ void avm_callsaveenvironment(void) //dial 15
 
 void execute_funcend(instr *unused) // dial 15
 {
- // printf("eimai stin funcend\n");
+ printf("eimai stin funcend\n");
   unsigned oldTop = top;
   top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
   pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
@@ -324,11 +325,11 @@ void libfunc_print(void) // dial 15
   {
   char *s = avm_tostring(avm_getactual(i));
   //char *s = avm_tostring(&retval);
-  //  printf("kane printsss %f\n", avm_getactual(i));
+    printf("kane printsss %f\n", avm_getactual(i));
     grn();
     puts(s);
     wht();
-    free(s);
+    // free(s);
   }
 }
 
@@ -781,7 +782,8 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv) //dial 15
     avm_warning("assigning from 'undef' content!");
 
   avm_memcellclear(lv);
-
+    printf("eimai edw rv %f\n",rv->data.numVal);
+  
   memcpy(lv, rv, sizeof(avm_memcell));
   printf("eimai edw lv %f\n",lv->data.numVal);
   if (lv->type == string_m)
