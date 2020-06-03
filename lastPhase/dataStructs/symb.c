@@ -108,6 +108,21 @@ item *lookupScopeAbove(char *name, int scope)
     return NULL;
 }
 
+item *lookupAllscopes(char *name, int scope)
+{
+    int index = scope;
+    item *tmp = NULL;
+    tmp = lookupScope(name, scope);
+    while (scope >= 0)
+    {
+        scope--;
+        if (tmp != NULL)
+            return tmp;
+        tmp = lookupScope(name, scope);
+    }
+    return NULL;
+}
+
 /*lookup in selected scope*/
 item *lookupScope(char *name, int scope)
 {
@@ -259,7 +274,9 @@ sc_spase get_scope_spase(item *new)
         s = function_local;
     else if (!strcmp(new->type, "library function"))
         s = program_variable;
-    else
+    else if(!strcmp(new->type, "formal argument")){
+         s = formal_argument;
+    } else
         s = program_variable;
     return s;
 }

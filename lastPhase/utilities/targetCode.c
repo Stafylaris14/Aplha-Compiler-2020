@@ -2,7 +2,7 @@
 #include "../dataStructs/linkedList.h"
 
 int total_instraction_size = 0; 
-int current_instraction = 1;
+int current_instraction;
 instr *instructions = (instr *)0;
 extern int currQuad;
 
@@ -14,6 +14,7 @@ char **namedLibFuncs;
 int namedLibFuncsSize = 0;
 struct userFunc *userFuncs[CONST_ARR_SIZE];
 int userFuncSize = 0;
+int total_globals=0;
 generator_func_t generators[] = {
     generate_ASSIGN,
     generate_ADD,
@@ -28,8 +29,8 @@ generator_func_t generators[] = {
     generate_IF_EQ,
     generate_IF_NOTEQ,
     generate_IF_LESSEQ,
-    generate_IF_LESS,
     generate_IF_GREATEREQ,
+    generate_IF_LESS,
     generate_IF_GREATER,
     generate_JUMP,
     generate_CALL,
@@ -58,7 +59,7 @@ void generate_UMINUS(quad q){
     i.res = make_operand(q.result);
     i.arg2 = malloc(sizeof(vmarg));
     i.arg2->type = number_a;
-    i.arg2->val = -1;
+    i.arg2->val = consts_add_numconst(-1);
     emit_instruction(i);
 }
 void generate_AND(quad q){
@@ -111,17 +112,19 @@ void generate_IF_GREATER(quad q){generate_single_relational(jgt_v , &q);}
 void generate_JUMP(quad q){generate_single_relational(jump_v , &q);}
 void generate_CALL(quad q)
 {
-    print_quad(q);
+    
     instr i;
     q.next_instr_label = get_next_instr_label();
     i.op = callfunc_v;
-    print_quad(q);
+   
     i.arg1 = make_operand(q.arg1);
     emit_instruction(i);
 }
 void generate_PARAM(quad q){
-    instr i ;
+    instr i;
     q.next_instr_label = get_next_instr_label();
+    print_quad(q);
+    i.arg2 = NULL;
     i.arg1 = make_operand(q.arg1);
     i.op = pusharg_v;
     emit_instruction(i);
@@ -130,14 +133,23 @@ void generate_RETURN(quad q){
     instr i ;
     i.op = assign_v;
     i.res = make_operand_returnval();
-    i.arg1 = make_operand(q.arg1);
+    i.arg1 = make_operand(q.result);
+    mag();
+    //print_quad(q);
+   // printf("to val arg1 einia %d\n" , q.arg1->sym->);
+    wht();
     emit_instruction(i);
+
 }
 void generate_GETRETVAL(quad q){
     q.next_instr_label = get_next_instr_label();
     instr i; 
     i.op = assign_v;
     i.res = make_operand(q.arg1);
+    i.arg1 = make_operand_returnval();
+    printf("yel\n");
+    //print_quad(q);
+    printf("yel\n");
     // if(q.arg1 == NULL) printf("einai NULL\n");
     // i.arg1 = make_operand_returnval(q.arg1);
     emit_instruction(i);
@@ -205,7 +217,7 @@ void generate_single_relational(vmop op , quad *q)
     i.arg1 = make_operand(q->arg1);
     i.arg2 = make_operand(q->arg2);
     i.res = malloc(sizeof(vmarg));
-    i.res->val = label_q;
+    i.res->val = label_q-1;
     i.res->type = label_a;
     i.op = op;
     emit_instruction(i);
@@ -271,7 +283,7 @@ void print_instructions()
         }
        
         printf("%d:" , i);
-        printf("%s\t\t" , get_string_vmopcode(instructions[i].op));
+        printf("%s|%d\t\t" , get_string_vmopcode(instructions[i].op) ,instructions[i].op );
          if(instructions[i].res->type != -1)
             printf("%d(%s)%d\t\t" , instructions[i].res->val , get_string_vmargtype(instructions[i].res) , instructions[i].res->type);
         else
@@ -297,7 +309,7 @@ void print_instructions()
         // instructions[i].arg2->val,
         // get_string_vmargtype(instructions[i].arg2));
     }
-    printf("eimai edw gia to curr einai %d\n" ,current_instraction );
+    //printf("eimai edw gia to curr einai %d\n" ,current_instraction );
     print_const_arrays();
 }
 
@@ -305,6 +317,7 @@ void print_const_arrays()
 {
     int i;
     grn();
+    printf("to total globals einia %d\n" , total_globals);
     printf("-----NUM CONSTS -----\n");
     for (i = 0; i < numConstSize; i++)
     {
@@ -344,55 +357,61 @@ vmarg* make_operand(expr *e)
     arg = NULL;
     arg = malloc(sizeof(vmarg));
     if(!arg) exit(-1);
-    
+    mag();
+    // printf("\n\n\n\neimai edw sto make op kai to expression type einai %d\n\n\n\n" , expressionType);
+    wht();
     switch (expressionType)
     {
     case boolexpr_:
-    case arthmexp_:
+    case arthmexp_: 
     case newtable_:
     case var_: 
     case tableitem_:
     {
-        arg->val = e->sym->offset; //na to to offset
+        
+        arg->val = e->sym->offset;
+
         switch (e->sym->scope_spase)
         {
         case program_variable:
             arg->type = global_a;
+            total_globals++;
             break;
         case function_local:
             arg->type = local_a;
             break;
         case formal_argument:
+            yel();
+            printf("----------------------------------------------eimai edw1\n");
+            wht();
             arg->type = formal_a;
             break;
         default:
             assert(0);
         }
+        
         break;
+        //return arg;
     }
     case constnum_:
         arg->type = number_a;
         arg->val = consts_add_numconst(e->numConst);
         break;
     case constbool_:
-        arg->type = constbool_;
+        arg->type = bool_a;
         arg->val = e->boolConst;
         break;
     case conststring_:
-        arg->type = conststring_;
+        arg->type = string_a;
         arg->val = consts_add_stringconst(e->stringConst);
         break;
     case pfunc_:
-        if(!strcmp(e->sym->name , "b")) {
-            printf("%d einai to type kai %d to scopescepasd\n\n" ,e->type , e->sym->scope_spase );
-        }
         arg->type = userFunc_a;
         arg->val = consts_add_userFunc(e);
         //arg->val= e->sym-> TODO thelei to taddress leei pou einai mesa sto symbol
         // TODO ????????
         break;
     case lfunc_:
-        printf("mpika edw!\n");
         arg->type = libFunc_a;
         arg->val = consts_add_namedLibFuncs(e->sym->name);
         break;
@@ -444,7 +463,7 @@ vmarg *make_operand_returnval()
 {
     vmarg* a1 = malloc(sizeof(vmarg));
     a1->type = retval_a;
-    a1->val = -1;
+    //a1->val = -1;
     return a1;
 }
 
@@ -517,7 +536,7 @@ int newUserFunction(int address, int localsize, char *name)
 
 int consts_add_userFunc(expr *e)
 {
-    // printf("eimai edw sto functions user %s\n" , func->id);
+    printf("eimai edw sto functions user %s\n" , e->sym->name);
     // userFuncs[userFuncSize] = func;
     int i;
     for (i = 0; i < userFuncSize; i++)
@@ -668,10 +687,22 @@ void write_bin()
 {
     FILE *fp;
     fp = fopen("instructions" , "wb+");
+    size_t size = 0;
     // instr
     int i;
+    fwrite(&total_globals , sizeof(int) , 1 , fp);
+    fwrite(&current_instraction , sizeof(int) , 1 , fp);
     for(i =0 ; i < current_instraction; i++)
         fwrite(&instructions[i] , sizeof(instr) ,1, fp);
+    //sizes
+    size = sizeof(stringConsts);
+    fwrite(&size , sizeof(size_t) , 1 , fp);
+    size = sizeof(numConsts);
+    fwrite(&size , sizeof(size_t) , 1 , fp);
+    size = sizeof(namedLibFuncs);
+    fwrite(&size , sizeof(size_t) , 1 , fp);
+    size = sizeof(userFuncs);
+    fwrite(&size , sizeof(size_t) , 1 , fp);
     // consts
     for(i =0 ; i< numConstSize;i++)
         fwrite(&numConsts[i] ,sizeof(numConsts[i]) , 1 , fp );
@@ -701,6 +732,8 @@ void print_quad(quad q)
         printf("arg1->type -> |%d|\n" , q.arg1->type);
         if((q.arg1->sym))
             printf("arg1->sym-> %s\n" , q.arg1->sym->name);
+            // printf("arg1->sym->%d\n" , q.arg1->sym->scope_spase);
+            //printf("arg1->sym->%s\n" , q.arg1->sym->);
     }
     if(q.arg2)
     {
@@ -711,6 +744,5 @@ void print_quad(quad q)
     printf("-----------------------------------\n");
     wht();
 }
-
 
 

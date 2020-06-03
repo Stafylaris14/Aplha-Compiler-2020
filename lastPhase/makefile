@@ -1,9 +1,12 @@
 compiler: parser scanner 
-	gcc -c  utilities/targetCode.c utilities/quad.c avm.c
-	gcc -c  scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
-	gcc -c  parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
-	gcc -o calc targetCode.o quad.o parser.o scanner.o avm.o linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o  
-	./calc Testfile.txt
+	gcc -c -lm utilities/targetCode.c utilities/quad.c avm.c
+	gcc -c -lm scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
+	gcc -c  -lm parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
+	gcc -o  calc avm.o targetCode.o quad.o parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o -lm  
+	./calc < Testfile.txt
+	
+
+
 
 wall: parser scanner 
 	gcc -Wall -c parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c
@@ -25,10 +28,10 @@ scanner:scanner.l
 
 
 compiler-debug:parser scanner 
-	gcc -c -g parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
-	gcc -c -g scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
-	gcc -c -g  utilities/quad.c  utilities/targetCode.c
-	gcc -o  calc -g parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o quad.o targetCode.o
+	gcc -c -g parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c -lm
+	gcc -c -g scanner.c dataStructs/commentStack.c dataStructs/linkedList.c -lm
+	gcc -c -g  utilities/quad.c  utilities/targetCode.c avm.c -lm
+	gcc -o  calc -g parser.o avm.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o quad.o targetCode.o -lm
 	gdb calc
 clean:
 	rm -f scanner.c

@@ -1,6 +1,6 @@
 %{
 
-//#include "utilities/quad.h"
+//#include "utilities/target.h"
 #include "avm.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
@@ -25,8 +25,9 @@ int objectHide = 1;//na min kanei hide an einai se object
 int assign_flag = 0;
 stack1 *loopcounterstack; //krataei poses anakikloseis exoun anoi3ei
 /* iopcode op; */
-
+extern int executionFinished;
 extern int currQuad;
+extern int tmp_count;
 
 
 expr *result;
@@ -143,7 +144,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <EXPR> Call Stmts 
 %type <EXPR> Term   Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
-%type <item> Funcdef
+%type <item> Funcdef 
 %type <item> Funcprefix
 %type <strVal> Funcname
 %type <label_jumps> Whilestart
@@ -194,6 +195,7 @@ Stmt: Expression semicolon {
                 backpatch($1->falselist, nextquad());
                 assign_flag = 0;
         }
+        tmp_count = 0;
         $$ = $1;
     } 
     | Ifstmt {$$ = $1;}
@@ -533,6 +535,7 @@ Lvalue: id {
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
+                                new = lookupAllscopes(new->name,scopeCounter);
                                 $$ = lvalue_expr(new);
                                  
 
@@ -543,12 +546,13 @@ Lvalue: id {
                                 item* new = NULL;
                                 new = newItem($2,"local", scopeCounter , yylineno );
                                 new_check(new);
+                                new = lookupAllscopes(new->name,scopeCounter);
                                 $$ = lvalue_expr(new);
         }
         | double_colons id {
                                 if(isFA($2))libcheck =1;
                                 item* tmp = lookupScope($2 , 0);
-                                if(tmp == NULL){error("Cant find Global " , yylineno);} 
+                                if(tmp == NULL){error("Cant find Global " , yylineno);}
                                 $$ = lvalue_expr(tmp);               
         }
         | Member {$$ = $1;};
@@ -713,6 +717,7 @@ Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend {
 Funcprefix: Function Funcname{
         item* new = newItem($2,"User Function", scopeCounter , yylineno );
         new_check(new);
+        new = lookupAllscopes(new->name,scopeCounter);
         expr*temp = newexpr(pfunc_);
         temp->sym = new;
         emit(JUMP,NULL,NULL,NULL,-1);
@@ -762,27 +767,27 @@ Const:  integer {$$ = newexpr_constint($1);
 
 
 
-Idlist: id Multy_id {
-        
+Idlist:    id Multy_id {
+                
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
                     formal_flag = 1;
                     new_check(new);
                     insert_formal_arg(functionName , $1);
                     formal_flag = 0;
-                    
+  
         }
         | {;}
         ;
 
-Multy_id: Multy_id comma id {
+Multy_id:   Multy_id comma  id {
         
                   item* new = newItem($3,"formal argument", scopeCounter , yylineno );
                   new_check(new);
                   insert_formal_arg(functionName , $3);
+                
         }
         | {;}
         ;
-
 
 
 
@@ -911,7 +916,7 @@ Returnstmt: Return semicolon {libcheck =0;
         } Expression semicolon {libcheck =0;
         returnFlag =0; 
         $$= $3;
-        emit(RETURN, $3, NULL, NULL, -1);
+        emit(RETURN, NULL, NULL, $3, -1);
         emit(JUMP,NULL,NULL,NULL,-1);
         $$->returnlist = new_list(nextquad()-1);
         }
@@ -945,12 +950,23 @@ int main(int argc, char** argv)
   }
     loopcounterstack = arxikopoisi();
     yyparse();
+    
     //printSymTable();
     printHash();
-    //printScopeList();
+    printScopeList();
     
     print_quads();
     generate();
     write_bin();
     print_instructions();   
+    //red();
+    read_bin();
+    avm_initialize();
+    //printf("vgika apo tin init\n");
+
+    while(!executionFinished)
+    {
+        execute_cycle();
+      
+    }
 }

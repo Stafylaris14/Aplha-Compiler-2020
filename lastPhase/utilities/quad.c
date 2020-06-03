@@ -124,9 +124,7 @@ void print_quads()
                     a1 = quads[i].arg1->sym->name;
                     break;
                 case lfunc_:
-                    red();
-                    printf("na to libb\n");
-                    cyn();
+                   a1 = quads[i].arg1->sym->name;
                     break;
                 default:
                     a1 = get_opcode_expr_string(quads[i].arg1->type);
@@ -184,9 +182,7 @@ void print_quads()
                     a2 = quads[i].arg2->sym->name;
                     break;
                 case lfunc_:
-                    red();
-                    printf("na to libb\n");
-                    cyn();
+                   a2 = quads[i].arg2->sym->name;
                     break;
                 default:
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
@@ -246,9 +242,7 @@ void print_quads()
                     a3 = quads[i].result->sym->name;
                     break;
                 case lfunc_:
-                    red();
-                    printf("na to libb\n");
-                    cyn();
+                    a3 = quads[i].result->sym->name;
                     break;
                 default:
                     a3= get_opcode_expr_string(quads[i].result->type);
@@ -571,9 +565,17 @@ int nextquad()
 
 expr *make_call(expr *lv, expr *reversed_elist)
 {
+    expr* tmp = reversed_elist;
+  
     expr *func = emit_iftableitem(lv);
     while (reversed_elist)
     {
+        if(reversed_elist->sym)
+            if(reversed_elist->sym->offset < 0){
+                item *sagapaw = lookup(reversed_elist->sym->name);      //ERROR
+                assert(sagapaw);
+                reversed_elist->sym->offset = sagapaw->offset;
+            }
         emit(PARAM, reversed_elist, NULL, NULL, -1);
         reversed_elist = reversed_elist->next;
     }
@@ -581,6 +583,7 @@ expr *make_call(expr *lv, expr *reversed_elist)
     expr *result = newexpr(var_);
     result->sym = tmp_item();
     emit(GETRETVAL, result, NULL, NULL, -1);
+    //printf("scopeeeeeeeeeeeeeeeeeeeeeee space %d\n",result->sym->scope_spase);
     return result;
 }
 
@@ -647,9 +650,6 @@ expr *lvalue_expr(item *sym)
     {
         sp = -1;
     }
-    printf("eimai edw sta palia\n");
-    printf("to onoma einai ->%s\n" , sym->name);
-    printf("to type einai -> %s\n" , sym->type);
     // e->contlist = NULL;
     // e->breaklist = NULL;
     // e->falselist = NULL;
