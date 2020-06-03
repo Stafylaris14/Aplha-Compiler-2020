@@ -144,7 +144,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <EXPR> Call Stmts 
 %type <EXPR> Term   Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
-%type <item> Funcdef
+%type <item> Funcdef 
 %type <item> Funcprefix
 %type <strVal> Funcname
 %type <label_jumps> Whilestart
@@ -767,27 +767,27 @@ Const:  integer {$$ = newexpr_constint($1);
 
 
 
-Idlist: id Multy_id {
-        
+Idlist:    id Multy_id {
+                
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
                     formal_flag = 1;
                     new_check(new);
                     insert_formal_arg(functionName , $1);
                     formal_flag = 0;
-                    
+  
         }
         | {;}
         ;
 
-Multy_id: Multy_id comma id {
+Multy_id:   Multy_id comma  id {
         
                   item* new = newItem($3,"formal argument", scopeCounter , yylineno );
                   new_check(new);
                   insert_formal_arg(functionName , $3);
+                
         }
         | {;}
         ;
-
 
 
 
@@ -952,7 +952,7 @@ int main(int argc, char** argv)
     yyparse();
     
     //printSymTable();
-    //printHash();
+    printHash();
     printScopeList();
     
     print_quads();

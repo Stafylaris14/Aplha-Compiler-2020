@@ -4,7 +4,7 @@
 #define CONST_ARR_SIZE 1000
 
 //gia ton pinaka tou telikou kwdika
-#define I_SIZE 499
+#define I_SIZE 1024
 #define I_EXPAND 1024
 #define I_CURRENT_SIZE current_instraction * sizeof(instr)
 #define I_NEW_SIZE (I_SIZE * sizeof(instr) + I_CURRENT_SIZE)

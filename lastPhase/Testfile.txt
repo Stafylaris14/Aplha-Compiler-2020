@@ -1,6 +1,6 @@
 
-function a(x){
-    return x;
+function a(x,y){
+    print(argument(1));
 }
 
-print(a(4));
+a(1 , "aaaa"); 

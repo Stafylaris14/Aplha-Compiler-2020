@@ -325,7 +325,7 @@ void libfunc_print(void) // dial 15
   {
   char *s = avm_tostring(avm_getactual(i));
   //char *s = avm_tostring(&retval);
-    printf("kane printsss %f\n", avm_getactual(i));
+    // printf("kane printsss %f\n", avm_getactual(i));
     grn();
     puts(s);
     wht();
@@ -1352,19 +1352,16 @@ void libfunc_argument(void)
   }
   else
   {
-    switch(avm_getactual(0)->type){
-      case number_m:
-        retval.type = number_m;
-        retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET +avm_getactual(0)->data.numVal);
-      break;
-      case string_m:
-        retval.type = string_m;
-        retval.data.strVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET +avm_getactual(0)->data.strVal);
-        break;
-    }
-    // retval.type = number_m;
-    // retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET +avm_getactual(0)->data.numVal);
-//    printf("argmument %f\n\n" ,retval.data.numVal );
+ 
+        
+         printf("oxiiii %d\n",stack[(int)(p_topsp + AVM_NUMACTUALS_OFFSET + avm_getactual(0)->data.numVal + 1)].type);
+        if(stack[(int)(p_topsp + AVM_NUMACTUALS_OFFSET + avm_getactual(0)->data.numVal + 1)].type == 0 ){
+          retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET + avm_getactual(0)->data.numVal + 1);
+          retval.type = number_m;
+        }else if(stack[(int)(p_topsp + AVM_NUMACTUALS_OFFSET + avm_getactual(0)->data.numVal + 1)].type == 1){
+          retval.data.strVal = stack[(int)(p_topsp + AVM_NUMACTUALS_OFFSET + avm_getactual(0)->data.numVal + 1)].data.strVal;
+          retval.type = string_m;
+      }
   }
 }
 

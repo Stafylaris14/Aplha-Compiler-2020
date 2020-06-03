@@ -565,6 +565,8 @@ int nextquad()
 
 expr *make_call(expr *lv, expr *reversed_elist)
 {
+    expr* tmp = reversed_elist;
+  
     expr *func = emit_iftableitem(lv);
     while (reversed_elist)
     {
@@ -574,7 +576,6 @@ expr *make_call(expr *lv, expr *reversed_elist)
                 assert(sagapaw);
                 reversed_elist->sym->offset = sagapaw->offset;
             }
-        //printf("8a se gamiswwwwwww %d kai id %s \n",sagapaw->offset,reversed_elist->sym->name );
         emit(PARAM, reversed_elist, NULL, NULL, -1);
         reversed_elist = reversed_elist->next;
     }
@@ -582,7 +583,7 @@ expr *make_call(expr *lv, expr *reversed_elist)
     expr *result = newexpr(var_);
     result->sym = tmp_item();
     emit(GETRETVAL, result, NULL, NULL, -1);
-    printf("scopeeeeeeeeeeeeeeeeeeeeeee space %d\n",result->sym->scope_spase);
+    //printf("scopeeeeeeeeeeeeeeeeeeeeeee space %d\n",result->sym->scope_spase);
     return result;
 }
 
