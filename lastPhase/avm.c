@@ -159,6 +159,7 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg) //dial 15
   case retval_a:
     return &retval;
   case number_a:
+    //reg->data.strVal = NULL;
     reg->type = number_m;
     reg->data.numVal = consts_get_number(arg->val);
     return reg;
@@ -432,6 +433,7 @@ static void avm_initstack(void)
   {
     AVM_WIPEOUT(stack[i]);
     stack[i].type = undef_m;
+    stack[i].data.strVal = NULL;
   }
 }
 
@@ -456,7 +458,7 @@ void avm_tablebucketsinit(avm_table_bucket **p) //dial 13
 
 avm_table *avm_tablenew(void) //dia 13
 {
-  avm_table *t = malloc(sizeof(avm_table));
+  avm_table *t = (avm_table*)malloc(sizeof(avm_table));
   AVM_WIPEOUT(*t);
 
   t->refCounter = t->total = 0;
@@ -560,7 +562,7 @@ void execute_tablecreate(instr *instr)
   lv->data.tableVal = avm_tablenew();
   avm_tableincrefcounter(lv->data.tableVal);
 }
-int keli = 0;
+
 
 avm_memcell *avm_tablegetelem(avm_table *table ,avm_memcell *key)
 {
@@ -573,16 +575,15 @@ avm_memcell *avm_tablegetelem(avm_table *table ,avm_memcell *key)
     if (pinakas == NULL){avm_error("Cannot access to table\n");assert(0);}
     if(pinakas->key.data.numVal != key->data.numVal){
       avm_table_bucket* tmp  = pinakas;
-      // if(tmp == NULL) assert(0);
-      red();
-      
+
       while( tmp!=NULL && tmp->key.data.numVal!=key->data.numVal){
-        //printf("eisai g ton poutso %f kai %f \n",tmp->key.data.numVal,key->data.numVal);
         tmp = tmp->next;
       }
       if(tmp == NULL) assert(0);
+      
       return &tmp->value;
-    }
+     }
+
     return &pinakas->value;
   }else if(key->type == string_m)
   {
@@ -596,6 +597,7 @@ avm_memcell *avm_tablegetelem(avm_table *table ,avm_memcell *key)
   {
     assert(0);
   }
+  
  
 }
 
@@ -609,10 +611,11 @@ void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val)
     pinakas = table->numIndexed[index];
     if(pinakas == NULL){
         pinakas = malloc(sizeof(avm_table_bucket));
-        pinakas->key.data.numVal = key->data.numVal;
-        pinakas->value.data.numVal = val->data.numVal;
+        pinakas->key = *key;
+        pinakas->value = *val;
        // pinakas->key.data.numVal = *key;
         pinakas->next = NULL;
+        printf("eeeeeeeeeeeeeeeeeeeee\n");
     }else{
       //   red();
 
@@ -629,9 +632,10 @@ void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val)
         //pinakas->next = Node;
        // pinakas = Node;
         //pinakas->next = NULL;
-        //       printf("mastoraaaaa %f\n",tmp->value.data.numVal);
+               
         // wht();
     }
+    printf("mastoraaaaa %d\n",val->type);
     table->numIndexed[index] = pinakas;
 
   }else if(key->type == string_m){
@@ -678,15 +682,14 @@ void execute_tablegetelem(instr *instr)
 
   if (t->type != table_m)
   {
-    mag();
-    printf("to type tou table edw einia %d\n" ,t->type );
+
     avm_error("illegal use of type %s as table!", typeStrings[t->type]);
   }
   else
   {
     avm_memcell *content = avm_tablegetelem(t->data.tableVal, i);
     mag();
-    //printf("to content type einia %d\n" , content->type);
+    printf("to content type einia %d\n" , content->type);
     if (content)
     {
       avm_assign(lv, content);
@@ -841,7 +844,12 @@ void execute_call(instr *instr) //dial 15
       break;
     }case number_m:
     {
+      mag();
+      printf("this is a text %s\n" , func->data.strVal);
       userFunc* f = consts_get_userfunction(func->data.numVal);
+      if(!f){
+
+      }
       pc = f->address;
       break;
     }
@@ -858,7 +866,7 @@ void execute_call(instr *instr) //dial 15
 
       printf("to type einia %d\n" , func->type);
       avm_error("call: cannot bind '%s' to function!", s);
-      free(s);
+      // free(s);
       executionFinished = 1;
     }
   }
@@ -1251,7 +1259,9 @@ void execute_jump(instr *instr)
   if (!executionFinished){
     grn();
     //printf("mpika sto exec finished\n");
+    exit(-1);
   }
+    
     pc = instr->res->val;
     //printf("to pc einai meta %d\n" , pc);
     wht();

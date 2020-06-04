@@ -635,11 +635,10 @@ Multy_exp: comma Expression Multy_exp {
         | {$$ = NULL;}
         ;
 
-Objectdef: left_bracket {if(scopeCounter != 0)scopeCounter--;else noCounter=1;objectHide =0;} Elist right_bracket {
-       if(!noCounter)
+Objectdef: left_bracket {scopeCounter--; noCounter=1;objectHide =0;} Elist right_bracket {
+      
         scopeCounter++;
-       else
-         noCounter =0;
+     
         objectHide=1;
         expr *t = newexpr(newtable_);
         t->sym = tmp_item();
@@ -651,11 +650,11 @@ Objectdef: left_bracket {if(scopeCounter != 0)scopeCounter--;else noCounter=1;ob
         }
         $$ = t;
         }
-        | left_bracket {if(scopeCounter != 0)scopeCounter--;else noCounter=1;objectHide =0;} Indexed right_bracket {
-                if(!noCounter)
+        | left_bracket {scopeCounter--;noCounter=1;objectHide =0;} Indexed right_bracket {
+                
                         scopeCounter++;
-                else
-                        noCounter =0;
+              
+                      
                 objectHide=1;
                 expr *t = newexpr(newtable_);
                 t->sym = tmp_item();
@@ -967,7 +966,7 @@ int main(int argc, char** argv)
     
     //printSymTable();
     //printHash();
-    printScopeList();
+    //printScopeList();
     
     print_quads();
     generate();

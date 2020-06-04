@@ -3,13 +3,21 @@ compiler: parser scanner
 	gcc -c -lm scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
 	gcc -c  -lm parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
 	gcc -o  calc avm.o targetCode.o quad.o parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o -lm  
-	./calc  Testfile.txt
+	
 
 
 wall: parser scanner 
 	gcc -Wall -c parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c
 	gcc -Wall -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 
 	gcc -Wall -o calc parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o
+
+tests:compiler
+	./calc ../testfiles/phase5/basic_complex.asc
+
+
+
+
+
 
 dataStructs: 
 	gcc  -c dataStructs/commentStack.c
