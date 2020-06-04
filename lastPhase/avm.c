@@ -189,6 +189,7 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg) //dial 15
 //GET CONSTS
 int consts_get_number(int index) //dial 15
 {
+  printf("ti fasi to index %d\n",index);
   return numConsts[index];
 }
 
@@ -221,11 +222,12 @@ void execute_cycle(void) //dial 15
   }
   else
   {
-
-    assert(pc < AVM_ENDING_PC); //2:	PUSHARG		01(formal)0:x    afto thelouyme!!!!
+    printf("ela mou pc %u kai end %u\n",pc,AVM_ENDING_PC);
+    assert(pc < AVM_ENDING_PC); 
     instr *instr1 = code + pc;
     cyn();
    // printf("to opeinai %d\n" , instr1->op);
+     printf("instruction %d - opcode %d\n", pc,instr1->op);
     unsigned oldPC = pc;
     assert(instr1->op >= 0 && instr1->op <= AVM_MAX_INSTRUCTIONS);    
     (*executeFuncs[instr1->op])(instr1);
@@ -266,6 +268,7 @@ void avm_dec_top(void) //dial 15
 
 void avm_push_envvalue(unsigned val) //dial 15
 {
+  printf("topppp %u\n",top);
   stack[top].type = number_m;
   stack[top].data.numVal = val;
   avm_dec_top();
@@ -319,9 +322,10 @@ void libfunc_print(void) // dial 15
   //printf("kane printsss\n");
   for (i = 0; i < n; ++i)
   {
+  printf("kane printsss %f\n", avm_getactual(i));
   char *s = avm_tostring(avm_getactual(i));
   //char *s = avm_tostring(&retval);
-    // printf("kane printsss %f\n", avm_getactual(i));
+     //printf("kane printsss %f\n", avm_getactual(i));
     grn();
     puts(s);
     wht();
@@ -511,9 +515,10 @@ void execute_if_eq(instr *instr) //dial 15
     //printf("av1 %d kai av2 %d\n",rv1->data.boolVal,rv2->data.boolVal);
     result = (avm_tobool(rv1) == avm_tobool(rv2));
   }
-  else if (rv1->type != rv2->type){
-    avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
-  }
+  // else if (rv1->type != rv2->type){
+  //   printf("ela %f kai allo %f\n", rv1->data.numVal, rv1->data.numVal);
+  //   avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
+  // }
   else
   {
     if (rv2->type == string_m)
@@ -530,7 +535,12 @@ void execute_if_eq(instr *instr) //dial 15
   
   if(result == 1){
    // printf("allazw pc re manm \n");
+     red();
+  printf("sto end to pc %u\n",pc);
     pc = instr->res->val;
+    assert(pc < AVM_MAX_INSTRUCTIONS);
+      red();
+  printf("sto end to pc %u\n",pc);
   }
 
   // if (!executionFinished && result){
@@ -669,6 +679,8 @@ void execute_tablegetelem(instr *instr)
 
   if (t->type != table_m)
   {
+    mag();
+    printf("to type tou table edw einia %d\n" ,t->type );
     avm_error("illegal use of type %s as table!", typeStrings[t->type]);
   }
   else
@@ -726,9 +738,16 @@ void avm_memcellclear(avm_memcell *m) //dial 15
 {
   if (m->type != undef_m)
   {
-    memclear_func_t f = memclearFuncs[m->type];
-    if (f)
+   // printf("eeeeee %f\n",m->type);
+    if(m->type!=1 && m->type!=3){
+      m->type = undef_m;
+      return;
+    }
+    memclear_func_t f = memclearFuncs[m->type];    
+  //  printf("eeeeeeasdasd %f\n",m->type);
+    if (f){
       (*f)(m);
+    }
     m->type = undef_m;
   }
 }
@@ -790,9 +809,11 @@ void avm_error(char *format, ...) //dial 15
 char *avm_tostring(avm_memcell *m) //dial 15
 {
   // mag();
-  // printf("memcels se prins ------------ type %d\n", m->type);
+   printf("memcels se prins ------------ type %d\n", m->type);
   // wht();
   // assert(m->type >= 0 && m->type <= undef_m);
+ // m->type = 2;
+ // assert(0);
   return (*tostringFuncs[m->type])(m);
 }
 
@@ -804,7 +825,8 @@ void execute_call(instr *instr) //dial 15
   assert(func);
   avm_callsaveenvironment();
   
-//printf("eimai stin call me arg1 %d kai rese\n",func->type);
+printf("eimai stin call me ---------instr %d kai rese %f\n",instr->op,func->data.numVal);
+
   switch (func->type)
   {
     case userfunc_m:
@@ -818,6 +840,11 @@ void execute_call(instr *instr) //dial 15
       // printf("%d\n" ,code[pc].op);
       assert(code[pc].op == enterfunc_v);
       break;
+    }case number_m:
+    {
+      userFunc* f = consts_get_userfunction(func->data.numVal);
+      pc = f->address;
+      break;
     }
     case string_m:
       avm_calllibfunc(func->data.strVal);
@@ -828,6 +855,9 @@ void execute_call(instr *instr) //dial 15
     default:
     {
       char *s = avm_tostring(func);
+      red();
+
+      printf("to type einia %d\n" , func->type);
       avm_error("call: cannot bind '%s' to function!", s);
       free(s);
       executionFinished = 1;
@@ -845,13 +875,14 @@ void execute_funcstart(instr *instr) //dial 15
 
   totalActuals = 0;
   userFunc *funcInfo = consts_get_userfunction(instr->res->val);
+  
   topsp = top;
   top = top - funcInfo->localsize;
 }
 
 unsigned avm_get_envvalue(unsigned i) //dial 15
 {
-  assert(stack[i].type == number_m);
+  //assert(stack[i].type == number_m);
   unsigned val = (unsigned)stack[i].data.numVal;
   assert(stack[i].data.numVal == ((double)val));
   return val;
@@ -953,10 +984,11 @@ char *libfunc_tostring(avm_memcell *kati) //dial 15
 }
 
 char *nil_tostring(avm_memcell *kati) { //dial 15
+red();
+printf("eimai edw!\n");
+wht();
   char*s = "Nill";
-
   return s;
-
 }
 
 char *undef_tostring(avm_memcell *kati) { //dial 15
@@ -972,6 +1004,7 @@ void avm_initialize(void) // dial 15
 
   top = AVM_STACKSIZE - total_globs;
   topsp = AVM_STACKSIZE - total_globs;
+  printf("topsp sto init %u\n",topsp);
   avm_initstack();
   avm_registerlibfunc("print", libfunc_print);
   avm_registerlibfunc("input", libfunc_input);
@@ -1300,6 +1333,7 @@ void read_bin()
 
 void libfunc_input(void)
 {
+  printf("se gamawwwwwwwwwwwwwwwwww\n");
 }
 
 void libfunc_objectmemberkeys(void)
@@ -1456,9 +1490,19 @@ int hash_avm(avm_memcell *key)
 {
   if(key->type == number_m) 
     return ((int)key->data.numVal%AVM_TABLE_HASHSIZE);
-  else if(key->type == string_m) 
-    return strlen(key->data.strVal)%AVM_TABLE_HASHSIZE;
-  else{
+  else if(key->type == string_m){
+    int i , index = 0;
+    for(i =0 ; i < strlen(key->data.strVal); i++){
+      index += (int)key->data.strVal[i];
+    }
+    return index%AVM_TABLE_HASHSIZE;
+  } 
+   
+  else if (key->type == table_m){
+    // printf("to key stin hash einia tyype %d\n" , key->data.tableVal->total);
+    return key->data.tableVal->total%AVM_TABLE_HASHSIZE;
+  }else{
+
     assert(0);
   }
 }

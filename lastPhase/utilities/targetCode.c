@@ -1,7 +1,7 @@
 #include "targetCode.h"
 #include "../dataStructs/linkedList.h"
 
-int total_instraction_size = 0; 
+int total_instraction_size = I_SIZE; 
 int current_instraction;
 instr *instructions = (instr *)0;
 extern int currQuad;
@@ -181,23 +181,41 @@ void generate(){
 void generate_single_quad(vmop op , quad *q){
     instr i ;
     i.op = op;
+    static int flag = 1;
+
     
+
+
+
+
+    if(flag){
+        if(q->arg1){
+            red();
+            printf("eimai stin make arg1 kai to type einai %d\n" , q->arg1->type );
+            wht();
+            flag = 0;
+        }
+    }
     i.arg1 = make_operand(q->arg1);
+    
+    
+    
     // grn();
     //  printf("arg1.val -> %d\n" , i.arg1->val);
-    //  printf("arg1.type -> %d\n" , i.arg1->type);
-
+      printf("arg1.type -> %d\n" , i.arg1->type);
+    // print_quad(*q);
     i.arg2 = make_operand(q->arg2);
+    
+   
     // red();
     // if(i.arg2){
     //     printf("arg2.val -> %d\n" , i.arg2->val);
-    //     printf("arg2.type -> %d\n" , i.arg2->type);
+      //   printf("arg2.type -> %d\n" , i.arg2->type);
     // }
 
     i.res = make_operand(q->result);
     // cyn();
     // printf("res.val -> %d\n" , i.res->val);
-    // printf("res.type -> %d\n" , i.res->type);
     // wht();
     
 
@@ -222,15 +240,18 @@ void generate_single_relational(vmop op , quad *q)
 int get_next_instr_label(){return 1+current_instraction;}
 
 void expand_instructions(){
-    assert(I_CURRENT_SIZE == current_instraction);
+    // assert(I_CURRENT_SIZE == current_instraction);
     instr *a = malloc(I_NEW_SIZE);
     int i;
     if (instructions)
     {
-        memcpy(a, instructions, I_CURRENT_SIZE);
-        free(instructions);
+        instructions = (instr*)realloc(instructions , I_NEW_SIZE);
+        red();
+        printf("new size  === %d\n" , I_NEW_SIZE);
+        // memcpy(a, instructions, I_CURRENT_SIZE);
+        // free(instructions);
     }
-    instructions = a;
+    // instructions = a;
     total_instraction_size += I_EXPAND;
 }
 
@@ -343,11 +364,10 @@ void print_const_arrays()
 vmarg* make_operand(expr *e)
 {
     
-    vmarg* arg = (vmarg*)malloc(sizeof(vmarg));
     if(e == NULL) {
-        arg = NULL;
         return NULL ;
     }
+    vmarg* arg = (vmarg*)malloc(sizeof(vmarg));
     expr_t expressionType = e->type;
     
     if(!arg) exit(-1);
@@ -463,8 +483,10 @@ vmarg *make_operand_returnval()
 
 void init_const_arrays()
 {
-    numConsts = malloc(sizeof(int) * CONST_ARR_SIZE);
-    stringConsts = malloc(CONST_ARR_SIZE);
+    numConsts = (int*)malloc(sizeof(int) * CONST_ARR_SIZE);
+    stringConsts = (char**)malloc(CONST_ARR_SIZE*sizeof(char*));
+   
+    
     namedLibFuncs = malloc(sizeof(struct userFunc) * CONST_ARR_SIZE);
     int i;
     for (i = 0; i < CONST_ARR_SIZE; i++)

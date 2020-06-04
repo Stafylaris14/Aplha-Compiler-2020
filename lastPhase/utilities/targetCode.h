@@ -5,8 +5,8 @@
 
 //gia ton pinaka tou telikou kwdika
 #define I_SIZE 1024
-#define I_EXPAND 1024
-#define I_CURRENT_SIZE current_instraction * sizeof(instr)
+#define I_EXPAND 2048
+#define I_CURRENT_SIZE current_instraction * sizeof(instr) 
 #define I_NEW_SIZE (I_SIZE * sizeof(instr) + I_CURRENT_SIZE)
 #define __DEBUG instr *INSTRUCTION_DEBUG = NULL;printf("%d" , INSTRUCTION_DEBUG->res->val);
 

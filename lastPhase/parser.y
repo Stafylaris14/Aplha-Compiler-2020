@@ -19,6 +19,7 @@ int returnFlag = 0;
 extern char* yytext;
 extern FILE* yyin;
 int functionCounter = 0; /* for no name functions */
+int noCounter = 0;
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
@@ -195,7 +196,7 @@ Stmt: Expression semicolon {
                 backpatch($1->falselist, nextquad());
                 assign_flag = 0;
         }
-        tmp_count = 0;
+        //tmp_count = 0;
         $$ = $1;
     } 
     | Ifstmt {$$ = $1;}
@@ -492,6 +493,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                         $$ = newexpr(assignexp_);
                         $$->sym = tmp_item();
                         if($4->type == boolexpr_){
+
                         if(assign_flag==1){
                                 emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
                                 emit(JUMP,NULL,NULL,NULL , nextquad() + 3);
@@ -504,7 +506,10 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                                 backpatch($4->falselist, nextquad());
 
                         }
+                        printf("typeeeee $4 %d kai type $$ %d kai $1 %d\n",$4->type,$$->type,$1->type);
+
                         }
+                        
                         emit(ASSIGN,$4,NULL,$1 , -1);
                         emit(ASSIGN,$1,NULL,$$ , -1);
                         
@@ -535,7 +540,9 @@ Lvalue: id {
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
+                                printf("elaa panw %d kai name %s\n",scopeCounter,new->name);
                                 new = lookupAllscopes(new->name,scopeCounter);
+                                printf("elaa %d kai name %s\n",scopeCounter,new->name);
                                 $$ = lvalue_expr(new);
                                  
 
@@ -630,8 +637,11 @@ Multy_exp: comma Expression Multy_exp {
         | {$$ = NULL;}
         ;
 
-Objectdef: left_bracket {scopeCounter--;objectHide =0;} Elist right_bracket {
+Objectdef: left_bracket {if(scopeCounter != 0)scopeCounter--;else noCounter=1;objectHide =0;} Elist right_bracket {
+       if(!noCounter)
         scopeCounter++;
+       else
+         noCounter =0;
         objectHide=1;
         expr *t = newexpr(newtable_);
         t->sym = tmp_item();
@@ -643,8 +653,11 @@ Objectdef: left_bracket {scopeCounter--;objectHide =0;} Elist right_bracket {
         }
         $$ = t;
         }
-        | left_bracket {scopeCounter--;objectHide =0;} Indexed right_bracket {
-                scopeCounter++;
+        | left_bracket {if(scopeCounter != 0)scopeCounter--;else noCounter=1;objectHide =0;} Indexed right_bracket {
+                if(!noCounter)
+                        scopeCounter++;
+                else
+                        noCounter =0;
                 objectHide=1;
                 expr *t = newexpr(newtable_);
                 t->sym = tmp_item();
@@ -683,6 +696,7 @@ Indexedelement: left_curle_bracket {scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
                 Expression colon Expression right_curle_bracket {       
                         if(objectHide)hide(scopeCounter);
+                        //if(scopeCounter !=0)
                         scopeCounter--;
                         $$ = malloc(sizeof(indexstr));
                         $$->ena = $3;
@@ -696,6 +710,7 @@ Block: left_curle_bracket {scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         Stmts right_curle_bracket {
                 if(objectHide)hide(scopeCounter);
+               // if(scopeCounter !=0)
                 scopeCounter--;
                 $$ = $3;
                 }
@@ -954,9 +969,9 @@ int main(int argc, char** argv)
     
     //printSymTable();
     //printHash();
-    //printScopeList();
+    printScopeList();
     
-    //print_quads();
+    print_quads();
     generate();
     write_bin();
     print_instructions();   

@@ -5,7 +5,8 @@ compiler: parser scanner
 	gcc -o  calc avm.o targetCode.o quad.o parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o -lm  
 	./calc < Testfile.txt
 	
-
+test: compiler
+	./calc < Test.maki
 
 
 wall: parser scanner 

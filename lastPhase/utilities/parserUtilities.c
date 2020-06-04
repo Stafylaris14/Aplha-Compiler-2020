@@ -152,6 +152,7 @@ void new_check(item *new)
           }
           else if (!strcmp(tmp->type, "User Function") && tmp->scope == new->scope)
           {
+             return;
             char *str = returnErrorString("Redeclaration Funtion", new->name);
             if (returnFlag == 1)
               return;
@@ -262,6 +263,7 @@ void new_check(item *new)
           }
           else if (!strcmp(tmp->type, "formal argument") && tmp->scope == new->scope)
           {
+            return;
             char *str = returnErrorString("Redeclaration formal argument ", new->name);
             error(str, yylineno);
             return;
