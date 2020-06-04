@@ -1,11 +1,10 @@
-/*
-    Test file for the final phase of HY-340: Languages & Compilers
-    Computer science dpt, University of Crete, Greece
 
-infinite loop
-*/
+x = 2;
 
 
-while(1){
-	print("ok");
- } // never prints
+while(true){
+	x = x + 10;
+    print(x);
+ } 
+
+

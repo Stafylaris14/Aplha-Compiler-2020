@@ -214,10 +214,13 @@ void execute_cycle(void) //dial 15
     mag();
    // printf("to pc einai %d\n" , pc);
     wht();
-  if (executionFinished)
+  if (executionFinished){
+    avm_warning("error\n");
     return;
+  }
   else if (pc == AVM_ENDING_PC)
   {
+    avm_warning("telos");
     executionFinished = 1;
     return;
   }
@@ -867,7 +870,7 @@ void execute_call(instr *instr) //dial 15
       printf("to type einia %d\n" , func->type);
       avm_error("call: cannot bind '%s' to function!", s);
       // free(s);
-      executionFinished = 1;
+      //executionFinished = 1;
     }
   }
 }
@@ -902,7 +905,7 @@ void avm_calllibfunc(char *funcName) //dial 15
   if (!f)
   {
     avm_error("unsupported lib func %s called ! ", funcName);
-    executionFinished = 1;
+    //executionFinished = 1;
   }
   else
   {
@@ -1257,9 +1260,8 @@ void execute_if_greatereq(instr *instr)
 void execute_jump(instr *instr)
 {
   if (!executionFinished){
-    grn();
-    //printf("mpika sto exec finished\n");
-    exit(-1);
+    // grn();
+    //exit(-1);
   }
     
     pc = instr->res->val;
