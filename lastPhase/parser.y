@@ -540,9 +540,7 @@ Lvalue: id {
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
-                                printf("elaa panw %d kai name %s\n",scopeCounter,new->name);
                                 new = lookupAllscopes(new->name,scopeCounter);
-                                printf("elaa %d kai name %s\n",scopeCounter,new->name);
                                 $$ = lvalue_expr(new);
                                  
 
@@ -974,7 +972,7 @@ int main(int argc, char** argv)
     print_quads();
     generate();
     write_bin();
-    print_instructions();   
+    //print_instructions();   
     //red();
     read_bin();
     avm_initialize();

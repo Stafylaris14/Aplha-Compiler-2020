@@ -181,28 +181,13 @@ void generate(){
 void generate_single_quad(vmop op , quad *q){
     instr i ;
     i.op = op;
-    static int flag = 1;
 
-    
-
-
-
-
-    if(flag){
-        if(q->arg1){
-            red();
-            printf("eimai stin make arg1 kai to type einai %d\n" , q->arg1->type );
-            wht();
-            flag = 0;
-        }
-    }
     i.arg1 = make_operand(q->arg1);
     
     
     
     // grn();
     //  printf("arg1.val -> %d\n" , i.arg1->val);
-      printf("arg1.type -> %d\n" , i.arg1->type);
     // print_quad(*q);
     i.arg2 = make_operand(q->arg2);
     
@@ -246,10 +231,7 @@ void expand_instructions(){
     if (instructions)
     {
         instructions = (instr*)realloc(instructions , I_NEW_SIZE);
-        red();
-        printf("new size  === %d\n" , I_NEW_SIZE);
-        // memcpy(a, instructions, I_CURRENT_SIZE);
-        // free(instructions);
+
     }
     // instructions = a;
     total_instraction_size += I_EXPAND;
@@ -395,9 +377,7 @@ vmarg* make_operand(expr *e)
             arg->type = local_a;
             break;
         case formal_argument:
-            yel();
-            printf("----------------------------------------------eimai edw1\n");
-            wht();
+        
             arg->type = formal_a;
             break;
         default:
@@ -552,7 +532,6 @@ int newUserFunction(int address, int localsize, char *name)
 
 int consts_add_userFunc(expr *e)
 {
-    printf("eimai edw sto functions user %s\n" , e->sym->name);
     // userFuncs[userFuncSize] = func;
     int i;
     for (i = 0; i < userFuncSize; i++)

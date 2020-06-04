@@ -133,7 +133,6 @@ item *tmp_item();
 
 expr *new_expression(expr_t type);
 
-expr *switch_expression_type(expr *tmp_expression, void *value);
 
 char *get_opcode_string(iopcode op);
 

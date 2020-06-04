@@ -57,8 +57,7 @@ void extend_quads()
 
 void print_quads()
 {
-    cyn();
-    printf("-------------------------------------------------------------------------\n");
+    
     /* 0-> normal arg | 1-> boolConst 2-> NumConst | 3-> StringConst */
     int flag = 0;
     int i;
@@ -350,70 +349,7 @@ expr *new_expression(expr_t type)
     return tmp_expression;
 }
 
-expr *switch_expression_type(expr *tmp_expression, void *value)
-{
-    switch (tmp_expression->type)
-    {
-    case constnum_:
-        tmp_expression->numConst = (int)value;
-        tmp_expression->boolConst = NULL_BOOL;
-        tmp_expression->stringConst = NULL_STR;
-        break;
-    case constbool_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case conststring_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = (char *)value;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case var_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case tableitem_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case pfunc_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case lfunc_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case arthmexp_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case assignexp_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case newtable_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case nill_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    default:
-        break;
-    }
-    return tmp_expression;
-}
+
 
 char *get_opcode_expr_string(expr_t str)
 {

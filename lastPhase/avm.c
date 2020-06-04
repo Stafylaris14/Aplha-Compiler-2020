@@ -189,7 +189,7 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg) //dial 15
 //GET CONSTS
 int consts_get_number(int index) //dial 15
 {
-  printf("ti fasi to index %d\n",index);
+ // printf("ti fasi to index %d\n",index);
   return numConsts[index];
 }
 
@@ -222,7 +222,7 @@ void execute_cycle(void) //dial 15
   }
   else
   {
-    printf("ela mou pc %u kai end %u\n",pc,AVM_ENDING_PC);
+  //  printf("ela mou pc %u kai end %u\n",pc,AVM_ENDING_PC);
     assert(pc < AVM_ENDING_PC); 
     instr *instr1 = code + pc;
     cyn();
@@ -268,7 +268,7 @@ void avm_dec_top(void) //dial 15
 
 void avm_push_envvalue(unsigned val) //dial 15
 {
-  printf("topppp %u\n",top);
+ // printf("topppp %u\n",top);
   stack[top].type = number_m;
   stack[top].data.numVal = val;
   avm_dec_top();
@@ -322,7 +322,6 @@ void libfunc_print(void) // dial 15
   //printf("kane printsss\n");
   for (i = 0; i < n; ++i)
   {
-  printf("kane printsss %f\n", avm_getactual(i));
   char *s = avm_tostring(avm_getactual(i));
   //char *s = avm_tostring(&retval);
      //printf("kane printsss %f\n", avm_getactual(i));
@@ -457,7 +456,7 @@ void avm_tablebucketsinit(avm_table_bucket **p) //dial 13
 
 avm_table *avm_tablenew(void) //dia 13
 {
-  avm_table *t = (avm_table *)malloc(sizeof(avm_table));
+  avm_table *t = malloc(sizeof(avm_table));
   AVM_WIPEOUT(*t);
 
   t->refCounter = t->total = 0;
@@ -768,7 +767,7 @@ void execute_assign(instr *instr) //dial 15
  
   if(lv == &retval){
       mag();
-      printf("to rv sto assign einai %d type kai %d\n" , rv->type , consts_get_number( rv->data.numVal));
+     //printf("to rv sto assign einai %d type kai %d\n" , rv->type , consts_get_number( rv->data.numVal));
       wht();
   }
   //assert(lv && ((&stack[AVM_STACKENV_SIZE] >= lv && lv > &stack[top]) || lv == &retval));
@@ -825,7 +824,7 @@ void execute_call(instr *instr) //dial 15
   assert(func);
   avm_callsaveenvironment();
   
-printf("eimai stin call me ---------instr %d kai rese %f\n",instr->op,func->data.numVal);
+//printf("eimai stin call me ---------instr %d kai rese %f\n",instr->op,func->data.numVal);
 
   switch (func->type)
   {
@@ -867,7 +866,6 @@ printf("eimai stin call me ---------instr %d kai rese %f\n",instr->op,func->data
 
 void execute_funcstart(instr *instr) //dial 15
 {
-  printf("eimai stin funcstart\n");
   avm_memcell *func = avm_translate_operand(instr->res, &ax);
 
   assert(pc == func->data.funcVal);
@@ -1004,7 +1002,6 @@ void avm_initialize(void) // dial 15
 
   top = AVM_STACKSIZE - total_globs;
   topsp = AVM_STACKSIZE - total_globs;
-  printf("topsp sto init %u\n",topsp);
   avm_initstack();
   avm_registerlibfunc("print", libfunc_print);
   avm_registerlibfunc("input", libfunc_input);
@@ -1199,13 +1196,13 @@ void execute_if_greater(instr *instr)
       result = rv1->data.tableVal > rv2->data.tableVal;
   }
     
-  printf("eimai sto greatew kai rv1 type %d kai result (%d) kai jump %d\n",rv1->type,result,instr->res->val);
+  //printf("eimai sto greatew kai rv1 type %d kai result (%d) kai jump %d\n",rv1->type,result,instr->res->val);
   wht();
   
   if (!executionFinished && result)
   {
        red();
-      printf("pernaw edww\n");
+     // printf("pernaw edww\n");
     pc = instr->res->val;
   }
 }
@@ -1255,7 +1252,6 @@ void execute_jump(instr *instr)
     grn();
     //printf("mpika sto exec finished\n");
   }
-   // printf("to pc einai prin %d\n" , pc);
     pc = instr->res->val;
     //printf("to pc einai meta %d\n" , pc);
     wht();
