@@ -797,9 +797,10 @@ Ifstmt: ifFix Stmt {
                 $$ = $2;
         }
         | ifFix Stmt elseFix Stmt {
+                $$ = $2;
+                $$->returnlist = mergelist($2->returnlist, $4->returnlist);
                 patchlabel($1 -1 , $3+2);
                 patchlabel($3 , nextquad()+1);
-                $$ = $2;
         }
         ;
 
@@ -952,10 +953,10 @@ int main(int argc, char** argv)
     yyparse();
     
     //printSymTable();
-    printHash();
-    printScopeList();
+    //printHash();
+    //printScopeList();
     
-    print_quads();
+    //print_quads();
     generate();
     write_bin();
     print_instructions();   

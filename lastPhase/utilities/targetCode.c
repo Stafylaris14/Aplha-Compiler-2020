@@ -123,7 +123,7 @@ void generate_CALL(quad q)
 void generate_PARAM(quad q){
     instr i;
     q.next_instr_label = get_next_instr_label();
-    print_quad(q);
+    //print_quad(q);
     i.arg2 = NULL;
     i.arg1 = make_operand(q.arg1);
     i.op = pusharg_v;
@@ -147,11 +147,6 @@ void generate_GETRETVAL(quad q){
     i.op = assign_v;
     i.res = make_operand(q.arg1);
     i.arg1 = make_operand_returnval();
-    printf("yel\n");
-    //print_quad(q);
-    printf("yel\n");
-    // if(q.arg1 == NULL) printf("einai NULL\n");
-    // i.arg1 = make_operand_returnval(q.arg1);
     emit_instruction(i);
 }
 void generate_FUNCSTART(quad q){
@@ -348,14 +343,13 @@ void print_const_arrays()
 vmarg* make_operand(expr *e)
 {
     
-    vmarg* arg = malloc(sizeof(vmarg));
+    vmarg* arg = (vmarg*)malloc(sizeof(vmarg));
     if(e == NULL) {
         arg = NULL;
         return NULL ;
     }
     expr_t expressionType = e->type;
-    arg = NULL;
-    arg = malloc(sizeof(vmarg));
+    
     if(!arg) exit(-1);
     mag();
     // printf("\n\n\n\neimai edw sto make op kai to expression type einai %d\n\n\n\n" , expressionType);
