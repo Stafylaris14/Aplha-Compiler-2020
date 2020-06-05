@@ -540,6 +540,7 @@ Lvalue: id {
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
+                                if(scopeCounter < 0) scopeCounter = 0;
                                 new = lookupAllscopes(new->name,scopeCounter);
                                 $$ = lvalue_expr(new);
                                  
@@ -551,6 +552,7 @@ Lvalue: id {
                                 item* new = NULL;
                                 new = newItem($2,"local", scopeCounter , yylineno );
                                 new_check(new);
+                                if(scopeCounter < 0) scopeCounter = 0;
                                 new = lookupAllscopes(new->name,scopeCounter);
                                 $$ = lvalue_expr(new);
         }
@@ -730,6 +732,7 @@ Funcprefix: Function Funcname{
         item* new = newItem($2,"User Function", scopeCounter , yylineno );
         new_check(new);
         new = lookupAllscopes(new->name,scopeCounter);
+        
         expr*temp = newexpr(pfunc_);
         temp->sym = new;
         emit(JUMP,NULL,NULL,NULL,-1);
@@ -968,7 +971,7 @@ int main(int argc, char** argv)
     //printHash();
     //printScopeList();
     
-    print_quads();
+    //print_quads();
     generate();
     write_bin();
     print_instructions();   

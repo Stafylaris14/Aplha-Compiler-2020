@@ -113,13 +113,14 @@ item *lookupAllscopes(char *name, int scope)
     int index = scope;
     item *tmp = NULL;
     tmp = lookupScope(name, scope);
-    while (scope >= 0)
+    while (scope >= -2)
     {
         scope--;
         if (tmp != NULL)
             return tmp;
         tmp = lookupScope(name, scope);
     }
+    printf("gitttttt %s kai %d\n",name,scope);
     return NULL;
 }
 

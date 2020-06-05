@@ -535,11 +535,12 @@ int consts_add_userFunc(expr *e)
     // userFuncs[userFuncSize] = func;
     int i;
     for (i = 0; i < userFuncSize; i++)
-        if(!strcmp(e->sym->name , userFuncs[i]->id)) return i;
+        if(!strcmp(e->sym->name , userFuncs[i]->id) && e->sym->scope == userFuncs[i]->scope) return i;
     
     userFunc* function = malloc(sizeof(userFunc));
     function->id = strdup(e->sym->name);
     // function->address = ;
+    function->scope = e->sym->scope;
     function->localsize = e->sym->formal_count;
     function->address =current_instraction; 
     userFuncs[userFuncSize] = function;

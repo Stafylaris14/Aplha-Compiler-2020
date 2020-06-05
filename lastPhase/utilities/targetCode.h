@@ -82,6 +82,7 @@ typedef struct instruction
 
 typedef struct userFunc
 {
+  int scope;
   int address;
   int localsize;
   char *id;
