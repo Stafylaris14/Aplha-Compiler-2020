@@ -1,7 +1,7 @@
 %{
 
-//#include "utilities/quad.h"
-#include "utilities/targetcode.h"
+//#include "utilities/target.h"
+#include "avm.h"
 #include "dataStructs/linkedList.h"
 #include "dataStructs/commentStack.h"
 
@@ -19,14 +19,16 @@ int returnFlag = 0;
 extern char* yytext;
 extern FILE* yyin;
 int functionCounter = 0; /* for no name functions */
+int noCounter = 0;
 int functionFlag  = 0;  /*1 if is inside a function for RETURN stmt*/
 int callFlag =0; // an exw call
 int objectHide = 1;//na min kanei hide an einai se object
 int assign_flag = 0;
 stack1 *loopcounterstack; //krataei poses anakikloseis exoun anoi3ei
 /* iopcode op; */
-
+extern int executionFinished;
 extern int currQuad;
+extern int tmp_count;
 
 
 expr *result;
@@ -143,7 +145,7 @@ char* functionName ; /* used to ADD formal arguments to linked list */
 %type <EXPR> Call Stmts 
 %type <EXPR> Term   Multy_exp Ifstmt Forstmt
 %type <EXPR> Lvalue Primary Objectdef Const Member Stmt
-%type <item> Funcdef
+%type <item> Funcdef 
 %type <item> Funcprefix
 %type <strVal> Funcname
 %type <label_jumps> Whilestart
@@ -194,6 +196,7 @@ Stmt: Expression semicolon {
                 backpatch($1->falselist, nextquad());
                 assign_flag = 0;
         }
+        //tmp_count = 0;
         $$ = $1;
     } 
     | Ifstmt {$$ = $1;}
@@ -490,6 +493,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                         $$ = newexpr(assignexp_);
                         $$->sym = tmp_item();
                         if($4->type == boolexpr_){
+
                         if(assign_flag==1){
                                 emit(ASSIGN,newexpr_constbool(1),NULL,$$ , -1);
                                 emit(JUMP,NULL,NULL,NULL , nextquad() + 3);
@@ -502,7 +506,10 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                                 backpatch($4->falselist, nextquad());
 
                         }
+                        printf("typeeeee $4 %d kai type $$ %d kai $1 %d\n",$4->type,$$->type,$1->type);
+
                         }
+                        
                         emit(ASSIGN,$4,NULL,$1 , -1);
                         emit(ASSIGN,$1,NULL,$$ , -1);
                         
@@ -533,6 +540,8 @@ Lvalue: id {
                                 item* new;
                                 if(scopeCounter == 0){new = newItem($1,"global variable", scopeCounter , yylineno);new_check(new); }
                                 else {new = newItem($1,"local variable", scopeCounter , yylineno );new_check(new);}
+                                if(scopeCounter < 0) scopeCounter = 0;
+                                new = lookupAllscopes(new->name,scopeCounter);
                                 $$ = lvalue_expr(new);
                                  
 
@@ -543,12 +552,14 @@ Lvalue: id {
                                 item* new = NULL;
                                 new = newItem($2,"local", scopeCounter , yylineno );
                                 new_check(new);
+                                if(scopeCounter < 0) scopeCounter = 0;
+                                new = lookupAllscopes(new->name,scopeCounter);
                                 $$ = lvalue_expr(new);
         }
         | double_colons id {
                                 if(isFA($2))libcheck =1;
                                 item* tmp = lookupScope($2 , 0);
-                                if(tmp == NULL){error("Cant find Global " , yylineno);} 
+                                if(tmp == NULL){error("Cant find Global " , yylineno);}
                                 $$ = lvalue_expr(tmp);               
         }
         | Member {$$ = $1;};
@@ -626,8 +637,10 @@ Multy_exp: comma Expression Multy_exp {
         | {$$ = NULL;}
         ;
 
-Objectdef: left_bracket {scopeCounter--;objectHide =0;} Elist right_bracket {
+Objectdef: left_bracket {scopeCounter--; noCounter=1;objectHide =0;} Elist right_bracket {
+      
         scopeCounter++;
+     
         objectHide=1;
         expr *t = newexpr(newtable_);
         t->sym = tmp_item();
@@ -639,8 +652,11 @@ Objectdef: left_bracket {scopeCounter--;objectHide =0;} Elist right_bracket {
         }
         $$ = t;
         }
-        | left_bracket {scopeCounter--;objectHide =0;} Indexed right_bracket {
-                scopeCounter++;
+        | left_bracket {scopeCounter--;noCounter=1;objectHide =0;} Indexed right_bracket {
+                
+                        scopeCounter++;
+              
+                      
                 objectHide=1;
                 expr *t = newexpr(newtable_);
                 t->sym = tmp_item();
@@ -679,6 +695,7 @@ Indexedelement: left_curle_bracket {scopeCounter++;
                 if(scopeCounter > maxScope) maxScope = scopeCounter;}
                 Expression colon Expression right_curle_bracket {       
                         if(objectHide)hide(scopeCounter);
+                        //if(scopeCounter !=0)
                         scopeCounter--;
                         $$ = malloc(sizeof(indexstr));
                         $$->ena = $3;
@@ -692,6 +709,7 @@ Block: left_curle_bracket {scopeCounter++;
         if(scopeCounter > maxScope) maxScope = scopeCounter;}
         Stmts right_curle_bracket {
                 if(objectHide)hide(scopeCounter);
+               // if(scopeCounter !=0)
                 scopeCounter--;
                 $$ = $3;
                 }
@@ -713,6 +731,8 @@ Funcdef: Funcprefix  Funcargs Funcblockstart Funcbody Funcblockend {
 Funcprefix: Function Funcname{
         item* new = newItem($2,"User Function", scopeCounter , yylineno );
         new_check(new);
+        new = lookupAllscopes(new->name,scopeCounter);
+        
         expr*temp = newexpr(pfunc_);
         temp->sym = new;
         emit(JUMP,NULL,NULL,NULL,-1);
@@ -762,27 +782,27 @@ Const:  integer {$$ = newexpr_constint($1);
 
 
 
-Idlist: id Multy_id {
-        
+Idlist:    id Multy_id {
+                
                 item* new = newItem($1,"formal argument", scopeCounter , yylineno );
                     formal_flag = 1;
                     new_check(new);
                     insert_formal_arg(functionName , $1);
                     formal_flag = 0;
-                    
+  
         }
         | {;}
         ;
 
-Multy_id: Multy_id comma id {
+Multy_id:   Multy_id comma  id {
         
                   item* new = newItem($3,"formal argument", scopeCounter , yylineno );
                   new_check(new);
                   insert_formal_arg(functionName , $3);
+                
         }
         | {;}
         ;
-
 
 
 
@@ -792,9 +812,10 @@ Ifstmt: ifFix Stmt {
                 $$ = $2;
         }
         | ifFix Stmt elseFix Stmt {
+                $$ = $2;
+                $$->returnlist = mergelist($2->returnlist, $4->returnlist);
                 patchlabel($1 -1 , $3+2);
                 patchlabel($3 , nextquad()+1);
-                $$ = $2;
         }
         ;
 
@@ -911,7 +932,7 @@ Returnstmt: Return semicolon {libcheck =0;
         } Expression semicolon {libcheck =0;
         returnFlag =0; 
         $$= $3;
-        emit(RETURN, $3, NULL, NULL, -1);
+        emit(RETURN, NULL, NULL, $3, -1);
         emit(JUMP,NULL,NULL,NULL,-1);
         $$->returnlist = new_list(nextquad()-1);
         }
@@ -945,12 +966,23 @@ int main(int argc, char** argv)
   }
     loopcounterstack = arxikopoisi();
     yyparse();
+    
     //printSymTable();
-    printHash();
+    //printHash();
     //printScopeList();
     
-    print_quads();
+    //print_quads();
     generate();
     write_bin();
     print_instructions();   
+    //red();
+    read_bin();
+    avm_initialize();
+    //printf("vgika apo tin init\n");
+
+    while(!executionFinished)
+    {
+        execute_cycle();
+      
+    }
 }

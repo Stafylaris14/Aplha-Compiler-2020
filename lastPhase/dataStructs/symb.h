@@ -51,6 +51,8 @@ void insert_symTable(item *i);
 
 item *lookupScope(char *name, int scope);
 
+item *lookupAllscopes(char *name, int scope);
+
 item *lookup(char *name);
 
 item *newItem(char *name, char *type, int scope, double lineno);

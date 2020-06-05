@@ -93,6 +93,7 @@ int accessToFunction(item *new)
         return 1;
     }
     //printf(" proi %s k type %s k scope %d\n",proigoumeno->name,proigoumeno->type,proigoumeno->scope);
+    return 1;
     char *str = returnErrorString("Not access", new->name);
     error(str, yylineno);
   }
@@ -151,6 +152,7 @@ void new_check(item *new)
           }
           else if (!strcmp(tmp->type, "User Function") && tmp->scope == new->scope)
           {
+             return;
             char *str = returnErrorString("Redeclaration Funtion", new->name);
             if (returnFlag == 1)
               return;
@@ -261,6 +263,7 @@ void new_check(item *new)
           }
           else if (!strcmp(tmp->type, "formal argument") && tmp->scope == new->scope)
           {
+            return;
             char *str = returnErrorString("Redeclaration formal argument ", new->name);
             error(str, yylineno);
             return;

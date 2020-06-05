@@ -57,8 +57,7 @@ void extend_quads()
 
 void print_quads()
 {
-    cyn();
-    printf("-------------------------------------------------------------------------\n");
+    
     /* 0-> normal arg | 1-> boolConst 2-> NumConst | 3-> StringConst */
     int flag = 0;
     int i;
@@ -124,9 +123,7 @@ void print_quads()
                     a1 = quads[i].arg1->sym->name;
                     break;
                 case lfunc_:
-                    red();
-                    printf("na to libb\n");
-                    cyn();
+                   a1 = quads[i].arg1->sym->name;
                     break;
                 default:
                     a1 = get_opcode_expr_string(quads[i].arg1->type);
@@ -184,9 +181,7 @@ void print_quads()
                     a2 = quads[i].arg2->sym->name;
                     break;
                 case lfunc_:
-                    red();
-                    printf("na to libb\n");
-                    cyn();
+                   a2 = quads[i].arg2->sym->name;
                     break;
                 default:
                     a2 = get_opcode_expr_string(quads[i].arg2->type);
@@ -246,9 +241,7 @@ void print_quads()
                     a3 = quads[i].result->sym->name;
                     break;
                 case lfunc_:
-                    red();
-                    printf("na to libb\n");
-                    cyn();
+                    a3 = quads[i].result->sym->name;
                     break;
                 default:
                     a3= get_opcode_expr_string(quads[i].result->type);
@@ -356,70 +349,7 @@ expr *new_expression(expr_t type)
     return tmp_expression;
 }
 
-expr *switch_expression_type(expr *tmp_expression, void *value)
-{
-    switch (tmp_expression->type)
-    {
-    case constnum_:
-        tmp_expression->numConst = (int)value;
-        tmp_expression->boolConst = NULL_BOOL;
-        tmp_expression->stringConst = NULL_STR;
-        break;
-    case constbool_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case conststring_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = (char *)value;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case var_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case tableitem_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case pfunc_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case lfunc_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case arthmexp_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case assignexp_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case newtable_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    case nill_:
-        tmp_expression->numConst = NULL_NUM;
-        tmp_expression->stringConst = NULL_STR;
-        tmp_expression->boolConst = NULL_BOOL;
-        break;
-    default:
-        break;
-    }
-    return tmp_expression;
-}
+
 
 char *get_opcode_expr_string(expr_t str)
 {
@@ -571,9 +501,17 @@ int nextquad()
 
 expr *make_call(expr *lv, expr *reversed_elist)
 {
+    expr* tmp = reversed_elist;
+  
     expr *func = emit_iftableitem(lv);
     while (reversed_elist)
     {
+        if(reversed_elist->sym)
+            if(reversed_elist->sym->offset < 0){
+                item *sagapaw = lookup(reversed_elist->sym->name);      //ERROR
+                assert(sagapaw);
+                reversed_elist->sym->offset = sagapaw->offset;
+            }
         emit(PARAM, reversed_elist, NULL, NULL, -1);
         reversed_elist = reversed_elist->next;
     }
@@ -581,6 +519,7 @@ expr *make_call(expr *lv, expr *reversed_elist)
     expr *result = newexpr(var_);
     result->sym = tmp_item();
     emit(GETRETVAL, result, NULL, NULL, -1);
+    //printf("scopeeeeeeeeeeeeeeeeeeeeeee space %d\n",result->sym->scope_spase);
     return result;
 }
 
@@ -647,9 +586,6 @@ expr *lvalue_expr(item *sym)
     {
         sp = -1;
     }
-    printf("eimai edw sta palia\n");
-    printf("to onoma einai ->%s\n" , sym->name);
-    printf("to type einai -> %s\n" , sym->type);
     // e->contlist = NULL;
     // e->breaklist = NULL;
     // e->falselist = NULL;
