@@ -222,7 +222,6 @@ void execute_cycle(void) //dial 15
     instr *instr1 = code + pc;
     unsigned oldPC = pc;
     assert(instr1->op >= 0 && instr1->op <= AVM_MAX_INSTRUCTIONS);    
-   // printf("instrction %d\n",instr1->op);
     (*executeFuncs[instr1->op])(instr1);
     if (pc == oldPC)
       ++pc;
