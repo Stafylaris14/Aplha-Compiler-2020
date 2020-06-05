@@ -506,7 +506,7 @@ Assignexpression: Lvalue {if(libcheck == 1){error("Den boreis na kaneis pra3eis 
                                 backpatch($4->falselist, nextquad());
 
                         }
-                        printf("typeeeee $4 %d kai type $$ %d kai $1 %d\n",$4->type,$$->type,$1->type);
+                        //printf("typeeeee $4 %d kai type $$ %d kai $1 %d\n",$4->type,$$->type,$1->type);
 
                         }
                         
@@ -974,11 +974,10 @@ int main(int argc, char** argv)
     //print_quads();
     generate();
     write_bin();
-    print_instructions();   
+    //print_instructions();   
     //red();
     read_bin();
     avm_initialize();
-    //printf("vgika apo tin init\n");
 
     while(!executionFinished)
     {

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "./dataStructs/linkedList.h"
+#include <ctype.h>
 
 char *typeStrings[8] = {"number_m",
                         "string_m",
@@ -102,7 +103,6 @@ int number_of_lib = 0;
 #define AVM_SAVEDTOP_OFFSET +2
 #define AVM_SAVEDTOPSP_OFFSET +1
 
-// extern userFunc* avm_getfuncinfo(unsigned address);
 
 typedef double (*arithmetic_func_t)(double x, double y);
 
@@ -176,9 +176,11 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg) //dial 15
     reg->type = libfunc_m;
     reg->data.libFuncVal = consts_get_libFunction(arg->val);
     return reg;
-  
+  case nill_a:
+    reg->type = nill_m;
+    break;
   default:
-    //assert(0);
+    assert(0);
     break;
   }
 }
@@ -216,14 +218,11 @@ void execute_cycle(void) //dial 15
   }
   else
   {
-  //  printf("ela mou pc %u kai end %u\n",pc,AVM_ENDING_PC);
     assert(pc < AVM_ENDING_PC); 
     instr *instr1 = code + pc;
- //   cyn();
-   // printf("to opeinai %d\n" , instr1->op);
-      //printf("instruction %d - opcode %d\n", pc,instr1->op);
     unsigned oldPC = pc;
     assert(instr1->op >= 0 && instr1->op <= AVM_MAX_INSTRUCTIONS);    
+   // printf("instrction %d\n",instr1->op);
     (*executeFuncs[instr1->op])(instr1);
     if (pc == oldPC)
       ++pc;
@@ -318,8 +317,9 @@ void libfunc_print(void) // dial 15
     grn();
     if(avm_getactual(i)->type == table_m)
       fprintf(stdout ,"(%s)", s );
-    else
+    else{
       fprintf(stdout ,"%s", s );
+    }
     wht();
     // free(s);
   }
@@ -391,7 +391,6 @@ void execute_arithmetic(instr *instr) // dial 15
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv1 = avm_translate_operand(instr->arg1, &ax);
   avm_memcell *rv2 = avm_translate_operand(instr->arg2, &bx);
-  // assert(lv && (&stack[0] <= lv && &stack[top] > lv || lv == &retval));
   assert(rv1 && rv2);
   if (rv1->type != number_m || rv2->type != number_m)
   {
@@ -493,7 +492,7 @@ void execute_if_eq(instr *instr) //dial 15
 
   if (rv1->type == undef_m || rv2->type == undef_m)
   {
-    avm_error("'undef'involved in equality!");
+    //avm_error("'undef'involved in equality!");
   }
   else if (rv1->type == nill_m || rv2->type == nill_m)
   {
@@ -546,8 +545,8 @@ avm_memcell *avm_tablegetelem(avm_table *table ,avm_memcell *key)
   if(key->type == number_m)
   {
      pinakas = table->numIndexed[index];
-    if (pinakas == NULL){avm_error("Cannot access to table\n");assert(0);}
-    if(pinakas->key.data.numVal != key->data.numVal){
+    if (pinakas == NULL){avm_error("Cannot access to table\n"); }
+    if(pinakas->key.data.numVal == key->data.numVal){
       avm_table_bucket* tmp  = pinakas;
 
       while( tmp!=NULL && tmp->key.data.numVal!=key->data.numVal){
@@ -562,18 +561,21 @@ avm_memcell *avm_tablegetelem(avm_table *table ,avm_memcell *key)
   }else if(key->type == string_m)
   {
     pinakas = table->strIndexed[index];
-    if(strcmp(pinakas->key.data.strVal,key->data.strVal)){
-      avm_table_bucket* tmp  = pinakas;
+    avm_table_bucket* tmp  = pinakas;
+    if(pinakas != NULL){
       while(strcmp(tmp->key.data.strVal,key->data.strVal))tmp = tmp->next;
+      return &tmp->value;
     }
     return &pinakas->value;
   }else 
   {
     assert(0);
   }
+
+}
   
  
-}
+
 
 void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val)
 {
@@ -582,22 +584,22 @@ void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val)
   int index = hash_avm(key);
   
   if(key->type == number_m){
+    //if(key->data.numVal == 0)assert(0);
     pinakas = table->numIndexed[index];
     if(pinakas == NULL){
         pinakas = malloc(sizeof(avm_table_bucket));
         pinakas->key = *key;
-        pinakas->key.type = key->type;
+       // pinakas->key.type = key->type;
         pinakas->value = *val;
-        pinakas->value.type = val->type;
-       // pinakas->key.data.numVal = *key;
+        //pinakas->value.type = val->type;
         pinakas->next = NULL;
     }else{
         avm_table_bucket *Node = malloc(sizeof(avm_table_bucket));
         Node->key = *key;
-        Node->key.type = key->type;
+        //Node->key.type = key->type;
         
         Node->value = *val;
-        Node->value.type = val->type;
+       // Node->value.type = val->type;
         Node->next = NULL; 
        avm_table_bucket* tmp = pinakas;       
         while(tmp->next != NULL){
@@ -635,6 +637,9 @@ void avm_tablesetelem(avm_table *table, avm_memcell *key, avm_memcell *val)
    table->total = table->total +1;
 }
 
+
+
+
 void execute_tablegetelem(instr *instr)
 {
 
@@ -642,8 +647,6 @@ void execute_tablegetelem(instr *instr)
   avm_memcell *t = avm_translate_operand(instr->arg1, (avm_memcell *)0);
   avm_memcell *i = avm_translate_operand(instr->arg2, &ax);
 
- // assert(lv && (&stack[top] <= lv && &stack[top] > lv || lv == &retval));
-  //assert(t && &stack[top] <= t && &stack[top] > t);
   assert(i);
 
   avm_memcellclear(lv);
@@ -651,8 +654,8 @@ void execute_tablegetelem(instr *instr)
 
   if (t->type != table_m)
   {
-      avm_error("illegal use of type %d as table!", typeStrings[t->type]);
-      // assert(0);
+    //  avm_error("illegal use of type %d as table!", typeStrings[t->type]);
+     // assert(0);
   }
   else
   {
@@ -694,7 +697,7 @@ void execute_tablesetelem(instr *instr) //dial 15
 void memclear_string(avm_memcell *m) //dia 15
 {
  // assert(m->data.strVal);
-  free(m->data.strVal);
+  // free(m->data.strVal);
 }
 
 void memclear_table(avm_memcell *m) //dia 15
@@ -722,7 +725,7 @@ void avm_memcellclear(avm_memcell *m) //dial 15
 void avm_warning(char *format, ...) //dial 15
 {
   cyn();
-  printf("AVM WARNING %s\n", format);
+  printf("\nAVM WARNING %s\n", format);
   wht();
 }
 
@@ -733,12 +736,7 @@ void execute_assign(instr *instr) //dial 15
   avm_memcell *lv = avm_translate_operand(instr->res, (avm_memcell *)0);
   avm_memcell *rv = avm_translate_operand(instr->arg1, &ax);
  
-  if(lv == &retval){
-    //   mag();
-    //  //printf("to rv sto assign einai %d type kai %d\n" , rv->type , consts_get_number( rv->data.numVal));
-    //   wht();
-  }
-  //assert(lv && ((&stack[AVM_STACKENV_SIZE] >= lv && lv > &stack[top]) || lv == &retval));
+  
   assert(rv);
 
   avm_assign(lv, rv);
@@ -749,12 +747,8 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv) //dial 15
 
   if (lv == rv)
     return;
-  if (lv == NULL)
-    printf("TO LV EINAI NULL!!!!\n");
   if (lv->type == table_m && rv->type == table_m && lv->data.tableVal == rv->data.tableVal)
     return;
-  if (rv->type == undef_m)
-    avm_warning("assigning from 'undef' content!");
 
   avm_memcellclear(lv);
   
@@ -769,19 +763,18 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv) //dial 15
 void avm_error(char *format, ...) //dial 15
 {
   red();
-  printf("AVM ERROR %s\n", format);
+  printf("\nAVM ERROR %s\n", format);
   wht();
 }
 
 char *avm_tostring(avm_memcell *m) //dial 15
 {
-   if(m->type <= 0 || m->type >= undef_m)m->type = 7;
+   if(m->type < 0 || m->type > undef_m)m->type = 7;
   return (*tostringFuncs[m->type])(m);
 }
 
 void execute_call(instr *instr) //dial 15
 {
-  yel();
    
   avm_memcell *func = avm_translate_operand(instr->arg1, &ax);
   assert(func);
@@ -800,7 +793,8 @@ void execute_call(instr *instr) //dial 15
     {
       userFunc* f = consts_get_userfunction(func->data.numVal);
       if(f == NULL){
-        assert(0);
+        avm_error("Function not found");
+        exit(1);
       }
       pc = f->address;
       break;
@@ -814,10 +808,6 @@ void execute_call(instr *instr) //dial 15
     default:
     {
       char *s = avm_tostring(func);
-      red();
-      avm_error("call: cannot bind '%s' to function!", s);
-      // free(s);
-      //executionFinished = 1;
     }
   }
 }
@@ -838,9 +828,11 @@ void execute_funcstart(instr *instr) //dial 15
 
 unsigned avm_get_envvalue(unsigned i) //dial 15
 {
-  //assert(stack[i].type == number_m);
   unsigned val = (unsigned)stack[i].data.numVal;
-  assert(stack[i].data.numVal == ((double)val));
+  if(stack[i].data.numVal != ((double)val)){
+    // avm_error("Segment can't reached");
+    // exit(1);
+  }
   return val;
 }
 
@@ -852,7 +844,6 @@ void avm_calllibfunc(char *funcName) //dial 15
   if (!f)
   {
     avm_error("unsupported lib func %s called ! ", funcName);
-    //executionFinished = 1;
   }
   else
   {
@@ -930,7 +921,6 @@ char *table_tostring(avm_memcell *kati) // dial 15
 char *userfunc_tostring(avm_memcell *kati) // dial 15
 {
   char* s = malloc(sizeof(500));
-  printf("\n\n%d\n\n" , kati->data.funcVal);
   userFunc* function = consts_get_userfunction_byaddress(kati->data.funcVal);
 
   sprintf(s , "user function (%s) " , function->id);
@@ -1024,9 +1014,12 @@ void execute_if_noteq(instr *instr)
   {
     result = (avm_tobool(rv1) == avm_tobool(rv2));
   }
-  else if (rv1->type != rv2->type)
-    avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
-  else
+  else if (rv1->type != rv2->type){
+    unsigned char t1 = avm_tobool(rv1);
+    unsigned char t2 = avm_tobool(rv2);
+    if(t1 == t2)result = 1;
+    else result = 0;
+  }else
   {
     if (rv1->type == string_m)
       result = strcmp(rv1->data.strVal, rv2->data.strVal);
@@ -1054,7 +1047,7 @@ void execute_if_lesseq(instr *instr)
 
   if (rv1->type == undef_m || rv2->type == undef_m)
   {
-    avm_error("'undef'involved in equality!");
+    //avm_error("'undef'involved in equality!");
   }
   else if (rv1->type == nill_m || rv2->type == nill_m)
   {
@@ -1094,7 +1087,7 @@ void execute_if_less(instr *instr)
 
   if (rv1->type == undef_m || rv2->type == undef_m)
   {
-    avm_error("'undef'involved in equality!");
+    //avm_error("'undef'involved in equality!");
   }
   else if (rv1->type == nill_m || rv2->type == nill_m)
   {
@@ -1134,7 +1127,7 @@ void execute_if_greater(instr *instr)
 
   if (rv1->type == undef_m || rv2->type == undef_m)
   {
-    avm_error("'undef'involved in equality!");
+    //avm_error("'undef'involved in equality!");
   }
   else if (rv1->type == nill_m || rv2->type == nill_m)
   {
@@ -1144,8 +1137,6 @@ void execute_if_greater(instr *instr)
   {
     result = (avm_tobool(rv1) == avm_tobool(rv2));
   }
-  else if (rv1->type != rv2->type)
-    avm_error("%s == %s is illegal!", typeStrings[rv1->type], typeStrings[rv2->type]);
   else
   {
     if (rv1->type == string_m)
@@ -1179,7 +1170,7 @@ void execute_if_greatereq(instr *instr)
 
   if (rv1->type == undef_m || rv2->type == undef_m)
   {
-    avm_error("'undef'involved in equality!");
+    //avm_error("'undef'involved in equality!");
   }
   else if (rv1->type == nill_m || rv2->type == nill_m)
   {
@@ -1284,7 +1275,7 @@ void read_bin()
 
 void libfunc_input(void)
 {
-      char*s;
+      char s[200];
       printf("Input:");
       scanf("%s" , s);
       if(!strcmp(s , "true")){
@@ -1300,16 +1291,11 @@ void libfunc_input(void)
         retval.data.numVal = atoi(s);
         return;
       }
-      
-
-      retval.type = string_m;
-      retval.data.strVal = strdup(s);
-    // free(s);
+    
 }
 
 void libfunc_objectmemberkeys(void)
 {
- 
   avm_memcell* t = avm_getactual(0);
   avm_table* p = t->data.tableVal;
   retval.type = table_m;
@@ -1322,17 +1308,17 @@ void libfunc_objectmemberkeys(void)
     if(p->numIndexed[i]!=NULL)
     {
       s = strdup(avm_tostring(&p->numIndexed[i]->key));
-      s[sizeof(avm_tostring(&p->numIndexed[i]->key))] = '\0';
+      // s[sizeof(avm_tostring(&p->numIndexed[i]->key))] = '\0';
       avm_memcell* temp = malloc(sizeof(avm_memcell));
       temp->data.strVal = strdup(s);
       temp->type = string_m;
-      avm_tablesetelem(retval.data.tableVal , s ,s);
+      avm_tablesetelem(retval.data.tableVal , temp ,temp);
       s[0] = '\0';
     }
      if(p->strIndexed[i]!=NULL)
     {
       s = strdup(avm_tostring(&p->strIndexed[i]->key));
-      s[sizeof(avm_tostring(&p->strIndexed[i]->key))] = '\0';
+      // s[sizeof(avm_tostring(&p->strIndexed[i]->key))] = '\0';
       avm_memcell* temp = malloc(sizeof(avm_memcell));
       temp->data.strVal = strdup(s);
       temp->type = string_m;
@@ -1340,6 +1326,7 @@ void libfunc_objectmemberkeys(void)
       s[0] = '\0';
     }
   }
+
 }
 
 void libfunc_objecttotalmembers(void)
@@ -1391,6 +1378,10 @@ void libfunc_strtonum(void)
     avm_memcell *a = avm_getactual(0);
     retval.type = number_m;
     retval.data.numVal = atoi(a->data.strVal);
+    printf("eimai edw stin str %f---------------------------------\n" , retval.data.numVal);
+    // if(retval.data.numVal == 0){
+
+    // }
   }
   
 }
@@ -1442,48 +1433,6 @@ void libfunc_sin()
   }
 }
 
-void print_stack(){
-  cyn();
-  printf("----------type---------data\n\n");
-  int i;
-  for(i = AVM_STACKSIZE; i > 4088; i--)
-  {
-    printf("[%d]|       %d      " ,i, stack[i].type);
-
-    switch (stack[i].type)
-    {
-    case number_m:
-      printf("%f \n" , stack[i].data.numVal);
-      break;
-    case string_m:
-      printf("%s\n" , stack[i].data.strVal);
-      break;
-    case bool_m:
-      if(stack[i].data.boolVal) printf("true\n");
-      else printf("false\n");
-      break;
-    case table_m:
-      printf("table\n");
-      break;
-    case userfunc_m:
-      printf(" \n");
-      break;
-    case libfunc_m:
-      printf("libfunc\n");
-      break;
-    case nill_m:
-      printf("nilll\n");
-      break;
-    case undef_m:
-      printf(" \n");
-      break;
-    default:
-      break;
-    }
-
-  }
-  printf("-------------------------\n");
-}
 
 userFunc* consts_get_userfunction_byaddress(int address)
 {
@@ -1501,7 +1450,7 @@ int hash_avm(avm_memcell *key)
       index += (int)key->data.strVal[i];
     }
     return index%AVM_TABLE_HASHSIZE;
-  } 
+  }
    
   else if (key->type == table_m){
     return key->data.tableVal->total%AVM_TABLE_HASHSIZE;

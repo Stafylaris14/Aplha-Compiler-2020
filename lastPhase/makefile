@@ -4,7 +4,6 @@ compiler: parser scanner
 	gcc -c  -lm parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c 
 	gcc -o  calc avm.o targetCode.o quad.o parser.o scanner.o  linkedList.o commentStack.o symb.o parserUtilities.o scopeList.o -lm  
 
-
 wall: parser scanner 
 	gcc -Wall -c parser.c dataStructs/symb.c utilities/parserUtilities.c dataStructs/scopeList.c
 	gcc -Wall -c scanner.c dataStructs/commentStack.c dataStructs/linkedList.c 

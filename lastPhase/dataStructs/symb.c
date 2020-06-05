@@ -120,7 +120,6 @@ item *lookupAllscopes(char *name, int scope)
             return tmp;
         tmp = lookupScope(name, scope);
     }
-    printf("gitttttt %s kai %d\n",name,scope);
     return NULL;
 }
 
